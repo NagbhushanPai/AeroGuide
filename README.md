@@ -2,7 +2,7 @@
 
 AeroGuide is a free, non-commercial aviation and airport intelligence website for India. It combines live flight tracking, airport guides, lounge discovery and credit-card lounge eligibility on one site. It uses **open data only** and runs on **free tiers at $0**. Every fact on it is sourced and dated, or clearly marked as unverified or demo.
 
-> **Status: Stage 0 (research and planning).** No application code yet. See [Implementation status](#implementation-status).
+> **Status: Stage 1 (foundation).** App shell, API health check and tooling are in place. Features arrive from Stage 2. See [Implementation status](#implementation-status).
 
 ## Features (planned for the MVP)
 
@@ -45,8 +45,8 @@ Details: [system architecture](docs/architecture/system-architecture.md) · [ADR
 ```text
 .
 ├── apps/
-│   ├── web/          # Next.js app (Stage 1)
-│   └── api/          # FastAPI app + scheduled jobs (Stage 1)
+│   ├── web/          # Next.js 16 app (App Router, Tailwind v4, shadcn/ui)
+│   └── api/          # FastAPI app, Alembic migrations, scheduled jobs
 ├── docs/
 │   ├── api/          # API contract
 │   ├── architecture/ # system, frontend, backend, database, data flow, deployment
@@ -55,13 +55,27 @@ Details: [system architecture](docs/architecture/system-architecture.md) · [ADR
 │   ├── planning/     # PRD, MVP scope, roadmap, backlog, implementation plan
 │   ├── research/     # provider and data-source research
 │   └── testing/      # testing strategy
-├── scripts/          # (Stage 1)
-└── .github/workflows # (Stage 1)
+├── .github/workflows # CI
+├── docker-compose.yml # local Postgres+PostGIS and Redis
+└── Makefile          # dev commands (mirrored as root pnpm scripts)
 ```
 
 ## Setup, environment, migrations, running and testing
 
-These arrive in **Stage 1**, together with Docker Compose, a Makefile, `.env.example` and a local development guide. The planned commands are in the [implementation plan](docs/planning/implementation-plan.md).
+Prerequisites: Node 22+, pnpm, Python 3.12, uv, Docker.
+
+```bash
+pnpm install && pnpm install:api
+cp apps/api/.env.example apps/api/.env
+cp apps/web/.env.example apps/web/.env.local
+pnpm up          # Postgres+PostGIS and Redis
+pnpm migrate     # alembic upgrade head
+pnpm dev:api     # http://localhost:8000/api/v1/health
+pnpm dev:web     # http://localhost:3000
+pnpm test        # unit tests (web + API)
+```
+
+The full command list, environment variables and notes are in the [local development guide](docs/deployment/local-development.md).
 
 ## Deployment
 
@@ -73,8 +87,8 @@ A weekly GitHub Actions job checks content staleness, source links and the open 
 
 | Stage | Status |
 |---|---|
-| 0 Research and planning | Docs written, awaiting approval |
-| 1 Foundation | Not started |
+| 0 Research and planning | Done |
+| 1 Foundation | In review: web shell and placeholder pages, API with `/api/v1/health`, first migration (extensions), Docker Compose, CI |
 | 2 Frontend design system | Not started |
 | 3 Airports | Not started |
 | 4 Flight tracking | Not started |

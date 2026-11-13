@@ -9,4 +9,4 @@
 | Database | [ERD](database/erd.md) · [Schema](database/schema.md) · [Data dictionary](database/data-dictionary.md) |
 | API | [API overview](api/api-overview.md) |
 | Testing | [Testing strategy](testing/testing-strategy.md) |
-| Deployment | Local development and deployment guides arrive in Stage 1 |
+| Deployment | [Local development](deployment/local-development.md) · Deployment guide arrives in Stage 6 |

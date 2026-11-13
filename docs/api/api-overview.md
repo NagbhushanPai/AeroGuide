@@ -24,7 +24,7 @@ Last updated: 2026-11-13. Status: proposed contract. The generated OpenAPI spec 
 ### Health
 | | |
 |---|---|
-| `GET /health` | `{ "status": "ok", "db": "ok", "postgis": "3.x", "redis": "ok" }` |
+| `GET /health` | **Implemented (Stage 1).** Always `200` while the process is up. `{ "status": "ok" \| "degraded", "environment", "version", "checks": { "database" \| "postgis" \| "redis": { "status": "ok" \| "error", "version", "detail" } } }` |
 | `GET /health/data` | Snapshot age, active provider, last error |
 
 ### Positions

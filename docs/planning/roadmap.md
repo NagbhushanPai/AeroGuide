@@ -4,8 +4,8 @@ Last updated: 2026-11-13. Each stage ends with a runnable app, updated docs, Con
 
 | Stage | Theme | Key deliverables | Exit gate | Status |
 |---|---|---|---|---|
-| **0** | Research and planning | Reference analysis, PRD, MVP scope, architecture, ERD, provider research, ADRs | Owner approves the docs and resolves blocking decisions | **Done, awaiting approval** |
-| **1** | Foundation | Monorepo (pnpm + uv), Next.js app, FastAPI app, Postgres+PostGIS and Redis via Docker Compose, `/health` and `/api/v1/health`, lint, format, type check, CI workflow, `.env.example`, Makefile | `make dev` starts everything. CI green | Not started |
+| **0** | Research and planning | Reference analysis, PRD, MVP scope, architecture, ERD, provider research, ADRs | Owner approves the docs and resolves blocking decisions | **Done** |
+| **1** | Foundation | Monorepo (pnpm + uv), Next.js app, FastAPI app, Postgres+PostGIS and Redis via Docker Compose, `/health` and `/api/v1/health`, lint, format, type check, CI workflow, `.env.example`, Makefile | `make dev` starts everything. CI green | **In review** |
 | **2** | Frontend design system | App shell, nav, footer, theme tokens, shadcn/ui components, homepage layout (with real empty states, no fake data), loading, error and empty patterns | Lighthouse a11y ≥ 95 on shell pages | Not started |
 | **3** | Airports | SQLAlchemy models and migrations (airports, terminals, airlines, sources, source checks), seed loader with provenance validation, airport search and detail APIs, directory and detail pages, **weekly data-check workflow** (staleness + source links) | 7 airports seeded with sourced data. Unverified sections labelled. The weekly job opens its first issue | Not started |
 | **4** | Flight tracking | Provider interface, Demo, adsb.lol and OpenSky position adapters, adsbdb route adapter, OpenSky movements adapter, on-demand ingestion with single-flight lock, positions API, MapLibre live map, panel, search, filters, staleness, cold-start state, flight detail page (open data only), provider smoke checks added to the weekly job | Live map works in live and demo modes. Source swap is config-only. $0 cost | Not started |
