@@ -1,12 +1,16 @@
-"""Build the map's airports layer from OurAirports (public domain).
+"""Build the airport geodata from OurAirports (public domain).
 
 Usage:
-    curl -L -o airports.csv https://davidmegginson.github.io/ourairports-data/airports.csv
-    python scripts/build_airports_geojson.py airports.csv apps/web/public/data/airports-in.geojson
+    curl -L -O https://davidmegginson.github.io/ourairports-data/airports.csv
+    python scripts/build_airport_data.py airports.csv
 
-Keeps Indian airports with scheduled passenger service and an IATA code. Only static
-geodata (codes, name, city, coordinates) is taken. Airport facts for the guides come from
-official sources in Stage 3, not from here.
+Writes two files from the same rows, so the map and the database always agree:
+    apps/web/public/data/airports-in.geojson   the live map's airports layer
+    apps/api/data/airports.yaml                seed file for the airports table
+
+Keeps Indian airports with scheduled passenger service and an IATA code. Only static geodata
+(codes, name, city, state, coordinates, elevation, size) is taken. Curated airport facts
+(terminals, airlines) live in apps/api/data/airport_guides/ and cite official sources.
 """
 
 import csv
@@ -15,54 +19,97 @@ import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[1]
+GEOJSON_OUT = ROOT / "apps/web/public/data/airports-in.geojson"
+SEED_OUT = ROOT / "apps/api/data/airports.yaml"
 KEEP_TYPES = {"large_airport", "medium_airport", "small_airport"}
 
 
-def main(src: str, dest: str) -> None:
-    features = []
+def read_rows(src: str) -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
     with open(src, encoding="utf-8", newline="") as f:
         for row in csv.DictReader(f):
             if row["iso_country"] != "IN" or row["type"] not in KEEP_TYPES:
                 continue
             if row["scheduled_service"] != "yes" or not row["iata_code"].strip():
                 continue
-            features.append(
+            elevation = row["elevation_ft"].strip()
+            rows.append(
                 {
-                    "type": "Feature",
-                    "geometry": {
-                        "type": "Point",
-                        "coordinates": [
-                            round(float(row["longitude_deg"]), 5),
-                            round(float(row["latitude_deg"]), 5),
-                        ],
-                    },
-                    "properties": {
-                        "iata": row["iata_code"].strip(),
-                        "icao": (row["icao_code"] or row["gps_code"]).strip() or None,
-                        "name": row["name"].strip(),
-                        "city": row["municipality"].strip() or None,
-                        "size": row["type"].removesuffix("_airport"),
-                    },
+                    "iata": row["iata_code"].strip(),
+                    "icao": (row["icao_code"] or row["gps_code"]).strip() or None,
+                    "name": row["name"].strip(),
+                    "city": row["municipality"].strip() or None,
+                    "state_code": row["iso_region"].strip(),
+                    "lat": round(float(row["latitude_deg"]), 5),
+                    "lon": round(float(row["longitude_deg"]), 5),
+                    "elevation_ft": int(elevation) if elevation else None,
+                    "size": row["type"].removesuffix("_airport"),
                 }
             )
-    features.sort(key=lambda feat: feat["properties"]["iata"])
+    rows.sort(key=lambda r: str(r["iata"]))
+    return rows
+
+
+def write_geojson(rows: list[dict[str, object]], today: str) -> None:
+    features = [
+        {
+            "type": "Feature",
+            "geometry": {"type": "Point", "coordinates": [r["lon"], r["lat"]]},
+            "properties": {k: r[k] for k in ("iata", "icao", "name", "city", "size")},
+        }
+        for r in rows
+    ]
     out = {
         "type": "FeatureCollection",
         "metadata": {
             "source": "OurAirports",
             "source_url": "https://ourairports.com/data/",
             "license": "Public domain",
-            "generated_at": datetime.now(UTC).date().isoformat(),
+            "generated_at": today,
             "filter": "iso_country=IN, scheduled_service=yes, has IATA code",
         },
         "features": features,
     }
-    Path(dest).parent.mkdir(parents=True, exist_ok=True)
-    Path(dest).write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), "utf-8")
-    print(f"wrote {len(features)} airports to {dest}")
+    GEOJSON_OUT.parent.mkdir(parents=True, exist_ok=True)
+    GEOJSON_OUT.write_text(json.dumps(out, ensure_ascii=False, separators=(",", ":")), "utf-8")
+
+
+def yaml_scalar(value: object) -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, int | float):
+        return str(value)
+    return json.dumps(value, ensure_ascii=False)  # a JSON string is a valid YAML scalar
+
+
+def write_seed(rows: list[dict[str, object]], today: str) -> None:
+    lines = [
+        "# GENERATED by scripts/build_airport_data.py from OurAirports (public domain).",
+        "# Do not edit by hand: rerun the script. Curated facts go in airport_guides/.",
+        "source: ourairports",
+        f"retrieved_at: {today}",
+        "airports:",
+    ]
+    for r in rows:
+        first = True
+        for key in ("iata", "icao", "name", "city", "state_code", "lat", "lon", "elevation_ft", "size"):
+            prefix = "  - " if first else "    "
+            lines.append(f"{prefix}{key}: {yaml_scalar(r[key])}")
+            first = False
+    SEED_OUT.parent.mkdir(parents=True, exist_ok=True)
+    SEED_OUT.write_text("\n".join(lines) + "\n", "utf-8")
+
+
+def main(src: str) -> None:
+    rows = read_rows(src)
+    today = datetime.now(UTC).date().isoformat()
+    write_geojson(rows, today)
+    write_seed(rows, today)
+    print(f"wrote {len(rows)} airports to {GEOJSON_OUT.relative_to(ROOT)} and {SEED_OUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 2:
         sys.exit(__doc__)
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1])

@@ -1,0 +1,7 @@
+# Curated guide for BLR. How to add facts: CONTRIBUTING.md, "Adding airport content".
+# Every terminal and terminal-airline entry needs a provenance block that cites a source key
+# from sources.yaml. Leave a section empty rather than guessing: the site shows
+# "Not yet verified" for anything missing.
+iata: BLR
+official_source: blr-official
+terminals: []

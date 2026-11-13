@@ -1,0 +1,10 @@
+# Airlines referenced by terminal assignments in airport_guides/. Add an airline here before
+# using its ICAO code in a guide. Codes must come from the airline's own website or the
+# ICAO/IATA registers, never from memory.
+#
+#   - icao: ABC            # 3 letters
+#     iata: AB             # 2 characters, optional
+#     name: Example Airways
+#     callsign: EXAMPLE    # optional
+#     country_iso: IN      # optional
+airlines: []

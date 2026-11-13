@@ -1,0 +1,50 @@
+# Sources cited by the seed files (ADR-0006). `key` is how other files refer to a source.
+# source_type: official_airport | aai | airline | bank | lounge_operator | network_program |
+#              licensed_provider | secondary
+# A `verified` record must cite a non-secondary source. Secondary sources (news, Wikipedia,
+# OurAirports) can only support `unverified` records, or lead you to a primary source.
+# `publisher` is left empty until the operator has been confirmed from the source itself.
+sources:
+  - key: ourairports
+    name: OurAirports open data
+    url: https://github.com/davidmegginson/ourairports-data
+    publisher: OurAirports
+    source_type: secondary
+    retrieved_at: 2026-11-13
+
+  - key: del-official
+    name: Delhi Airport official website
+    url: https://www.newdelhiairport.in/
+    source_type: official_airport
+    retrieved_at: 2026-11-13
+
+  - key: blr-official
+    name: Kempegowda International Airport Bengaluru official website
+    url: https://www.bengaluruairport.com/
+    source_type: official_airport
+    retrieved_at: 2026-11-13
+
+  - key: hyd-official
+    name: Rajiv Gandhi International Airport official website
+    url: https://www.hyderabad.aero/
+    source_type: official_airport
+    retrieved_at: 2026-11-13
+
+  - key: maa-aai
+    name: Chennai Airport page, Airports Authority of India
+    url: https://www.aai.aero/en/airports/chennai
+    publisher: Airports Authority of India
+    source_type: aai
+    retrieved_at: 2026-11-13
+
+  - key: cok-official
+    name: Cochin International Airport official website
+    url: https://www.cial.aero/
+    source_type: official_airport
+    retrieved_at: 2026-11-13
+
+  - key: jai-official
+    name: Jaipur International Airport official website
+    url: https://jaipur.adaniairports.com/
+    source_type: official_airport
+    retrieved_at: 2026-11-13
