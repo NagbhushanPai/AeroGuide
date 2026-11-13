@@ -4,6 +4,14 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (Stage 5a + 5b: lounges and cards)
+- Database (migration 0004): amenities, access programmes, lounges with amenities and acceptance windows, banks, card networks, cards, and versioned lounge policies with typed rules. Policy versions and acceptance windows can't overlap.
+- Seed format for lounges (`data/lounges/{IATA}.yaml`) and cards (`data/cards/*.yaml`), validated across files. 5 issuers and 5 card networks seeded; no lounges or cards yet (they need checking against official pages).
+- Eligibility engine (`app/eligibility`): pure and rule-based. Answers yes, no or depends, with the check behind each answer. Table-driven tests for every rule type plus property-based tests (Hypothesis).
+- API: `GET /lounges`, `/lounges/{slug}`, `/cards`, `/cards/{slug}`, `/access-programs`, and `POST /eligibility` (unknown fields rejected, nothing stored).
+- Web: `/lounges`, `/lounges/[slug]`, `/cards` (checker plus cards by issuer), `/cards/[slug]` (version history), and a lounges section on airport guides. The checker keeps everything in page memory only.
+- Contributor guide for lounges and cards, and the launch-set research checklist.
+
 ### Added (terminals and airlines from open data)
 - Terminals as mapped in OpenStreetMap: `scripts/build_osm_terminals.py` builds `apps/api/data/osm_terminals.yaml` (92 passenger terminals at 66 airports), seeded into a new `osm_terminals` table, unverified and credited to OpenStreetMap contributors (ODbL). Shown on airport guides apart from verified terminals.
 - Airlines seen at each airport: the live service records aircraft with airline callsigns on the ground or below 3,000 ft within 6 km of an airport, once per aircraft, airline, airport and IST day (`airport_sightings`, kept 45 days). `GET /api/v1/airports/{code}/airlines-seen?days=7` and an "Airlines seen here" section on guides, with the method and its gaps stated.

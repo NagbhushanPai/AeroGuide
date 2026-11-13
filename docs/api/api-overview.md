@@ -52,42 +52,29 @@ Last updated: 2026-11-13. Status: proposed contract. The generated OpenAPI spec 
 ### Lounges
 | | |
 |---|---|
-| `GET /lounges?airport=&terminal=&scope=&amenity=` | Lounge summaries |
-| `GET /lounges/{slug}` | Full lounge record, access methods (acceptance only), provenance |
+| `GET /lounges?airport=&program=` | **Implemented.** Lounge summaries with the programmes accepted today |
+| `GET /lounges/{slug}` | **Implemented.** Full record: hours, amenities as stated, acceptance windows (acceptance only, never card benefits), provenance on each |
+| `GET /access-programs` | **Implemented.** Lounge programmes |
 
 ### Cards
 | | |
 |---|---|
-| `GET /cards?q=&bank=&network=&benefit=domestic\|international` | Card summaries with current policy headline |
-| `GET /cards/{slug}` | Card, variants, current policies, rules, **policy history**, provenance |
-| `GET /cards/compare?slugs=a,b,c` | Side-by-side (P1) |
+| `GET /cards?bank=` | **Implemented.** Cards with the domestic and international summaries in force today, plus every issuer (so issuers without cards still show) |
+| `GET /cards/{slug}` | **Implemented.** Card, every policy version (newest first, `in_force` flag), rules and provenance |
+| `GET /cards/compare?slugs=a,b,c` | Side-by-side (P1, later) |
 
 ### Eligibility
-`POST /eligibility`
+`POST /eligibility` (**implemented**, [ADR-0009](../decisions/0009-deterministic-eligibility-engine.md)). Unknown fields are rejected, so a card number can't be sent by mistake. The response is `Cache-Control: no-store`, and nothing is stored or logged.
 
-Request (no sensitive card data accepted. Unknown fields are rejected):
 ```json
 {
-  "card_variant_id": "uuid",
-  "lounge_slug": "…",                    // or "airport_iata"
-  "travel_date": "2026-12-01",
-  "journey": "domestic",                 // domestic | international
-  "spend_last_period_inr": 60000,        // optional, self-reported
-  "visits_used_this_period": 1           // optional, self-reported
+  "cards": ["example-bank-voyager"],
+  "airport": "DEL",
+  "on": "2026-11-20",
+  "scope": "domestic",
+  "guests": 0,
+  "facts": { "example-bank-voyager": { "visits_used": 1, "spend_inr": 60000 } }
 }
 ```
 
-Response:
-```json
-{
-  "status": "conditional",               // eligible | conditional | not_eligible | unknown
-  "reasons": [{ "code": "SPEND_GATE_UNCONFIRMED", "message": "…" }],
-  "requirements": [{ "type": "spend_gate", "text": "…" }],
-  "program": { "code": "…", "name": "…" },
-  "policy_version_id": "uuid",
-  "policy_valid_from": "2026-10-01",
-  "sources": [{ "name": "…", "url": "…", "retrieved_at": "…" }],
-  "evaluated_at": "2026-11-13T10:00:00Z",
-  "disclaimer": "Final access is decided by the lounge and your card issuer."
-}
-```
+The response has one entry per card, per lounge listed at the airport: `status` (`yes`, `no` or `depends`), the `checks` behind it (rule, status, message), the programmes used, guests covered, how to enter and the policy summary, plus a disclaimer.

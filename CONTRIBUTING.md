@@ -72,6 +72,66 @@ If you can't find an official source, leave the section empty. The site says "No
 
 Merged changes reach production through `.github/workflows/deploy-data.yml` (migrations, then seed).
 
+### Adding lounges and cards
+
+Two kinds of fact are kept apart, each with its own source:
+
+- **What a lounge accepts** (`apps/api/data/lounges/{IATA}.yaml`): from the lounge operator's, programme's or airport's own page.
+- **What a card grants** (`apps/api/data/cards/{bank}--{card}.yaml`): from the bank's own card page or its most important terms document.
+
+The checker joins them. The research list for the first cards is [docs/research/card-launch-set.md](docs/research/card-launch-set.md).
+
+Before you start, add the programme to `access_programs.yaml` and each page you read to `sources.yaml` (`source_type: lounge_operator`, `network_program` or `bank`).
+
+A lounge (example values, not a real lounge):
+
+```yaml
+iata: DEL
+lounges:
+  - slug: example-lounge-del-t1     # unique: name, airport, terminal
+    name: Example Lounge            # as the source names it
+    terminal: T1                    # as the source names it
+    scope: domestic                 # domestic | international | both
+    side: airside                   # airside (after security) | landside
+    location_text: "Level 2, near gate 10"   # quoted, only if stated
+    opening_hours: { mode: 24h }    # or { mode: weekly, periods: [{ days: [mon, tue], open: "05:00", close: "23:00" }] }
+    amenities: [wifi, food]         # codes from amenities.yaml, only what the source states
+    provenance: { status: verified, source: example-operator-page, verified_at: 2026-11-20, verified_by: your-github-handle }
+    accepts:
+      - program: example-lounge-programme
+        valid_from: 2026-11-20
+        provenance: { status: verified, source: example-operator-page, verified_at: 2026-11-20, verified_by: your-github-handle }
+```
+
+A card (example values, not a real card):
+
+```yaml
+slug: example-bank-voyager
+bank: example-bank                  # slug from banks.yaml
+network: visa                       # code from card_networks.yaml
+name: Voyager
+product_url: https://example.org/cards/voyager
+provenance: { status: verified, source: example-bank-voyager-page, verified_at: 2026-11-20, verified_by: your-github-handle }
+policies:
+  - scope: domestic                 # one version per scope at a time
+    valid_from: 2026-07-01          # the date the bank says the benefit applies from
+    summary: 2 visits a quarter after spending ₹50,000 in the previous calendar quarter.
+    rules:
+      - { type: program_entitlement, program: example-lounge-programme }
+      - { type: visit_quota, count: 2, period: quarter }
+      - { type: spend_gate, amount: 50000, window: previous_calendar_quarter }
+      - { type: entry_method, method: card_swipe }
+    provenance: { status: verified, source: example-bank-voyager-page, verified_at: 2026-11-20, verified_by: your-github-handle }
+```
+
+Rules:
+
+- **Rule types:** `program_entitlement`, `visit_quota`, `spend_gate`, `guest_allowance`, `airport_restriction` and `entry_method`. Each has fixed fields, and an unknown field is an error.
+- **Unclear wording:** if the bank's wording can be read two ways (for example "previous quarter" without saying calendar or billing), add `ambiguous: true` to that rule. The checker then answers "depends", never "yes".
+- **Conditions no rule type captures:** quote them in `unmodelled_terms`. Every answer for that version becomes "depends".
+- **Benefit changes:** end the old version with `valid_to` (the first day the old version no longer applies) and add a new one. Never rewrite a past version. Versions of the same card and scope can't overlap.
+- **Checking your work:** run `pnpm seed:check` before opening the PR.
+
 ## Local development
 
 See [docs/deployment/local-development.md](docs/deployment/local-development.md).

@@ -78,3 +78,8 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 | `policy_rules.rule_type` | `visit_quota`, `spend_gate`, `guest_allowance`, `program_entitlement`, `airport_restriction`, `entry_method` |
 | `policy_rules.rule` | Typed JSON for the rule. Example `visit_quota`: `{ "count": 2, "period": "quarter" }`. Example `spend_gate`: `{ "amount": 50000, "currency": "INR", "window": "previous_calendar_quarter", "ambiguous": false }`. The amounts here are illustrative only, not real card data |
 | `policy_rules.access_program_id` | For `program_entitlement`: which programme the card unlocks |
+| `policy_rules.rule.ambiguous` | The bank's wording can be read more than one way. The rule can never produce a plain "yes" |
+| `policy_rules.position` | Order of the rules as written in the seed file |
+| `lounge_policies.unmodelled_terms` | Bank wording no rule type captures, quoted. Makes every answer for that version "depends" |
+| `lounges.terminal` | Terminal as the source names it (free text; curated terminals may not exist yet) |
+| `credit_cards` (variants) | A variant with different benefits (for example a metal edition) is its own card |
