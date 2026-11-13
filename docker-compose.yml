@@ -1,0 +1,35 @@
+# Local development services. Production uses free managed equivalents (ADR-0012):
+# Supabase Postgres + PostGIS, Upstash Redis.
+name: aeroguide
+
+services:
+  db:
+    image: postgis/postgis:17-3.7
+    environment:
+      POSTGRES_USER: aeroguide
+      POSTGRES_PASSWORD: aeroguide # local only
+      POSTGRES_DB: aeroguide
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      # Skip the image's default extensions; migrations enable what we need.
+      - ./scripts/db-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aeroguide -d aeroguide"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  db-data:
