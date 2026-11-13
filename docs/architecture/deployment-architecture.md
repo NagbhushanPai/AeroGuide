@@ -28,7 +28,7 @@ There is **no background worker** (Render has no free one). Live ingestion runs 
 ## Connecting the database (Supabase)
 
 1. Create a free Supabase project (region: Mumbai, `ap-south-1`). In *Database → Extensions*, PostGIS, pg_trgm and btree_gist can stay off: migration 0001 enables them.
-2. Copy the **session pooler** connection string (port 5432; the direct host is IPv6-only and the transaction pooler on 6543 breaks asyncpg's prepared statements). Change the scheme to `postgresql+asyncpg://` and add `?ssl=require`.
+2. Copy the **session pooler** connection string (port 5432; the direct host is IPv6-only and the transaction pooler on 6543 breaks asyncpg's prepared statements). Paste it as shown: the API switches `postgresql://` to the asyncpg driver and `sslmode=` to `ssl=` itself (`normalise_database_url` in `app/core/config.py`).
 3. Add it as the GitHub repository secret `DATABASE_URL`, then run *Actions → Deploy data → Run workflow* once.
 4. Add the same value as `DATABASE_URL` in the Render service's environment. Render redeploys, and `/api/v1/health` reports the database and PostGIS as `ok`.
 

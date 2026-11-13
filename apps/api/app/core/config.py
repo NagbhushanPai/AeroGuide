@@ -6,6 +6,25 @@ from typing import Annotated, Literal
 from pydantic import Field, PostgresDsn, RedisDsn, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
+SYNC_SCHEMES = ("postgres://", "postgresql://", "postgresql+psycopg://", "postgresql+psycopg2://")
+
+
+def normalise_database_url(url: str) -> str:
+    """Use the asyncpg driver, and asyncpg's `ssl` parameter in place of libpq's `sslmode`."""
+    url = url.strip()
+    for scheme in SYNC_SCHEMES:
+        if url.startswith(scheme):
+            url = "postgresql+asyncpg://" + url.removeprefix(scheme)
+            break
+    base, sep, query = url.partition("?")
+    if sep:
+        params = [
+            "ssl=" + p.removeprefix("sslmode=") if p.startswith("sslmode=") else p
+            for p in query.split("&")
+        ]
+        url = f"{base}?{'&'.join(params)}"
+    return url
+
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
@@ -34,6 +53,14 @@ class Settings(BaseSettings):
     snapshot_ttl_s: float = 60.0
     route_lookups_per_refresh: int = 10
     upstream_timeout_s: float = 12.0
+
+    @field_validator("database_url", mode="before")
+    @classmethod
+    def use_asyncpg(cls, value: object) -> object:
+        """Accept URLs as hosting dashboards show them (Supabase: postgresql://...)."""
+        if isinstance(value, str):
+            return normalise_database_url(value)
+        return value
 
     @field_validator("position_providers", mode="before")
     @classmethod
