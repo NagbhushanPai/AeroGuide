@@ -101,7 +101,7 @@ See [docs/planning/roadmap.md](docs/planning/roadmap.md). AI features are delibe
 
 ## Data sources and attribution
 
-Live positions come from open community ADS-B networks (adsb.lol, data under ODbL 1.0; OpenSky Network, non-commercial terms). Reported routes come from adsbdb. Map data is © OpenStreetMap contributors. All are credited in the UI. Airport, lounge and card information comes from official sources, cited on each record. See [docs/research/](docs/research/).
+Live positions come from open community ADS-B networks (adsb.lol, data under ODbL 1.0; adsb.fi, personal non-commercial use with credit; OpenSky Network, non-commercial terms). Reported routes come from adsbdb. Map data is © OpenStreetMap contributors. All are credited in the UI. Airport, lounge and card information comes from official sources, cited on each record. See [docs/research/](docs/research/).
 
 ## Contributing and licence
 

@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added
+- adsb.fi as a second community position source (`POSITION_PROVIDERS=adsblol,adsbfi,opensky`). A sweep now fails if more than 2 of its 10 regions are missing, instead of showing a partial map.
+
+### Fixed
+- Provider failures are logged with the error type (some network errors have empty messages).
+
 ### Added (live map, Stage 4 pulled forward)
 - The homepage is now a full-screen live flight map: sidebar list with search and From/To filters, selected-flight panel (reported route, progress, estimated arrival, all missing fields shown as "Not available"), live status with source and age, IST clock.
 - Layers: traffic, airports (OurAirports, public domain), weather radar (RainViewer). Basemap from OpenFreeMap, following the theme.

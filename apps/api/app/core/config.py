@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     health_check_timeout_s: float = 2.0
 
     # Live data (ADR-0004, ADR-0011, ADR-0012). Comma-separated, tried in order.
-    position_providers: Annotated[list[str], NoDecode] = ["adsblol", "opensky"]
+    position_providers: Annotated[list[str], NoDecode] = ["adsblol", "adsbfi", "opensky"]
     route_lookups_enabled: bool = True
     # One sweep a minute fits adsb.lol's 10 requests/minute limit (see adsblol.GRID).
     snapshot_ttl_s: float = 60.0

@@ -141,7 +141,9 @@ class LiveService:
                 continue
             except Exception as exc:  # any provider failure → try the next one
                 errors.append(f"{provider.name}: {type(exc).__name__}")
-                logger.warning("position provider %s failed: %s", provider.name, exc)
+                logger.warning(
+                    "position provider %s failed: %s: %s", provider.name, type(exc).__name__, exc
+                )
                 continue
             self._snapshot = Snapshot(
                 aircraft=aircraft,

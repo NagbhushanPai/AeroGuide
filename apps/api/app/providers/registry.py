@@ -5,12 +5,12 @@ from collections.abc import Callable
 import httpx
 
 from app.providers.flight_info.adsbdb import AdsbdbRoutes
-from app.providers.positions.adsblol import AdsbLolProvider
+from app.providers.positions.adsblol import AdsbFiProvider, AdsbLolProvider
 from app.providers.positions.base import PositionProvider
 from app.providers.positions.demo import DemoProvider
 from app.providers.positions.opensky import OpenSkyProvider
 
-POSITION_PROVIDERS = ("adsblol", "opensky", "demo")
+POSITION_PROVIDERS = ("adsblol", "adsbfi", "opensky", "demo")
 
 
 def build_position_providers(names: list[str], client: httpx.AsyncClient) -> list[PositionProvider]:
@@ -24,6 +24,7 @@ def build_position_providers(names: list[str], client: httpx.AsyncClient) -> lis
         )
     factories: dict[str, Callable[[], PositionProvider]] = {
         "adsblol": lambda: AdsbLolProvider(client),
+        "adsbfi": lambda: AdsbFiProvider(client),
         "opensky": lambda: OpenSkyProvider(client),
         "demo": DemoProvider,
     }

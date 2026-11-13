@@ -20,7 +20,7 @@ ADS-B gives a **callsign** (for example `AIC101`), not a marketed **flight numbe
 | Provider | Data | Commercial use | Cost / limits | India coverage | Notes |
 |---|---|---|---|---|---|
 | **adsb.lol** | Positions with type and registration. REST: `/v2/point/{lat}/{lon}/{nm}`, `/v2/hex`, `/v2/callsign` | Not clearly stated. Data is **ODbL 1.0**, which needs attribution and share-alike on derived databases | Free. Rate limits are "dynamic based on load". The project says an API key (for feeders) will be required in future | Good. Tested 2026-11-13: dense traffic over India | Includes type and registration, unlike OpenSky's free API |
-| **adsb.fi open data** | Positions | Check the terms | Free, rate-limited | Reasonable | A second community feed |
+| **adsb.fi open data** | Positions with type and registration (same format as adsb.lol). REST: `/api/v3/lat/{lat}/lon/{lon}/dist/{nm}` (≤ 250 nm) | **Personal, non-commercial use only**, must credit adsb.fi with a link | 1 request/second. Errors (400/401/403/404/429) count toward a temporary IP block | Good. Tested 2026-11-13: 254 aircraft over India in one sweep | Used as the second source |
 | **OpenSky Network** | Positions (state vectors), flights by aircraft or airport (batch, delayed) | **Non-commercial or research only.** For-profit use needs written permission | Free credits per day (anonymous about 400; ours showed `X-Rate-Limit-Remaining: 396`). An India bbox call costs 4 credits, so about 100 calls a day anonymously | Good | Browser CORS is blocked, so it needs a server-side proxy (fine, we have one) |
 | **FlightAware AeroAPI** | Positions, schedules, status, history, alerts | Personal tier: personal or academic only. Standard and up: business | Usage-based per result set. Personal has no minimum (free monthly credit†). **Standard from $100/month**, **Premium from $1,000/month** | Global, strong | Mature, well documented. Strongest candidate for flight status |
 | **Flightradar24 API** | Live positions by bbox, callsign or route; flight summaries | By plan terms | Plans: Explorer, Essential, Advanced. Entry about $9/month†. Credits per call. Free sandbox key | Global, strong | Separate from consumer FR24 Premium |
@@ -40,7 +40,7 @@ So FlightAware AeroAPI, Flightradar24, AeroDataBox, aviationstack and Cirium/OAG
 
 | Need | Source | How it is used |
 |---|---|---|
-| Live positions | **adsb.lol** (primary), **OpenSky Network** (fallback), adsb.fi (second fallback, once its terms are checked) | Fetched on demand by the API while people are viewing the map, refreshed at most once a minute ([ADR-0012](../decisions/0012-zero-budget-hosting.md)) |
+| Live positions | **adsb.lol** (primary), **adsb.fi** (second), **OpenSky Network** (third) | Fetched on demand by the API while people are viewing the map, refreshed at most once a minute ([ADR-0012](../decisions/0012-zero-budget-hosting.md)) |
 | Aircraft type and registration | adsb.lol fields (`t`, `r`) | Shown as broadcast or derived by the network |
 | Callsign → route | adsbdb.com (community) | Shown only as a **"reported route"**, with its source. Hidden when the aircraft's track contradicts it |
 | Observed departures and arrivals per airport | **OpenSky `/flights/departure` and `/flights/arrival`** (batch, previous-day data, interval ≤ 7 days, needs a free account and OAuth2 client credentials) | Airport pages: "flights observed yesterday". Flight pages: observed first-seen and last-seen times for recent days |
@@ -72,10 +72,14 @@ These fields show **"Not available from open data sources"**. The only status sh
 | Weather radar layer | RainViewer public API | Free for personal, educational and community use, with attribution |
 | Basemap | OpenFreeMap (OpenMapTiles, OpenStreetMap) | Free, attribution to OpenStreetMap contributors |
 
+### Lesson from the first deployment (2026-11-13)
+
+On Render's free tier, outgoing requests share IP addresses with other apps. adsb.lol answered `429` on the **second** request of a sweep, and OpenSky requests failed. A single community source isn't enough from shared hosting, which is why adsb.fi was added as a second source with the same data format.
+
 ## Open questions
 
 1. Does adsb.lol's ODbL licence and its terms fit our use (display plus short-lived caching, no redistribution of a database)? Ask the project.
-2. Check adsb.fi's open data terms before enabling it.
+2. ~~Check adsb.fi's open data terms.~~ Done: personal, non-commercial, attribution with a link (the UI links the active source).
 3. Register an OpenSky account and confirm the current daily credit allowance.
 
 ## Sources

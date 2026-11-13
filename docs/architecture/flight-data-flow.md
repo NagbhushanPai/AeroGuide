@@ -59,9 +59,11 @@ On a **cold start** the API first loads `positions:snapshot` from Redis, if one 
 
 ### Source failover
 
-The configured order is `POSITION_PROVIDERS=adsblol,opensky`. If the first fails, the next is tried. A source that answers `429` rests for its `Retry-After` and is skipped until then.
+The configured order is `POSITION_PROVIDERS=adsblol,adsbfi,opensky` (the default). If the first fails, the next is tried. A source that answers `429` rests for its `Retry-After` and is skipped until then.
 
-**Coverage:** the 10-point adsb.lol grid reaches every Indian airport with scheduled service except the island airports Agatti (AGX) and Port Blair (IXZ). OpenSky (fallback) covers the whole bounding box but reports no aircraft type or registration. `meta.source` always names the source that actually produced the data. **The demo provider is never in the automatic failover chain** ([ADR-0011](../decisions/0011-demo-mode-is-explicit.md)).
+A sweep fails if more than 2 of its 10 regions don't answer, so a half-empty map is never shown as complete.
+
+**Coverage:** the 10-point grid (used for adsb.lol and adsb.fi) reaches every Indian airport with scheduled service except the island airports Agatti (AGX) and Port Blair (IXZ). OpenSky (fallback) covers the whole bounding box but reports no aircraft type or registration. `meta.source` always names the source that actually produced the data. **The demo provider is never in the automatic failover chain** ([ADR-0011](../decisions/0011-demo-mode-is-explicit.md)).
 
 ## Selected aircraft: reported route
 

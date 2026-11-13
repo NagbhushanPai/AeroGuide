@@ -368,3 +368,36 @@ async def test_opensky_429_is_a_rate_limit() -> None:
         with pytest.raises(ProviderRateLimitedError) as info:
             await OpenSkyProvider(client).fetch()
     assert info.value.retry_after_s == 900
+
+
+async def test_adsbfi_uses_its_own_path_and_names_itself() -> None:
+    from app.providers.positions.adsblol import GRID, AdsbFiProvider
+
+    paths: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        paths.append(request.url.path)
+        return httpx.Response(200, json={"ac": [{"hex": "800abc", "lat": 20.0, "lon": 78.0}]})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        aircraft = await AdsbFiProvider(client, spacing_s=0).fetch()
+    assert len(paths) == len(GRID)
+    assert paths[0].startswith("/api/v3/lat/")
+    assert aircraft[0].source == "adsb.fi"
+
+
+async def test_sweep_with_too_many_missing_regions_fails() -> None:
+    from app.providers.positions.adsblol import AdsbLolProvider
+
+    calls = 0
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        nonlocal calls
+        calls += 1
+        if calls <= 3:
+            return httpx.Response(503)
+        return httpx.Response(200, json={"ac": []})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        with pytest.raises(RuntimeError, match="3 of 10"):
+            await AdsbLolProvider(client, spacing_s=0).fetch()
