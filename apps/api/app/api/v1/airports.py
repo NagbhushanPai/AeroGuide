@@ -6,8 +6,8 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from app.api.deps import AppResources, get_resources
 from app.core.india import Region, today_ist
-from app.schemas.airports import AirportDetail, AirportList
-from app.services.airports import get_airport, search_airports
+from app.schemas.airports import AirlinesSeen, AirportDetail, AirportList
+from app.services.airports import airlines_seen, get_airport, search_airports
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/airports", tags=["airports"])
@@ -79,3 +79,34 @@ async def airport_detail(
         raise HTTPException(status_code=404, detail=f"No airport with code {code.upper()}")
     response.headers["Cache-Control"] = CACHE_CONTROL
     return airport
+
+
+@router.get(
+    "/{code}/airlines-seen",
+    response_model=AirlinesSeen,
+    summary="Airlines seen at an airport",
+    description=(
+        "Airlines whose aircraft were seen on the ground or low near the airport in community "
+        "ADS-B data, per IST day. An observation: not a schedule and not a terminal assignment."
+    ),
+    responses={
+        404: {"description": "Unknown airport"},
+        503: {"description": "Database unavailable"},
+    },
+)
+async def airport_airlines_seen(
+    resources: Annotated[AppResources, Depends(get_resources)],
+    response: Response,
+    code: Annotated[str, Path(pattern=r"^[A-Za-z]{3,4}$")],
+    days: Annotated[int, Query(ge=1, le=30)] = 7,
+) -> AirlinesSeen:
+    try:
+        async with resources.engine.connect() as conn:
+            result = await airlines_seen(conn, code, days, today_ist())
+    except (SQLAlchemyError, OSError) as exc:
+        logger.warning("airlines seen failed: %s: %s", type(exc).__name__, exc)
+        raise HTTPException(status_code=503, detail=UNAVAILABLE) from exc
+    if result is None:
+        raise HTTPException(status_code=404, detail=f"No airport with code {code.upper()}")
+    response.headers["Cache-Control"] = "public, max-age=600"
+    return result

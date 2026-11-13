@@ -13,7 +13,7 @@ import asyncio
 import json
 import logging
 import time
-from collections.abc import Callable, Sequence
+from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Protocol
@@ -75,6 +75,7 @@ class LiveService:
         warm_write_interval_s: float = 60.0,
         route_lookups_per_refresh: int = 10,
         monotonic: Callable[[], float] = time.monotonic,
+        on_snapshot: "Callable[[Snapshot, LiveService], Awaitable[None]] | None" = None,
     ) -> None:
         if not providers:
             raise ValueError("at least one position provider is required")
@@ -85,6 +86,10 @@ class LiveService:
         self._warm_interval = warm_write_interval_s
         self._route_budget = route_lookups_per_refresh
         self._monotonic = monotonic
+        # Called in the background after each fresh upstream sweep (for example, airport
+        # sightings). Its failures are logged and never affect the live snapshot.
+        self._on_snapshot = on_snapshot
+        self._observer_task: asyncio.Task[None] | None = None
 
         self._snapshot: Snapshot | None = None
         self._last_attempt: float | None = None
@@ -155,6 +160,7 @@ class LiveService:
             self.last_error = "; ".join(errors) or None
             await self._maybe_write_warm()
             self._start_enrichment()
+            self._notify(self._snapshot)
             return
         self.last_error = "; ".join(errors)
 
@@ -268,7 +274,22 @@ class LiveService:
 
         await asyncio.gather(*(one(cs) for cs in callsigns), return_exceptions=True)
 
+    def _notify(self, snapshot: Snapshot) -> None:
+        if self._on_snapshot is None or snapshot.source.is_demo:
+            return
+        if self._observer_task is not None and not self._observer_task.done():
+            return  # still handling the previous sweep; skip rather than queue up
+        self._observer_task = asyncio.create_task(self._observe(snapshot))
+
+    async def _observe(self, snapshot: Snapshot) -> None:
+        if self._on_snapshot is None:
+            return
+        try:
+            await self._on_snapshot(snapshot, self)
+        except Exception as exc:
+            logger.warning("snapshot observer failed: %s: %s", type(exc).__name__, exc)
+
     async def aclose(self) -> None:
-        for task in (self._refresh_task, self._enrich_task):
+        for task in (self._refresh_task, self._enrich_task, self._observer_task):
             if task is not None:
                 task.cancel()

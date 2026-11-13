@@ -4,19 +4,32 @@ from datetime import date, timedelta
 from typing import Any
 
 from geoalchemy2 import Geometry
-from sqlalchemy import Select, and_, case, cast, func, or_, select
+from sqlalchemy import Select, and_, case, cast, distinct, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.orm import aliased
 
 from app.core.india import Region
-from app.models import Airline, Airport, Source, Terminal, TerminalAirline
+from app.ingestion import sightings
+from app.models import (
+    Airline,
+    Airport,
+    AirportSighting,
+    OsmTerminal,
+    Source,
+    Terminal,
+    TerminalAirline,
+)
 from app.models.enums import VerificationStatus
 from app.schemas.airports import (
     AirlineRef,
+    AirlineSeen,
+    AirlinesSeen,
     AirportDetail,
     AirportList,
     AirportSummary,
     DisplayStatus,
+    MappedTerminal,
+    MappedTerminals,
     Provenance,
     SourceRef,
     TerminalAirlineOut,
@@ -27,6 +40,15 @@ TERMINAL_NOTE = (
     "Terminal assignments change. Always confirm the terminal on your boarding pass or with "
     "your airline before you travel."
 )
+OSM_ATTRIBUTION = "© OpenStreetMap contributors (ODbL)"
+SIGHTINGS_METHOD = (
+    f"Aircraft with an airline callsign seen on the ground, or below {sightings.MAX_ALT_FT:,} ft "
+    f"within {sightings.RADIUS_KM:g} km of the airport, in community ADS-B data while "
+    "AeroGuide's live service was running. Shows which airlines fly here, not which terminal "
+    "they use. Coverage has gaps."
+)
+SIGHTINGS_SOURCE = "Community ADS-B networks (adsb.lol, adsb.fi, OpenSky Network)"
+
 # Below this pg_trgm similarity a name is too different to be a typo of the query.
 FUZZY_THRESHOLD = 0.3
 
@@ -259,6 +281,45 @@ async def get_airport(conn: AsyncConnection, code: str, today: date) -> AirportD
         )
     ).all()
 
+    osrc = aliased(Source)
+    mapped = (
+        await conn.execute(
+            select(
+                OsmTerminal.name,
+                OsmTerminal.ref,
+                OsmTerminal.osm_ref,
+                func.ST_Y(_geom(OsmTerminal.location)).label("lat"),
+                func.ST_X(_geom(OsmTerminal.location)).label("lon"),
+                OsmTerminal.verification_status,
+                OsmTerminal.verified_at,
+                OsmTerminal.reverify_after_days,
+                OsmTerminal.notes,
+                *_source_columns(osrc, "src_"),
+            )
+            .outerjoin(osrc, osrc.id == OsmTerminal.primary_source_id)
+            .where(OsmTerminal.airport_id == row.id)
+            .order_by(OsmTerminal.name)
+        )
+    ).all()
+    mapped_terminals = (
+        MappedTerminals(
+            items=[
+                MappedTerminal(
+                    name=m.name,
+                    ref=m.ref,
+                    lat=round(m.lat, 5),
+                    lon=round(m.lon, 5),
+                    osm_url=f"https://www.openstreetmap.org/{m.osm_ref}",
+                )
+                for m in mapped
+            ],
+            provenance=_provenance(mapped[0], today),
+            attribution=OSM_ATTRIBUTION,
+        )
+        if mapped
+        else None
+    )
+
     summary = _summary(row, today)
     return AirportDetail(
         **summary.model_dump(),
@@ -289,5 +350,62 @@ async def get_airport(conn: AsyncConnection, code: str, today: date) -> AirportD
             )
             for t in terminals
         ],
+        mapped_terminals=mapped_terminals,
         terminal_note=TERMINAL_NOTE,
+    )
+
+
+async def airlines_seen(
+    conn: AsyncConnection, code: str, days: int, today: date
+) -> AirlinesSeen | None:
+    """Airlines whose aircraft were seen at the airport in the last `days` IST days."""
+    code = code.upper()
+    airport = (
+        await conn.execute(
+            select(Airport.id, Airport.iata).where(
+                Airport.iata == code if len(code) == 3 else Airport.icao == code
+            )
+        )
+    ).one_or_none()
+    if airport is None:
+        return None
+    since = today - timedelta(days=days - 1)
+    window = and_(AirportSighting.airport_id == airport.id, AirportSighting.service_date >= since)
+    rows = (
+        await conn.execute(
+            select(
+                AirportSighting.airline_icao,
+                func.max(AirportSighting.airline_name).label("name"),
+                func.count(distinct(AirportSighting.icao24)).label("aircraft"),
+                func.count(distinct(AirportSighting.service_date)).label("days_seen"),
+                func.max(AirportSighting.last_seen).label("last_seen"),
+            )
+            .where(window)
+            .group_by(AirportSighting.airline_icao)
+            .order_by(
+                func.count(distinct(AirportSighting.icao24)).desc(), AirportSighting.airline_icao
+            )
+        )
+    ).all()
+    days_with_data = (
+        await conn.execute(select(func.count(distinct(AirportSighting.service_date))).where(window))
+    ).scalar_one()
+    return AirlinesSeen(
+        iata=airport.iata,
+        days=days,
+        since=since,
+        until=today,
+        days_with_data=days_with_data,
+        airlines=[
+            AirlineSeen(
+                icao=r.airline_icao,
+                name=r.name,
+                aircraft=r.aircraft,
+                days_seen=r.days_seen,
+                last_seen=r.last_seen,
+            )
+            for r in rows
+        ],
+        method=SIGHTINGS_METHOD,
+        source=SIGHTINGS_SOURCE,
     )

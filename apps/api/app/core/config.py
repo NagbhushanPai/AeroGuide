@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     snapshot_ttl_s: float = 60.0
     route_lookups_per_refresh: int = 10
     upstream_timeout_s: float = 12.0
+    # Record airline sightings at airports from the live snapshot (needs the database).
+    sightings_enabled: bool = True
+    sightings_flush_interval_s: float = 300.0
 
     @field_validator("database_url", mode="before")
     @classmethod

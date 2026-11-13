@@ -1,6 +1,6 @@
 """Airport API responses. Every fact-bearing object carries its provenance (ADR-0006)."""
 
-from datetime import date
+from datetime import date, datetime
 from typing import Literal
 
 from pydantic import BaseModel, Field
@@ -73,6 +73,22 @@ class TerminalOut(BaseModel):
     airlines: list[TerminalAirlineOut]
 
 
+class MappedTerminal(BaseModel):
+    name: str
+    ref: str | None
+    lat: float
+    lon: float
+    osm_url: str
+
+
+class MappedTerminals(BaseModel):
+    """Terminal buildings as mapped in OpenStreetMap. Unverified; roles are not stated."""
+
+    items: list[MappedTerminal]
+    provenance: Provenance
+    attribution: str
+
+
 class AirportDetail(AirportSummary):
     elevation_ft: int | None
     timezone: str
@@ -81,6 +97,28 @@ class AirportDetail(AirportSummary):
     )
     provenance: Provenance = Field(description="Provenance of the geodata (codes, coordinates).")
     terminals: list[TerminalOut]
+    mapped_terminals: MappedTerminals | None = Field(
+        description="OpenStreetMap terminals, shown separately from verified terminals."
+    )
     terminal_note: str = Field(
         description="Always shown: terminal assignments change, so travellers must confirm them."
     )
+
+
+class AirlineSeen(BaseModel):
+    icao: str = Field(description="Airline ICAO code from the callsign prefix")
+    name: str | None = Field(description="From community route data when known")
+    aircraft: int = Field(description="Distinct aircraft seen")
+    days_seen: int
+    last_seen: datetime
+
+
+class AirlinesSeen(BaseModel):
+    iata: str
+    days: int
+    since: date
+    until: date
+    days_with_data: int = Field(description="Days in the window with any sighting here")
+    airlines: list[AirlineSeen]
+    method: str
+    source: str

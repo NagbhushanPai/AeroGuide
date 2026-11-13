@@ -1,5 +1,6 @@
 """FastAPI application factory."""
 
+import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -15,6 +16,7 @@ from app.core.logging import configure_logging
 from app.database.redis import RedisKeyValue, create_redis
 from app.database.session import create_engine
 from app.ingestion.live import LiveService
+from app.ingestion.sightings import SightingRecorder
 from app.providers.registry import build_position_providers, build_route_lookup
 
 REPO_URL = "https://github.com/NagbhushanPai/AeroGuide"
@@ -33,12 +35,18 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             headers={"User-Agent": f"AeroGuide/{__version__} (+{REPO_URL})"},
             follow_redirects=True,
         )
+        recorder = (
+            SightingRecorder(engine, flush_interval_s=settings.sightings_flush_interval_s)
+            if settings.sightings_enabled
+            else None
+        )
         live = LiveService(
             build_position_providers(settings.position_providers, http),
             build_route_lookup(settings.route_lookups_enabled, http),
             RedisKeyValue(redis),
             ttl_s=settings.snapshot_ttl_s,
             route_lookups_per_refresh=settings.route_lookups_per_refresh,
+            on_snapshot=recorder,
         )
         await live.warm_start()
         app.state.resources = AppResources(settings=settings, engine=engine, redis=redis, live=live)
@@ -46,6 +54,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             yield
         finally:
             await live.aclose()
+            if recorder is not None:
+                try:
+                    await recorder.flush()  # don't lose the last few minutes on shutdown
+                except Exception as exc:
+                    logging.getLogger(__name__).warning("final sightings flush failed: %s", exc)
             await http.aclose()
             await redis.aclose()
             await engine.dispose()
