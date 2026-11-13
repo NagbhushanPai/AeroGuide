@@ -1,0 +1,75 @@
+# Weekly data check (ADR-0013): review queue, source links, seed validation and open data
+# providers. Opens one issue labelled `data-check`, or updates the open one. Never edits data.
+name: Weekly data check
+
+on:
+  schedule:
+    - cron: "0 3 * * 1" # Mondays 03:00 UTC (08:30 IST)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: weekly-data-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --frozen --no-dev
+
+      - name: Find the open data-check issue
+        id: previous
+        run: |
+          gh label create data-check --color FBCA04 \
+            --description "Weekly data check report" --force
+          number=$(gh issue list --label data-check --state open --limit 1 \
+            --json number --jq '.[0].number // empty')
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          if [ -n "$number" ]; then
+            gh issue view "$number" --json body --jq .body > "$RUNNER_TEMP/previous.md"
+          else
+            : > "$RUNNER_TEMP/previous.md"
+          fi
+
+      - name: Run the data check
+        id: check
+        continue-on-error: true
+        run: >-
+          uv run --no-dev python -m app.jobs.data_check
+          --previous "$RUNNER_TEMP/previous.md"
+          --output "$RUNNER_TEMP/report.md"
+
+      - name: Open or update the issue
+        if: always()
+        env:
+          NUMBER: ${{ steps.previous.outputs.number }}
+        run: |
+          if [ ! -s "$RUNNER_TEMP/report.md" ]; then
+            echo "The data check crashed before writing a report; see the job log." > "$RUNNER_TEMP/report.md"
+          fi
+          title="Weekly data check — $(date -u +%F)"
+          if [ -n "$NUMBER" ]; then
+            gh issue edit "$NUMBER" --title "$title" --body-file "$RUNNER_TEMP/report.md"
+            gh issue comment "$NUMBER" --body "Updated with the $(date -u +%F) run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          else
+            gh issue create --title "$title" --label data-check --body-file "$RUNNER_TEMP/report.md"
+          fi
+
+      - name: Fail when the seed files are invalid
+        if: steps.check.outcome == 'failure'
+        run: |
+          echo "::error::Seed validation failed or the check crashed. See the issue and the log."
+          exit 1

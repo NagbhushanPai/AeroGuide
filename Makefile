@@ -1,6 +1,6 @@
 # AeroGuide developer commands. Every target has a matching root `pnpm` script for Windows
 # shells without make (see docs/deployment/local-development.md).
-.PHONY: help install up down dev-web dev-api migrate lint fmt typecheck test test-integration build
+.PHONY: help install up down dev-web dev-api migrate seed seed-check data-check lint fmt typecheck test test-integration build
 
 help: ## List targets
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-18s %s\n", $$1, $$2}'
@@ -24,6 +24,15 @@ dev-api: ## Run the FastAPI dev server (http://localhost:8000/api/v1/docs)
 migrate: ## Apply database migrations
 	pnpm migrate
 
+seed: ## Load the reviewed YAML content (apps/api/data) into the database
+	pnpm seed
+
+seed-check: ## Validate the YAML content without a database
+	pnpm seed:check
+
+data-check: ## Run the weekly data check locally (writes apps/api/data-check-report.md)
+	pnpm data-check
+
 lint: ## Lint web and API
 	pnpm lint
 
@@ -36,7 +45,7 @@ typecheck: ## Type-check web and API
 test: ## Unit tests (web + API)
 	pnpm test
 
-test-integration: up migrate ## API tests against local Postgres+PostGIS and Redis
+test-integration: up migrate seed ## API tests against local Postgres+PostGIS and Redis
 	pnpm test:api:integration
 
 build: ## Production build of the web app

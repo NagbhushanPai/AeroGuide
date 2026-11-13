@@ -21,5 +21,5 @@ USER aeroguide
 
 ENV PATH="/app/.venv/bin:$PATH" PORT=8000
 EXPOSE 8000
-# Render sets $PORT. Migrations run as Render's pre-deploy command: `alembic upgrade head`.
+# Render sets $PORT. Migrations and seed run from .github/workflows/deploy-data.yml (no pre-deploy on the free tier).
 CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT} --proxy-headers"]

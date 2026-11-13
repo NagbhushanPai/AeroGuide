@@ -1,0 +1,60 @@
+# Applies migrations and the reviewed seed content to the production database (Supabase) after
+# they land on main. Render's free tier has no pre-deploy command, so this runs here instead.
+# Does nothing until the repository secret DATABASE_URL is set:
+#   postgresql+asyncpg://USER:PASSWORD@HOST:5432/postgres   (Supabase session pooler, port 5432)
+name: Deploy data
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/api/migrations/**
+      - apps/api/data/**
+      - apps/api/app/models/**
+      - apps/api/app/seed/**
+      - .github/workflows/deploy-data.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-data
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Skip when no database is configured
+        id: configured
+        working-directory: .
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::notice::DATABASE_URL secret not set; skipping migrations and seed."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.configured.outputs.enabled == 'true'
+        uses: actions/checkout@v4
+      - if: steps.configured.outputs.enabled == 'true'
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - if: steps.configured.outputs.enabled == 'true'
+        run: uv sync --frozen --no-dev
+      - if: steps.configured.outputs.enabled == 'true'
+        name: Validate seed files
+        run: uv run --no-dev python -m app.seed --check
+      - if: steps.configured.outputs.enabled == 'true'
+        name: Apply migrations
+        run: uv run --no-dev alembic upgrade head
+      - if: steps.configured.outputs.enabled == 'true'
+        name: Seed content
+        run: uv run --no-dev python -m app.seed
