@@ -25,6 +25,6 @@ Common operators and programmes in India to research (confirm current relationsh
 
 ## Limitations
 
-- Programme acceptance changes. VIMANA's notes report a change to DreamFolks domestic access in 2025. **We have not independently verified this.** It is an example of why `valid_from` and `valid_to` are needed on acceptance records.
+- Programme acceptance changes.It is an example of why `valid_from` and `valid_to` are needed on acceptance records.
 - There is no open API for lounge data. Curation is manual.
 - Hours and prices must show their verification date in the UI, with a "may have changed" notice after the re-verify interval (60 days by default).

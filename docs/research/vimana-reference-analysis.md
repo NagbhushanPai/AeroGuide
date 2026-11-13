@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Reference | https://vimana.live/ |
+
 | Inspected | 2026-11-13 |
 | Purpose | Functional and UX reference for AeroGuide. **We use it for function and UX only.** We do not copy its code, branding, copy, assets or data. |
 
