@@ -15,10 +15,10 @@ sequenceDiagram
 
   B->>A: GET /api/v1/positions?bbox=…
   A->>M: snapshot age?
-  alt age < 15 s
+  alt age < 60 s
     M-->>A: cached snapshot
-  else stale (single-flight lock: one sweep only)
-    A->>P: fetch India area
+  else stale: serve current snapshot now, refresh in background (one sweep at a time)
+    A->>P: 10 point queries, 1 s apart (adsb.lol: 10 requests/min)
     P-->>A: raw states
     A->>A: normalise → AircraftState[] (drop invalid, tag source)
     A->>M: replace snapshot + append to 15-min trail ring buffer
@@ -47,19 +47,21 @@ On a **cold start** the API first loads `positions:snapshot` from Redis, if one 
 
 | Age of a position (`now − position_time`) | Behaviour |
 |---|---|
-| < 60 s | Normal |
-| 60 s – 5 min | Shown faded with "last seen X ago". No ETA |
+| < 90 s | Live (sweeps run once a minute, so 0-70 s is normal) |
+| 90 s – 5 min | Labelled "Delayed" with "last seen X ago" |
 | > 5 min | Removed from the map. Searchable as "last seen" while still in the trail buffer |
 
 | Age of the whole snapshot | `meta.mode` |
 |---|---|
-| < 60 s | `live` (or `demo` if the demo provider is configured) |
-| 60 s – 5 min | `degraded`, with a banner: "Live data delayed" |
+| < 90 s | `live` (or `demo` if the demo provider is configured) |
+| 90 s – 5 min | `degraded`, with a banner: "Live data delayed" |
 | none or > 5 min | `unavailable`. The map shows basemap and airports with an explanation |
 
 ### Source failover
 
-The configured order is `POSITION_PROVIDERS=adsblol,opensky`. If the first fails, the next is tried. `meta.source` always names the source that actually produced the data. **The demo provider is never in the automatic failover chain** ([ADR-0011](../decisions/0011-demo-mode-is-explicit.md)).
+The configured order is `POSITION_PROVIDERS=adsblol,opensky`. If the first fails, the next is tried. A source that answers `429` rests for its `Retry-After` and is skipped until then.
+
+**Coverage:** the 10-point adsb.lol grid reaches every Indian airport with scheduled service except the island airports Agatti (AGX) and Port Blair (IXZ). OpenSky (fallback) covers the whole bounding box but reports no aircraft type or registration. `meta.source` always names the source that actually produced the data. **The demo provider is never in the automatic failover chain** ([ADR-0011](../decisions/0011-demo-mode-is-explicit.md)).
 
 ## Selected aircraft: reported route
 
@@ -96,7 +98,11 @@ Open data gives **no schedules or airline status**, so the page is built from wh
 ## Airport movements (daily)
 
 - Airport pages show "flights observed yesterday", fetched from OpenSky `/flights/departure` and `/flights/arrival` for that airport's ICAO code over the previous day (UTC).
-- Fetched lazily on the first request of the day and cached in Redis for 24 h. That's at most 2 calls × 7 airports a day.
+- Fetched lazily on the first request of the day and cached in Redis for 24 h. That's at most 2 calls × 7 airports a day. *(Planned with the airport pages, Stage 3.)*
+
+## Reported routes (background)
+
+After each sweep, up to 10 callsigns without a cached route are looked up on adsbdb (3 at a time) and cached for 6 h, including "no route" answers. The route list fills in over a few minutes while people are viewing. adsb.lol's batch route endpoint was tested and returns an empty body, so it isn't used.
 
 ## Identifier mapping
 

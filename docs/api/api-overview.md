@@ -30,8 +30,8 @@ Last updated: 2026-11-13. Status: proposed contract. The generated OpenAPI spec 
 ### Positions
 | | |
 |---|---|
-| `GET /positions?bbox=minLon,minLat,maxLon,maxLat` | GeoJSON `FeatureCollection` of aircraft + `meta`. Feature properties: `icao24, callsign, registration, type_code, alt_baro_ft, on_ground, gs_kt, track_deg, vrate_fpm, position_time, is_demo` |
-| `GET /positions/{icao24}` | Latest state + `reported_route \| null` + `meta` (+ `trail` in P1) |
+| `GET /positions?bbox=minLon,minLat,maxLon,maxLat` | **Implemented.** GeoJSON `FeatureCollection` of aircraft + `meta`. Feature properties: `icao24, callsign, registration, type_code, alt_baro_ft, on_ground, gs_kt, track_deg, vrate_fpm, position_time, is_demo` |
+| `GET /positions/{icao24}` | **Implemented.** Latest state + `reported_route \| null` + `route_note` (why a route is missing or hidden) + `progress` (flown and remaining km, estimated arrival from live position) + `meta`. `404` if not tracked |
 
 ### Flights (open data only)
 | | |

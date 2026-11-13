@@ -16,7 +16,10 @@ The owner has decided AeroGuide is **non-commercial with a zero budget**. The ma
 | OpenFreeMap tiles | Free, no key |
 
 ## Decision
-1. **No always-on worker.** Live positions are fetched **on demand** inside the API process. When a request arrives and the in-memory snapshot is older than 15 s, a single-flight lock makes exactly one upstream sweep, and concurrent requests wait for it. With no viewers, no upstream calls are made. This is also polite to the community data providers.
+1. **No always-on worker.** Live positions are fetched **on demand** inside the API process. When a request arrives and the in-memory snapshot is older than **60 s**, one background sweep starts (a single lock guarantees only one) while the existing snapshot is served immediately (stale-while-revalidate). Only a request with no snapshot at all waits. With no viewers, no upstream calls are made.
+   - **Why 60 s:** adsb.lol allows **10 requests per rolling minute** (observed 2026-11-13: the 11th request in a minute gets `429` with `Retry-After`). One sweep is exactly 10 point queries, 1 s apart, so it fits once a minute.
+   - **Rate limits are honoured:** a `429` aborts the sweep (partial coverage would silently hide regions), the source rests for `Retry-After` (default 2 min for adsb.lol, 1 h for OpenSky), and the next source is used meanwhile.
+   - Because sweeps run once a minute, positions are normally 0-70 s old, so the **"live" threshold is 90 s** (was 60 s).
 2. **In-memory first, Redis sparingly.** The latest snapshot and rate-limit counters live in process memory (a single instance). Redis (Upstash) holds:
    - the snapshot, written **at most once every 60 s**, so a restarted instance can serve something at once,
    - the callsign → route cache (6 h),

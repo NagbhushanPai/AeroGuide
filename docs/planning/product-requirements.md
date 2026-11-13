@@ -55,9 +55,12 @@ AeroGuide is an aviation and airport intelligence site for India that combines:
 IDs are referenced by the backlog and tests. **P0** = MVP, **P1** = MVP if time allows, **P2** = later.
 
 ### Homepage
+
+> **Changed 2026-11-13 (owner):** the homepage **is** the live map (map-first, with a sidebar flight list). The overview content moved to `/about`. The hero search becomes the map's flight search.
+
 | ID | Requirement | Pri |
 |---|---|---|
-| HOME-1 | Logo, primary nav, hero with a flight search (flight number, airport code or city) | P0 |
+| HOME-1 | Logo, primary nav, hero with a flight search (flight number, airport code or city). Search ships with real results: airports in Stage 3, flights in Stage 4 | P0 |
 | HOME-2 | Quick entry to the live map | P0 |
 | HOME-3 | Popular airports, featured airport guides, lounge discovery and card-checker entry points, all driven by DB data | P0 |
 | HOME-4 | Popular routes. **Only shown if backed by a real data source.** Otherwise the section is hidden | P1 |
@@ -73,10 +76,12 @@ IDs are referenced by the backlog and tests. **P0** = MVP, **P1** = MVP if time 
 | LIVE-5 | Search by callsign, flight number or registration | P0 |
 | LIVE-6 | Filters: airline, departure airport, arrival airport, status | P0 (airline, observed state: airborne or on ground). P1 (departure and arrival airport, based on *reported* routes and labelled as such) |
 | LIVE-7 | Always-visible data-source badge and last-updated time. **DEMO DATA** label whenever simulated data is shown | P0 |
-| LIVE-8 | Stale handling. A position older than 60 s is shown faded. Older than 5 min it is hidden from the map but kept in search with "last seen" | P0 |
+| LIVE-8 | Stale handling. A position older than 90 s is labelled "Delayed" (upstream refreshes once a minute). Older than 5 min it is hidden | P0 |
 | LIVE-9 | The map still works with no live data: basemap, airports layer, an empty state that explains why | P0 |
 | LIVE-10 | Updates without reload (polling every 15 s, see [ADR-0005](../decisions/0005-live-updates-polling-first.md)) | P0 |
 | LIVE-11 | A "waking up" state while the free-tier API cold-starts | P0 |
+| LIVE-12 | Layers: airports (OurAirports) and weather radar (RainViewer), each credited | P1, built |
+| LIVE-13 | Watch a flight: on-page and browser alerts for take-off, landing and coverage loss while the tab is open | P1, built |
 
 **Info panel fields:** flight number, airline, aircraft type, origin, destination, current position, altitude, ground speed, heading, departure information, arrival information, estimated arrival, status, last updated.
 

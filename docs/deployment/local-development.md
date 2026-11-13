@@ -60,6 +60,14 @@ pnpm dev:web    # http://localhost:3000
 
 Never commit `.env` files. Only `.env.example` files are tracked.
 
+## Live map notes
+
+- The web app reads live data from `NEXT_PUBLIC_API_BASE_URL` (default `http://localhost:8000`). Run `pnpm dev:api` alongside `pnpm dev:web`. The API's `CORS_ORIGINS` must include the web origin.
+- `pnpm --filter web gen:api` regenerates `src/lib/api/schema.d.ts` from the running API's OpenAPI schema. Run it after changing API schemas.
+- `pnpm dev` and `pnpm build` in `apps/web` copy MapLibre's web worker into `public/vendor/` (git-ignored) first.
+- Set `POSITION_PROVIDERS=demo` in `apps/api/.env` to work offline with clearly labelled simulated aircraft.
+- The first request after the API starts waits for one upstream sweep (about 10 s). After that, data is served instantly and refreshed in the background once a minute.
+
 ## Notes
 
 - **Next.js 16 with Cache Components** is enabled. Read the bundled docs in `apps/web/node_modules/next/dist/docs/` before writing data-fetching code (`use cache`, `<Suspense>`, async `params`). `next dev` regenerates `apps/web/AGENTS.md`, so commit it as is.

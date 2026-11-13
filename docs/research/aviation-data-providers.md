@@ -40,7 +40,7 @@ So FlightAware AeroAPI, Flightradar24, AeroDataBox, aviationstack and Cirium/OAG
 
 | Need | Source | How it is used |
 |---|---|---|
-| Live positions | **adsb.lol** (primary), **OpenSky Network** (fallback), adsb.fi (second fallback, once its terms are checked) | Fetched on demand by the API while people are viewing the map, cached for about 15 s ([ADR-0012](../decisions/0012-zero-budget-hosting.md)) |
+| Live positions | **adsb.lol** (primary), **OpenSky Network** (fallback), adsb.fi (second fallback, once its terms are checked) | Fetched on demand by the API while people are viewing the map, refreshed at most once a minute ([ADR-0012](../decisions/0012-zero-budget-hosting.md)) |
 | Aircraft type and registration | adsb.lol fields (`t`, `r`) | Shown as broadcast or derived by the network |
 | Callsign → route | adsbdb.com (community) | Shown only as a **"reported route"**, with its source. Hidden when the aircraft's track contradicts it |
 | Observed departures and arrivals per airport | **OpenSky `/flights/departure` and `/flights/arrival`** (batch, previous-day data, interval ≤ 7 days, needs a free account and OAuth2 client credentials) | Airport pages: "flights observed yesterday". Flight pages: observed first-seen and last-seen times for recent days |
@@ -60,11 +60,19 @@ These fields show **"Not available from open data sources"**. The only status sh
 
 | Source | Limit | Our use |
 |---|---|---|
-| adsb.lol | Dynamic, based on load | One India sweep (about 17 point queries in small batches) at most every 15 s, and only while someone is viewing the map |
+| adsb.lol | **Observed 2026-11-13: 10 requests per rolling minute** (the 11th gets `429` with `Retry-After`) | One India sweep of exactly 10 point queries, 1 s apart, at most once a minute, only while someone is viewing. `429` is honoured |
 | OpenSky (registered free account) | Daily credit allowance. An India bbox costs 4 credits | Fallback only. Airport departure and arrival batch calls run once a day |
 | adsbdb | Not published | Cached 6 h per callsign. Called only when a user selects a flight |
 
-## Open questions before Stage 4
+### Other open data used
+
+| Data | Source | Licence / terms |
+|---|---|---|
+| Airport coordinates and codes for the map layer | OurAirports | Public domain |
+| Weather radar layer | RainViewer public API | Free for personal, educational and community use, with attribution |
+| Basemap | OpenFreeMap (OpenMapTiles, OpenStreetMap) | Free, attribution to OpenStreetMap contributors |
+
+## Open questions
 
 1. Does adsb.lol's ODbL licence and its terms fit our use (display plus short-lived caching, no redistribution of a database)? Ask the project.
 2. Check adsb.fi's open data terms before enabling it.

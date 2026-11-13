@@ -2,7 +2,7 @@
 
 AeroGuide is a free, non-commercial aviation and airport intelligence website for India. It combines live flight tracking, airport guides, lounge discovery and credit-card lounge eligibility on one site. It uses **open data only** and runs on **free tiers at $0**. Every fact on it is sourced and dated, or clearly marked as unverified or demo.
 
-> **Status: Stage 1 (foundation).** App shell, API health check and tooling are in place. Features arrive from Stage 2. See [Implementation status](#implementation-status).
+> **Status: live map in review.** The homepage is a live flight map of India from open ADS-B data. Airport, lounge and card content arrives in Stages 3 and 5. See [Implementation status](#implementation-status).
 
 ## Features (planned for the MVP)
 
@@ -88,10 +88,10 @@ A weekly GitHub Actions job checks content staleness, source links and the open 
 | Stage | Status |
 |---|---|
 | 0 Research and planning | Done |
-| 1 Foundation | In review: web shell and placeholder pages, API with `/api/v1/health`, first migration (extensions), Docker Compose, CI |
-| 2 Frontend design system | Not started |
+| 1 Foundation | Done: web shell, API with `/api/v1/health`, first migration (extensions), Docker Compose, CI |
+| 2 Frontend design system | In review: dark/light theme, mobile menu, data-honesty components, `/about`, `/design-system`, axe + Lighthouse a11y 100 |
 | 3 Airports | Not started |
-| 4 Flight tracking | Not started |
+| 4 Flight tracking | In review (pulled ahead of Stage 3): live map homepage, `/api/v1/positions`, adsb.lol and OpenSky with failover and rate-limit backoff, reported routes, airports and weather layers, watch alerts. Flight detail page still to do |
 | 5 Lounges and cards | Not started |
 | 6 Testing and deployment | Not started |
 
