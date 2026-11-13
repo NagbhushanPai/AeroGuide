@@ -1,0 +1,7 @@
+# Card networks. Reference names only.
+card_networks:
+  - { code: visa, name: Visa }
+  - { code: mastercard, name: Mastercard }
+  - { code: rupay, name: RuPay }
+  - { code: amex, name: American Express }
+  - { code: diners, name: Diners Club }

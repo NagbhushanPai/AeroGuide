@@ -1,0 +1,8 @@
+# Card issuers. `url` is the bank's official website (checked 2026-11-14; several banks
+# have moved to .bank.in addresses). Card product pages go on each card file.
+banks:
+  - { slug: hdfc-bank, name: HDFC Bank, url: "https://www.hdfc.bank.in/" }
+  - { slug: sbi-card, name: SBI Card, url: "https://www.sbicard.com/" }
+  - { slug: icici-bank, name: ICICI Bank, url: "https://www.icici.bank.in/" }
+  - { slug: axis-bank, name: Axis Bank, url: "https://www.axis.bank.in/" }
+  - { slug: kotak-mahindra-bank, name: Kotak Mahindra Bank, url: "https://www.kotak.bank.in/" }

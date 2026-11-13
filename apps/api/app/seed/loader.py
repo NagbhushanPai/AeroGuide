@@ -14,6 +14,7 @@ from app.core.india import IST_TIMEZONE, STATES
 from app.models import Airline, Airport, OsmTerminal, Source, Terminal, TerminalAirline
 from app.models.enums import VerificationStatus
 from app.seed.bundle import REVERIFY_DAYS, Bundle
+from app.seed.loader_lounges import LoungeSummary, apply_lounges_and_cards
 from app.seed.schemas import ProvenanceIn
 
 GEODATA_NOTE = "Geodata from OurAirports. Not yet cross-checked against AIP India."
@@ -29,6 +30,7 @@ class SeedSummary:
     terminals: int
     terminal_airlines: int
     osm_terminals: int
+    lounges: LoungeSummary
 
 
 def _provenance(p: ProvenanceIn, table: str, sources: dict[str, uuid.UUID]) -> dict[str, Any]:
@@ -180,6 +182,8 @@ async def apply_bundle(conn: AsyncConnection, bundle: Bundle) -> SeedSummary:
             )
         )
 
+    lounge_summary = await apply_lounges_and_cards(conn, bundle, source_ids, airport_ids)
+
     # Remove what the YAML no longer contains (children first, sources last).
     await conn.execute(delete(OsmTerminal).where(OsmTerminal.id.not_in(osm_ids)))
     await conn.execute(delete(TerminalAirline).where(TerminalAirline.id.not_in(assignment_ids)))
@@ -196,4 +200,5 @@ async def apply_bundle(conn: AsyncConnection, bundle: Bundle) -> SeedSummary:
         terminals=len(terminal_ids),
         terminal_airlines=len(assignment_ids),
         osm_terminals=len(osm_ids),
+        lounges=lounge_summary,
     )

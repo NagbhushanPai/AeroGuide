@@ -1,0 +1,7 @@
+# Lounge access programmes: what lounges accept and cards grant. Add one before using its
+# key in a lounge or card file, with the programme's official website.
+#   - key: example-lounge-programme
+#     name: Example Lounge Programme
+#     kind: membership        # membership | network | bank | airline | paid
+#     url: https://example.org/
+programs: []

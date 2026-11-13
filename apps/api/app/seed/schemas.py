@@ -2,10 +2,11 @@
 rules across files (does a source key exist?) live in bundle.validate_bundle."""
 
 from datetime import date
-from typing import Annotated, Self
+from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, StringConstraints, model_validator
 
+from app.eligibility.rules import Rule
 from app.models.enums import AirlineOperation, SourceType, TerminalRole, VerificationStatus
 
 Key = Annotated[str, StringConstraints(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")]
@@ -136,3 +137,144 @@ class GuideFile(Strict):
     iata: Iata
     official_source: Key | None = None
     terminals: list[TerminalIn] = []
+
+
+# ---------------------------------------------------------------- lounges and cards (Stage 5)
+
+Slug = Annotated[str, StringConstraints(pattern=r"^[a-z0-9]+(-[a-z0-9]+)*$")]
+Hhmm = Annotated[str, StringConstraints(pattern=r"^([01][0-9]|2[0-3]):[0-5][0-9]$")]
+Day = Literal["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
+
+
+class AmenityIn(Strict):
+    code: Annotated[str, StringConstraints(pattern=r"^[a-z_]+$")]
+    label: Text
+
+
+class AmenitiesFile(Strict):
+    amenities: list[AmenityIn]
+
+
+class CardNetworkIn(Strict):
+    code: Annotated[str, StringConstraints(pattern=r"^[a-z]+$")]
+    name: Text
+
+
+class CardNetworksFile(Strict):
+    card_networks: list[CardNetworkIn]
+
+
+class BankIn(Strict):
+    slug: Slug
+    name: Text
+    url: HttpUrl
+
+
+class BanksFile(Strict):
+    banks: list[BankIn]
+
+
+class AccessProgramIn(Strict):
+    key: Key
+    name: Text
+    kind: Literal["membership", "network", "bank", "airline", "paid"]
+    url: HttpUrl | None = None
+
+
+class AccessProgramsFile(Strict):
+    programs: list[AccessProgramIn]
+
+
+class HoursPeriod(Strict):
+    days: list[Day] = Field(min_length=1)
+    open: Hhmm
+    close: Hhmm  # may be earlier than open: the period runs past midnight
+
+
+class OpeningHours(Strict):
+    mode: Literal["24h", "weekly"]
+    periods: list[HoursPeriod] = []
+
+    @model_validator(mode="after")
+    def periods_match_mode(self) -> Self:
+        if self.mode == "24h" and self.periods:
+            raise ValueError("24h opening hours take no periods")
+        if self.mode == "weekly" and not self.periods:
+            raise ValueError("weekly opening hours need at least one period")
+        return self
+
+
+class AcceptanceIn(Strict):
+    """The lounge accepts this programme. A fact about the lounge, from its operator."""
+
+    program: Key
+    valid_from: date
+    valid_to: date | None = None
+    paid_price: float | None = Field(default=None, ge=0)
+    currency: Literal["INR", "USD"] | None = None
+    paid_duration_min: int | None = Field(default=None, ge=1, le=1440)
+    provenance: ProvenanceIn
+
+    @model_validator(mode="after")
+    def check(self) -> Self:
+        if self.valid_to is not None and self.valid_to <= self.valid_from:
+            raise ValueError("valid_to must be after valid_from")
+        if (self.paid_price is None) != (self.currency is None):
+            raise ValueError("paid_price and currency go together")
+        return self
+
+
+class LoungeIn(Strict):
+    slug: Slug
+    name: Text
+    terminal: Text | None = None  # as the source names it, for example "T3"
+    operator: Text | None = None
+    scope: Literal["domestic", "international", "both"]
+    side: Literal["airside", "landside"]
+    location_text: Text | None = None  # quoted from the source
+    nearest_gate: Text | None = None  # only when the source states it
+    opening_hours: OpeningHours | None = None  # None = not verified
+    amenities: list[str] = []
+    lat: float | None = Field(default=None, ge=-90, le=90)
+    lon: float | None = Field(default=None, ge=-180, le=180)
+    provenance: ProvenanceIn
+    accepts: list[AcceptanceIn] = []
+
+    @model_validator(mode="after")
+    def coordinates_together(self) -> Self:
+        if (self.lat is None) != (self.lon is None):
+            raise ValueError("lat and lon go together")
+        return self
+
+
+class LoungesFile(Strict):
+    iata: Iata
+    lounges: list[LoungeIn]
+
+
+class PolicyIn(Strict):
+    """One version of a card's lounge benefit. Add a version; never rewrite a past one."""
+
+    scope: Literal["domestic", "international"]
+    valid_from: date
+    valid_to: date | None = None
+    summary: Text
+    rules: list[Rule] = []
+    unmodelled_terms: Text | None = None
+    provenance: ProvenanceIn
+
+    @model_validator(mode="after")
+    def valid_range(self) -> Self:
+        if self.valid_to is not None and self.valid_to <= self.valid_from:
+            raise ValueError("valid_to must be after valid_from")
+        return self
+
+
+class CardFile(Strict):
+    slug: Slug
+    bank: Slug
+    network: Annotated[str, StringConstraints(pattern=r"^[a-z]+$")]
+    name: Text
+    product_url: HttpUrl
+    provenance: ProvenanceIn
+    policies: list[PolicyIn] = []

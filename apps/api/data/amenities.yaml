@@ -1,0 +1,16 @@
+# Amenity vocabulary for lounges. Tag a lounge only with what its source states:
+# a missing tag means "not stated", never "not available".
+amenities:
+  - { code: wifi, label: Wi-Fi }
+  - { code: food, label: Food }
+  - { code: alcohol, label: Alcoholic drinks }
+  - { code: showers, label: Showers }
+  - { code: sleeping, label: Sleeping pods or rest area }
+  - { code: spa, label: Spa or massage }
+  - { code: quiet_zone, label: Quiet zone }
+  - { code: business, label: Business centre or work desks }
+  - { code: charging, label: Charging points }
+  - { code: flight_info, label: Flight information screens }
+  - { code: accessible, label: Wheelchair accessible }
+  - { code: kids, label: Children's area }
+  - { code: smoking, label: Smoking room }

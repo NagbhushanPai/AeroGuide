@@ -1,8 +1,10 @@
 """Reads every seed file and checks the rules that span files. No database needed."""
 
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import date, timedelta
+from itertools import pairwise
 from pathlib import Path
 from typing import Any
 
@@ -10,11 +12,18 @@ import yaml
 from pydantic import BaseModel, ValidationError
 
 from app.core.india import STATES
+from app.eligibility.rules import ProgramEntitlement
 from app.models.enums import PRIMARY_SOURCE_TYPES, VerificationStatus
 from app.seed.schemas import (
+    AccessProgramsFile,
     AirlinesFile,
     AirportsFile,
+    AmenitiesFile,
+    BanksFile,
+    CardFile,
+    CardNetworksFile,
     GuideFile,
+    LoungesFile,
     OsmTerminalsFile,
     ProvenanceIn,
     SourceIn,
@@ -24,7 +33,16 @@ from app.seed.schemas import (
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 
 # Default re-verification windows in days (docs/database/schema.md).
-REVERIFY_DAYS = {"airports": 365, "terminals": 180, "terminal_airlines": 90, "osm_terminals": 90}
+REVERIFY_DAYS = {
+    "airports": 365,
+    "terminals": 180,
+    "terminal_airlines": 90,
+    "osm_terminals": 90,
+    "lounges": 60,
+    "lounge_access_methods": 60,
+    "credit_cards": 60,
+    "lounge_policies": 60,
+}
 
 
 class SeedError(Exception):
@@ -40,6 +58,12 @@ class Bundle:
     airlines: AirlinesFile
     osm_terminals: OsmTerminalsFile
     guides: list[GuideFile] = field(default_factory=list)
+    amenities: AmenitiesFile = field(default_factory=lambda: AmenitiesFile(amenities=[]))
+    networks: CardNetworksFile = field(default_factory=lambda: CardNetworksFile(card_networks=[]))
+    banks: BanksFile = field(default_factory=lambda: BanksFile(banks=[]))
+    programs: AccessProgramsFile = field(default_factory=lambda: AccessProgramsFile(programs=[]))
+    lounges: list[LoungesFile] = field(default_factory=list)
+    cards: list[CardFile] = field(default_factory=list)
 
     @property
     def sources_by_key(self) -> dict[str, SourceIn]:
@@ -73,9 +97,45 @@ def read_bundle(data_dir: Path = DATA_DIR) -> Bundle:
         for path in sorted((data_dir / "airport_guides").glob("*.yaml"))
         if (g := _read(path, GuideFile, errors)) is not None
     ]
-    if errors or sources is None or airports is None or airlines is None or osm is None:
+    amenities = _read(data_dir / "amenities.yaml", AmenitiesFile, errors)
+    networks = _read(data_dir / "card_networks.yaml", CardNetworksFile, errors)
+    banks = _read(data_dir / "banks.yaml", BanksFile, errors)
+    programs = _read(data_dir / "access_programs.yaml", AccessProgramsFile, errors)
+    lounges = [
+        f
+        for path in sorted((data_dir / "lounges").glob("*.yaml"))
+        if (f := _read(path, LoungesFile, errors)) is not None
+    ]
+    cards = [
+        c
+        for path in sorted((data_dir / "cards").glob("*.yaml"))
+        if (c := _read(path, CardFile, errors)) is not None
+    ]
+    if (
+        errors
+        or sources is None
+        or airports is None
+        or airlines is None
+        or osm is None
+        or amenities is None
+        or networks is None
+        or banks is None
+        or programs is None
+    ):
         raise SeedError(errors)
-    bundle = Bundle(sources.sources, airports, airlines, osm, guides)
+    bundle = Bundle(
+        sources.sources,
+        airports,
+        airlines,
+        osm,
+        guides,
+        amenities,
+        networks,
+        banks,
+        programs,
+        lounges,
+        cards,
+    )
     errors.extend(validate_bundle(bundle))
     if errors:
         raise SeedError(errors)
@@ -160,6 +220,75 @@ def validate_bundle(bundle: Bundle) -> list[str]:
                 if ta.airline not in airline_codes:
                     errors.append(f"{at}: not in airlines.yaml")
                 check_provenance(at, ta.provenance)
+    errors.extend(_validate_lounges_and_cards(bundle, iatas, check_provenance))
+    return errors
+
+
+def _overlaps(windows: list[tuple[date, date | None]]) -> bool:
+    """True if any two [from, to) windows overlap (to=None means open-ended)."""
+    ordered = sorted(windows, key=lambda w: w[0])
+    return any(end is None or start < end for (_, end), (start, _) in pairwise(ordered))
+
+
+def _validate_lounges_and_cards(
+    bundle: Bundle, iatas: set[str], check_provenance: Callable[[str, ProvenanceIn], None]
+) -> list[str]:
+    errors: list[str] = []
+    amenity_codes = {a.code for a in bundle.amenities.amenities}
+    program_keys = {p.key for p in bundle.programs.programs}
+    bank_slugs = {b.slug for b in bundle.banks.banks}
+    network_codes = {n.code for n in bundle.networks.card_networks}
+    for code in _dupes([a.code for a in bundle.amenities.amenities]):
+        errors.append(f"amenities.yaml: duplicate code {code}")
+    for key in _dupes([p.key for p in bundle.programs.programs]):
+        errors.append(f"access_programs.yaml: duplicate key {key}")
+    for slug in _dupes([b.slug for b in bundle.banks.banks]):
+        errors.append(f"banks.yaml: duplicate slug {slug}")
+
+    for slug in _dupes([lg.slug for f in bundle.lounges for lg in f.lounges]):
+        errors.append(f"lounges: slug {slug} is used more than once")
+    for code in _dupes([f.iata for f in bundle.lounges]):
+        errors.append(f"lounges: more than one file for {code}")
+    for f in bundle.lounges:
+        where = f"lounges/{f.iata}.yaml"
+        if f.iata not in iatas:
+            errors.append(f"{where}: {f.iata} is not in airports.yaml")
+        for lg in f.lounges:
+            at = f"{where}: {lg.slug}"
+            check_provenance(at, lg.provenance)
+            for code in lg.amenities:
+                if code not in amenity_codes:
+                    errors.append(f"{at}: unknown amenity {code!r}")
+            by_program: dict[str, list[tuple[date, date | None]]] = {}
+            for acc in lg.accepts:
+                if acc.program not in program_keys:
+                    errors.append(f"{at}: unknown programme {acc.program!r}")
+                check_provenance(f"{at}: accepts {acc.program}", acc.provenance)
+                by_program.setdefault(acc.program, []).append((acc.valid_from, acc.valid_to))
+            for program, windows in by_program.items():
+                if _overlaps(windows):
+                    errors.append(f"{at}: overlapping acceptance windows for {program}")
+
+    for slug in _dupes([c.slug for c in bundle.cards]):
+        errors.append(f"cards: slug {slug} is used more than once")
+    for c in bundle.cards:
+        at = f"cards: {c.slug}"
+        if c.bank not in bank_slugs:
+            errors.append(f"{at}: unknown bank {c.bank!r}")
+        if c.network not in network_codes:
+            errors.append(f"{at}: unknown network {c.network!r}")
+        check_provenance(at, c.provenance)
+        by_scope: dict[str, list[tuple[date, date | None]]] = {}
+        for pol in c.policies:
+            pat = f"{at}: {pol.scope} policy from {pol.valid_from.isoformat()}"
+            check_provenance(pat, pol.provenance)
+            by_scope.setdefault(pol.scope, []).append((pol.valid_from, pol.valid_to))
+            for rule in pol.rules:
+                if isinstance(rule, ProgramEntitlement) and rule.program not in program_keys:
+                    errors.append(f"{pat}: unknown programme {rule.program!r}")
+        for scope, windows in by_scope.items():
+            if _overlaps(windows):
+                errors.append(f"{at}: overlapping {scope} policy versions")
     return errors
 
 
@@ -188,6 +317,20 @@ def due_for_review(bundle: Bundle, today: date) -> list[DueItem]:
         else:
             items.append(DueItem(where, p.status.value))
 
+    for lf in bundle.lounges:
+        for lg in lf.lounges:
+            visit(f"{lf.iata} lounge {lg.slug}", lg.provenance, "lounges")
+            for acc in lg.accepts:
+                visit(
+                    f"{lf.iata} lounge {lg.slug}, accepts {acc.program}",
+                    acc.provenance,
+                    "lounge_access_methods",
+                )
+    for c in bundle.cards:
+        visit(f"card {c.slug}", c.provenance, "credit_cards")
+        for pol in c.policies:
+            if pol.valid_to is None:  # past versions don't need re-checking
+                visit(f"card {c.slug}, {pol.scope} policy", pol.provenance, "lounge_policies")
     for g in bundle.guides:
         for t in g.terminals:
             visit(f"{g.iata} terminal {t.code}", t.provenance, "terminals")
