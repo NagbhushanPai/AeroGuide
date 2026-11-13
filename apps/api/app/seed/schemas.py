@@ -79,6 +79,23 @@ class AirportsFile(Strict):
     airports: list[AirportIn]
 
 
+class OsmTerminalIn(Strict):
+    iata: Iata
+    osm: Annotated[str, StringConstraints(pattern=r"^(node|way|relation)/[0-9]+$")]
+    name: Text
+    ref: Text | None = None
+    lat: float = Field(ge=-90, le=90)
+    lon: float = Field(ge=-180, le=180)
+
+
+class OsmTerminalsFile(Strict):
+    """Generated (scripts/build_osm_terminals.py). One source for every row."""
+
+    source: Key
+    retrieved_at: date
+    terminals: list[OsmTerminalIn]
+
+
 class AirlineIn(Strict):
     icao: AirlineIcao
     iata: AirlineIata | None = None

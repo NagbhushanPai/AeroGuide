@@ -48,3 +48,10 @@ sources:
     url: https://jaipur.adaniairports.com/
     source_type: official_airport
     retrieved_at: 2026-11-13
+
+  - key: openstreetmap
+    name: OpenStreetMap
+    url: https://www.openstreetmap.org/copyright
+    publisher: OpenStreetMap contributors
+    source_type: secondary
+    retrieved_at: 2026-11-14

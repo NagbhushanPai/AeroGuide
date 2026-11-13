@@ -11,12 +11,13 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncConnection
 
 from app.core.india import IST_TIMEZONE, STATES
-from app.models import Airline, Airport, Source, Terminal, TerminalAirline
+from app.models import Airline, Airport, OsmTerminal, Source, Terminal, TerminalAirline
 from app.models.enums import VerificationStatus
 from app.seed.bundle import REVERIFY_DAYS, Bundle
 from app.seed.schemas import ProvenanceIn
 
 GEODATA_NOTE = "Geodata from OurAirports. Not yet cross-checked against AIP India."
+OSM_NOTE = "As mapped in OpenStreetMap. Not checked against the airport operator."
 
 
 @dataclass(frozen=True)
@@ -27,6 +28,7 @@ class SeedSummary:
     airlines: int
     terminals: int
     terminal_airlines: int
+    osm_terminals: int
 
 
 def _provenance(p: ProvenanceIn, table: str, sources: dict[str, uuid.UUID]) -> dict[str, Any]:
@@ -154,7 +156,32 @@ async def apply_bundle(conn: AsyncConnection, bundle: Bundle) -> SeedSummary:
                     )
                 )
 
+    osm_source = source_ids[bundle.osm_terminals.source]
+    osm_ids: list[uuid.UUID] = []
+    for ot in bundle.osm_terminals.terminals:
+        osm_ids.append(
+            await _upsert(
+                conn,
+                OsmTerminal,
+                {
+                    "airport_id": airport_ids[ot.iata],
+                    "osm_ref": ot.osm,
+                    "name": ot.name,
+                    "ref": ot.ref,
+                    "location": WKTElement(f"POINT({ot.lon} {ot.lat})", srid=4326),
+                    "verification_status": VerificationStatus.UNVERIFIED,
+                    "verified_at": None,
+                    "verified_by": None,
+                    "reverify_after_days": REVERIFY_DAYS["osm_terminals"],
+                    "primary_source_id": osm_source,
+                    "notes": OSM_NOTE,
+                },
+                ["osm_ref"],
+            )
+        )
+
     # Remove what the YAML no longer contains (children first, sources last).
+    await conn.execute(delete(OsmTerminal).where(OsmTerminal.id.not_in(osm_ids)))
     await conn.execute(delete(TerminalAirline).where(TerminalAirline.id.not_in(assignment_ids)))
     await conn.execute(delete(Terminal).where(Terminal.id.not_in(terminal_ids)))
     await conn.execute(delete(Airline).where(Airline.id.not_in(list(airline_ids.values()))))
@@ -168,4 +195,5 @@ async def apply_bundle(conn: AsyncConnection, bundle: Bundle) -> SeedSummary:
         airlines=len(airline_ids),
         terminals=len(terminal_ids),
         terminal_airlines=len(assignment_ids),
+        osm_terminals=len(osm_ids),
     )

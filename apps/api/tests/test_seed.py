@@ -103,3 +103,32 @@ def test_review_queue_lists_outdated_and_unverified(tmp_path: Path) -> None:
 def test_recently_verified_record_is_not_due(tmp_path: Path) -> None:
     bundle = read_bundle(with_test_terminal(tmp_path, verified_at="2026-11-01"))
     assert "DEL terminal T9" not in {d.where for d in due_for_review(bundle, date(2026, 11, 13))}
+
+
+def test_osm_terminals_must_belong_to_listed_airports(tmp_path: Path) -> None:
+    data = copy_data(tmp_path)
+    (data / "osm_terminals.yaml").write_text(
+        "source: openstreetmap\nretrieved_at: 2026-11-14\nterminals:\n"
+        "  - {iata: ZZZ, osm: way/1, name: Test, lat: 1, lon: 1}\n"
+        "  - {iata: DEL, osm: way/2, name: Test, lat: 1, lon: 1}\n"
+        "  - {iata: DEL, osm: way/2, name: Again, lat: 1, lon: 1}\n"
+        "  - {iata: DEL, osm: street/3, name: Bad, lat: 1, lon: 1}\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(SeedError) as exc:
+        read_bundle(data)
+    errors = "\n".join(exc.value.errors)
+    assert "osm" in errors  # street/3 fails the element format
+    data2 = copy_data(tmp_path / "b")
+    (data2 / "osm_terminals.yaml").write_text(
+        "source: openstreetmap\nretrieved_at: 2026-11-14\nterminals:\n"
+        "  - {iata: ZZZ, osm: way/1, name: Test, lat: 1, lon: 1}\n"
+        "  - {iata: DEL, osm: way/2, name: Test, lat: 1, lon: 1}\n"
+        "  - {iata: DEL, osm: way/2, name: Again, lat: 1, lon: 1}\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(SeedError) as exc2:
+        read_bundle(data2)
+    errors2 = "\n".join(exc2.value.errors)
+    assert "ZZZ is not in airports.yaml" in errors2
+    assert "duplicate element way/2" in errors2

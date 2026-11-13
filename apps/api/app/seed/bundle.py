@@ -15,6 +15,7 @@ from app.seed.schemas import (
     AirlinesFile,
     AirportsFile,
     GuideFile,
+    OsmTerminalsFile,
     ProvenanceIn,
     SourceIn,
     SourcesFile,
@@ -23,7 +24,7 @@ from app.seed.schemas import (
 DATA_DIR = Path(__file__).resolve().parents[2] / "data"
 
 # Default re-verification windows in days (docs/database/schema.md).
-REVERIFY_DAYS = {"airports": 365, "terminals": 180, "terminal_airlines": 90}
+REVERIFY_DAYS = {"airports": 365, "terminals": 180, "terminal_airlines": 90, "osm_terminals": 90}
 
 
 class SeedError(Exception):
@@ -37,6 +38,7 @@ class Bundle:
     sources: list[SourceIn]
     airports: AirportsFile
     airlines: AirlinesFile
+    osm_terminals: OsmTerminalsFile
     guides: list[GuideFile] = field(default_factory=list)
 
     @property
@@ -65,14 +67,15 @@ def read_bundle(data_dir: Path = DATA_DIR) -> Bundle:
     sources = _read(data_dir / "sources.yaml", SourcesFile, errors)
     airports = _read(data_dir / "airports.yaml", AirportsFile, errors)
     airlines = _read(data_dir / "airlines.yaml", AirlinesFile, errors)
+    osm = _read(data_dir / "osm_terminals.yaml", OsmTerminalsFile, errors)
     guides = [
         g
         for path in sorted((data_dir / "airport_guides").glob("*.yaml"))
         if (g := _read(path, GuideFile, errors)) is not None
     ]
-    if errors or sources is None or airports is None or airlines is None:
+    if errors or sources is None or airports is None or airlines is None or osm is None:
         raise SeedError(errors)
-    bundle = Bundle(sources.sources, airports, airlines, guides)
+    bundle = Bundle(sources.sources, airports, airlines, osm, guides)
     errors.extend(validate_bundle(bundle))
     if errors:
         raise SeedError(errors)
@@ -113,6 +116,18 @@ def validate_bundle(bundle: Bundle) -> list[str]:
     for a in rows:
         if a.state_code not in STATES:
             errors.append(f"airports.yaml: {a.iata}: unknown state code {a.state_code}")
+
+    osm = bundle.osm_terminals
+    if osm.source not in sources:
+        errors.append(f"osm_terminals.yaml: unknown source {osm.source!r}")
+    for ref in _dupes([t.osm for t in osm.terminals]):
+        errors.append(f"osm_terminals.yaml: duplicate element {ref}")
+    known = {a.iata for a in rows}
+    for mapped in osm.terminals:
+        if mapped.iata not in known:
+            errors.append(
+                f"osm_terminals.yaml: {mapped.osm}: {mapped.iata} is not in airports.yaml"
+            )
 
     airline_codes = {a.icao for a in bundle.airlines.airlines}
     for code in _dupes([a.icao for a in bundle.airlines.airlines]):

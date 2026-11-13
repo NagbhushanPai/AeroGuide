@@ -26,7 +26,8 @@ async def _write(data_dir: Path) -> None:
     print(
         f"seeded {summary.sources} sources, {summary.airports} airports "
         f"({summary.guides} with guides), {summary.airlines} airlines, "
-        f"{summary.terminals} terminals, {summary.terminal_airlines} terminal airlines"
+        f"{summary.terminals} terminals, {summary.terminal_airlines} terminal airlines, "
+        f"{summary.osm_terminals} OpenStreetMap terminals"
     )
 
 
