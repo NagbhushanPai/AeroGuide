@@ -1,0 +1,272 @@
+"""On-demand live snapshot (ADR-0012).
+
+- Upstream is fetched only when a request arrives and the snapshot is older than `ttl_s`;
+  an existing snapshot is served while the refresh runs in the background.
+- A single lock makes concurrent requests share one upstream sweep.
+- Providers are tried in order; the demo provider is only ever used if configured alone.
+- The snapshot is written to Redis at most every `warm_write_interval_s` so a restarted
+  instance can serve immediately (marked with its real age).
+- Reported routes are looked up a few at a time in the background and cached.
+"""
+
+import asyncio
+import json
+import logging
+import time
+from collections.abc import Callable, Sequence
+from dataclasses import dataclass, field
+from datetime import UTC, datetime
+from typing import Protocol
+
+from pydantic import TypeAdapter
+
+from app.providers.flight_info.adsbdb import RouteLookupError
+from app.providers.positions.base import PositionProvider, ProviderRateLimitedError
+from app.schemas.positions import AircraftState, ReportedRoute
+
+logger = logging.getLogger(__name__)
+
+SNAPSHOT_KEY = "positions:snapshot"
+SNAPSHOT_REDIS_TTL_S = 300
+ROUTE_TTL_S = 6 * 3600
+
+_aircraft_list = TypeAdapter(list[AircraftState])
+_route_or_none = TypeAdapter(ReportedRoute | None)
+
+
+class RouteLookup(Protocol):
+    async def route_for_callsign(self, callsign: str) -> ReportedRoute | None: ...
+
+
+class KeyValueStore(Protocol):
+    """The subset of redis.asyncio.Redis used here (keeps tests free of a real Redis)."""
+
+    async def get(self, name: str) -> str | None: ...
+    async def set(self, name: str, value: str, ex: int | None = None) -> object: ...
+
+
+@dataclass(frozen=True, slots=True)
+class SourceInfo:
+    name: str
+    url: str
+    attribution: str
+    is_demo: bool
+
+
+@dataclass(slots=True)
+class Snapshot:
+    aircraft: list[AircraftState]
+    source: SourceInfo
+    fetched_at: datetime
+    by_icao: dict[str, AircraftState] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.by_icao = {a.icao24: a for a in self.aircraft}
+
+
+class LiveService:
+    def __init__(
+        self,
+        providers: Sequence[PositionProvider],
+        routes: RouteLookup | None,
+        store: KeyValueStore | None,
+        *,
+        ttl_s: float = 60.0,
+        warm_write_interval_s: float = 60.0,
+        route_lookups_per_refresh: int = 10,
+        monotonic: Callable[[], float] = time.monotonic,
+    ) -> None:
+        if not providers:
+            raise ValueError("at least one position provider is required")
+        self._providers = list(providers)
+        self._routes = routes
+        self._store = store
+        self._ttl = ttl_s
+        self._warm_interval = warm_write_interval_s
+        self._route_budget = route_lookups_per_refresh
+        self._monotonic = monotonic
+
+        self._snapshot: Snapshot | None = None
+        self._last_attempt: float | None = None
+        self._last_warm_write: float | None = None
+        self.last_error: str | None = None
+        self._lock = asyncio.Lock()
+
+        self._route_cache: dict[str, tuple[float, ReportedRoute | None]] = {}
+        self._enrich_task: asyncio.Task[None] | None = None
+        self._refresh_task: asyncio.Task[None] | None = None
+        self._cooldown_until: dict[str, float] = {}
+
+    # ---- snapshot ---------------------------------------------------------------------
+
+    async def snapshot(self) -> Snapshot | None:
+        """Current snapshot, refreshing when due.
+
+        Stale-while-revalidate: if any snapshot exists, it's returned at once and the refresh
+        runs in the background (one at a time). Only a request with no snapshot at all waits.
+        Callers judge freshness from `fetched_at`, so a stale answer is never passed off as live.
+        """
+        if not self._is_due():
+            return self._snapshot
+        if self._snapshot is None:
+            async with self._lock:
+                if self._is_due():  # another request may have refreshed while we waited
+                    await self._refresh()
+            return self._snapshot
+        if self._refresh_task is None or self._refresh_task.done():
+            self._refresh_task = asyncio.create_task(self._locked_refresh())
+        return self._snapshot
+
+    async def _locked_refresh(self) -> None:
+        async with self._lock:
+            if self._is_due():
+                await self._refresh()
+
+    def _is_due(self) -> bool:
+        return self._last_attempt is None or self._monotonic() - self._last_attempt >= self._ttl
+
+    async def _refresh(self) -> None:
+        self._last_attempt = self._monotonic()
+        errors = []
+        for provider in self._providers:
+            if self._cooldown_until.get(provider.name, 0.0) > self._monotonic():
+                errors.append(f"{provider.name}: resting after rate limit")
+                continue
+            try:
+                aircraft = await provider.fetch()
+            except ProviderRateLimitedError as exc:
+                self._cooldown_until[provider.name] = self._monotonic() + exc.retry_after_s
+                errors.append(f"{provider.name}: rate-limited")
+                logger.warning("%s", exc)
+                continue
+            except Exception as exc:  # any provider failure → try the next one
+                errors.append(f"{provider.name}: {type(exc).__name__}")
+                logger.warning("position provider %s failed: %s", provider.name, exc)
+                continue
+            self._snapshot = Snapshot(
+                aircraft=aircraft,
+                source=SourceInfo(
+                    provider.name, provider.url, provider.attribution, provider.is_demo
+                ),
+                fetched_at=datetime.now(UTC),
+            )
+            self.last_error = "; ".join(errors) or None
+            await self._maybe_write_warm()
+            self._start_enrichment()
+            return
+        self.last_error = "; ".join(errors)
+
+    async def warm_start(self) -> None:
+        """Load the last snapshot saved by a previous instance (it keeps its real age)."""
+        if self._store is None:
+            return
+        try:
+            raw = await self._store.get(SNAPSHOT_KEY)
+            if not raw:
+                return
+            data = json.loads(raw)
+            self._snapshot = Snapshot(
+                aircraft=_aircraft_list.validate_python(data["aircraft"]),
+                source=SourceInfo(**data["source"]),
+                fetched_at=datetime.fromisoformat(data["fetched_at"]),
+            )
+        except Exception as exc:  # a bad cache entry must never stop the app starting
+            logger.warning("warm start skipped: %s", exc)
+
+    async def _maybe_write_warm(self) -> None:
+        if self._store is None or self._snapshot is None:
+            return
+        now = self._monotonic()
+        if self._last_warm_write is not None and now - self._last_warm_write < self._warm_interval:
+            return
+        self._last_warm_write = now
+        snap = self._snapshot
+        payload = {
+            "aircraft": _aircraft_list.dump_python(snap.aircraft, mode="json"),
+            "source": {
+                "name": snap.source.name,
+                "url": snap.source.url,
+                "attribution": snap.source.attribution,
+                "is_demo": snap.source.is_demo,
+            },
+            "fetched_at": snap.fetched_at.isoformat(),
+        }
+        try:
+            await self._store.set(SNAPSHOT_KEY, json.dumps(payload), ex=SNAPSHOT_REDIS_TTL_S)
+        except Exception as exc:
+            logger.warning("warm snapshot write failed: %s", exc)
+
+    # ---- routes -----------------------------------------------------------------------
+
+    def cached_route(self, callsign: str | None) -> ReportedRoute | None:
+        if not callsign:
+            return None
+        hit = self._route_cache.get(callsign)
+        if hit is None or hit[0] < self._monotonic():
+            return None
+        return hit[1]
+
+    def _route_known(self, callsign: str) -> bool:
+        hit = self._route_cache.get(callsign)
+        return hit is not None and hit[0] >= self._monotonic()
+
+    async def route(self, callsign: str | None) -> ReportedRoute | None:
+        """Route for one callsign, looking it up now if it isn't cached."""
+        if not callsign or self._routes is None:
+            return None
+        if self._route_known(callsign):
+            return self.cached_route(callsign)
+        return await self._lookup(callsign)
+
+    async def _lookup(self, callsign: str) -> ReportedRoute | None:
+        key = f"route:{callsign}"
+        if self._store is not None:
+            try:
+                raw = await self._store.get(key)
+                if raw is not None:
+                    route = _route_or_none.validate_json(raw)
+                    self._route_cache[callsign] = (self._monotonic() + ROUTE_TTL_S, route)
+                    return route
+            except Exception as exc:
+                logger.warning("route cache read failed: %s", exc)
+        if self._routes is None:
+            return None
+        try:
+            route = await self._routes.route_for_callsign(callsign)
+        except RouteLookupError as exc:
+            logger.info("route lookup for %s failed: %s", callsign, exc)
+            return None  # transient: not cached, retried later
+        self._route_cache[callsign] = (self._monotonic() + ROUTE_TTL_S, route)
+        if self._store is not None:
+            try:
+                await self._store.set(key, _route_or_none.dump_json(route).decode(), ex=ROUTE_TTL_S)
+            except Exception as exc:
+                logger.warning("route cache write failed: %s", exc)
+        return route
+
+    def _start_enrichment(self) -> None:
+        if self._routes is None or self._snapshot is None or self._snapshot.source.is_demo:
+            return
+        if self._enrich_task is not None and not self._enrich_task.done():
+            return
+        pending = [
+            a.callsign
+            for a in self._snapshot.aircraft
+            if a.callsign and not a.on_ground and not self._route_known(a.callsign)
+        ][: self._route_budget]
+        if pending:
+            self._enrich_task = asyncio.create_task(self._enrich(pending))
+
+    async def _enrich(self, callsigns: list[str]) -> None:
+        sem = asyncio.Semaphore(3)  # polite to the community service
+
+        async def one(cs: str) -> None:
+            async with sem:
+                await self._lookup(cs)
+
+        await asyncio.gather(*(one(cs) for cs in callsigns), return_exceptions=True)
+
+    async def aclose(self) -> None:
+        for task in (self._refresh_task, self._enrich_task):
+            if task is not None:
+                task.cancel()

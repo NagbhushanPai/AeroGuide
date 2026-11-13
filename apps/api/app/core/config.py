@@ -27,6 +27,21 @@ class Settings(BaseSettings):
 
     health_check_timeout_s: float = 2.0
 
+    # Live data (ADR-0004, ADR-0011, ADR-0012). Comma-separated, tried in order.
+    position_providers: Annotated[list[str], NoDecode] = ["adsblol", "opensky"]
+    route_lookups_enabled: bool = True
+    # One sweep a minute fits adsb.lol's 10 requests/minute limit (see adsblol.GRID).
+    snapshot_ttl_s: float = 60.0
+    route_lookups_per_refresh: int = 10
+    upstream_timeout_s: float = 12.0
+
+    @field_validator("position_providers", mode="before")
+    @classmethod
+    def split_providers(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [p.strip().lower() for p in value.split(",") if p.strip()]
+        return value
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def split_origins(cls, value: object) -> object:

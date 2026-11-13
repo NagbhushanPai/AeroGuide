@@ -7,6 +7,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.core.config import Settings
+from app.ingestion.live import LiveService
 
 
 @dataclass(frozen=True, slots=True)
@@ -14,6 +15,7 @@ class AppResources:
     settings: Settings
     engine: AsyncEngine
     redis: "Redis"
+    live: LiveService
 
 
 def get_resources(request: Request) -> AppResources:
