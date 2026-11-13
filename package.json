@@ -1,0 +1,30 @@
+{
+  "name": "aeroguide",
+  "private": true,
+  "description": "AeroGuide: aviation and airport intelligence for India",
+  "license": "MIT",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "up": "docker compose up -d --wait",
+    "down": "docker compose down",
+    "dev:web": "pnpm --filter web dev",
+    "dev:api": "cd apps/api && uv run uvicorn app.main:app --reload --port 8000",
+    "migrate": "cd apps/api && uv run alembic upgrade head",
+    "lint": "pnpm lint:web && pnpm lint:api",
+    "lint:web": "pnpm --filter web lint",
+    "lint:api": "cd apps/api && uv run ruff check . && uv run ruff format --check .",
+    "fmt": "pnpm --filter web fmt && cd apps/api && uv run ruff format . && uv run ruff check --fix .",
+    "typecheck": "pnpm typecheck:web && pnpm typecheck:api",
+    "typecheck:web": "pnpm --filter web typecheck",
+    "typecheck:api": "cd apps/api && uv run mypy",
+    "test": "pnpm test:web && pnpm test:api",
+    "test:web": "pnpm --filter web test",
+    "test:api": "cd apps/api && uv run pytest",
+    "build:web": "pnpm --filter web build",
+    "test:api:integration": "cd apps/api && uv run pytest --integration",
+    "install:api": "cd apps/api && uv sync"
+  }
+}
