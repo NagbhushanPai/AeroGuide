@@ -12,11 +12,11 @@ export type NavItem = {
 };
 
 export const mainNav: readonly NavItem[] = [
-  { href: "/", label: "Home", stage: 2 },
-  { href: "/live", label: "Live Flights", stage: 4 },
+  { href: "/", label: "Live Map", stage: 4 },
   { href: "/airports", label: "Airports", stage: 3 },
   { href: "/lounges", label: "Lounges", stage: 5 },
   { href: "/cards", label: "Cards", stage: 5 },
+  { href: "/about", label: "About", stage: 2 },
 ] as const;
 
 /** True when `pathname` is the nav item's page or a page nested under it. */

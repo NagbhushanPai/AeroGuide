@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import { Providers } from "@/components/providers";
-import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { siteConfig } from "@/lib/site";
 
@@ -18,15 +17,17 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: "#0b1220",
-  colorScheme: "dark",
+  colorScheme: "dark light",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    // Dark-first theme (docs/architecture/frontend-architecture.md). A light toggle arrives in Stage 2.
+    // next-themes sets the `dark`/`light` class before paint (dark by default), so the server
+    // markup can't know it: suppressHydrationWarning applies to this element only.
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
         <a
@@ -37,10 +38,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         <Providers>
           <SiteHeader />
-          <main id="main" className="flex-1">
-            {children}
-          </main>
-          <SiteFooter />
+          {/* Each route group supplies its own <main id="main">: (site) scrolls, the map is fixed. */}
+          {children}
         </Providers>
       </body>
     </html>

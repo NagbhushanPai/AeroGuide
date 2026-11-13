@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16">
+    <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-16">
       <EmptyState
         icon={Compass}
         title="Page not found"
@@ -16,6 +16,6 @@ export default function NotFound() {
           <Link href="/">Back to home</Link>
         </Button>
       </EmptyState>
-    </div>
+    </main>
   );
 }

@@ -1,9 +1,6 @@
 "use client";
 
-import { TriangleAlert } from "lucide-react";
-
-import { EmptyState } from "@/components/data/empty-state";
-import { Button } from "@/components/ui/button";
+import { ErrorState } from "@/components/data/error-state";
 
 export default function ErrorPage({
   reset,
@@ -12,16 +9,12 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-16">
-      <EmptyState
-        icon={TriangleAlert}
+    <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-4 py-16">
+      <ErrorState
         title="Something went wrong"
-        description="The page couldn't be loaded. Try again in a moment."
-      >
-        <Button variant="outline" onClick={reset}>
-          Try again
-        </Button>
-      </EmptyState>
-    </div>
+        description="This page couldn't be loaded. Try again in a moment."
+        onRetry={reset}
+      />
+    </main>
   );
 }

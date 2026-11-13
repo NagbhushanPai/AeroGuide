@@ -45,3 +45,6 @@ next-env.d.ts
 /test-results/
 /playwright-report/
 /blob-report/
+
+# generated at dev/build time (scripts/copy-maplibre-worker.mjs)
+/public/vendor/
