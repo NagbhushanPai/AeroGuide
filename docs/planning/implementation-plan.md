@@ -13,8 +13,9 @@ Last updated: 2026-11-13. This is the detailed plan for the **next** stage. Late
    - Next.js (App Router, TypeScript strict), Tailwind CSS, shadcn/ui init, Lucide.
    - ESLint and Prettier, Vitest + Testing Library, Playwright scaffold.
    - Placeholder routes for every nav item, each rendering a real "coming in Stage N" empty state. No dead links.
+   - `LICENSE` (MIT) is already in place from Stage 0.
 3. **apps/api**
-   - FastAPI app factory, settings via `pydantic-settings`, module layout per the [backend architecture](../architecture/backend-architecture.md).
+   - FastAPI app factory, settings via `pydantic-settings`, module layout per the [backend architecture](../architecture/backend-architecture.md). A single process, with no worker ([ADR-0012](../decisions/0012-zero-budget-hosting.md)).
    - SQLAlchemy 2.x async engine (asyncpg), Alembic initialised, with the first migration enabling the `postgis` extension.
    - Redis client. `GET /api/v1/health` reports DB, PostGIS and Redis status.
    - Ruff, mypy (strict on `app/`) and pytest with a test database.
@@ -33,6 +34,7 @@ Last updated: 2026-11-13. This is the detailed plan for the **next** stage. Late
 | Docker Desktop not running | Health checks with a clear error in `make dev` |
 | PostGIS version drift between local and Supabase | Pin the image. Supabase supports PostGIS. Check the version when deploying |
 | Next.js and shadcn/ui version churn | Pin versions in the lockfile and record them in the README |
+| Free-tier compatibility | Keep the API image small and stateless so Render free cold starts stay short. No paid-only services in Compose |
 
 ### Proposed commits
 - `chore: initialise monorepo tooling`

@@ -5,6 +5,7 @@
 | Status | Draft for approval (Stage 0) |
 | Last updated | 2026-11-13 |
 | Scope | India first, global later |
+| Constraints | **Non-commercial. Zero budget. Open data sources only** (owner decision, 2026-11-13) |
 
 ## 1. Problem
 
@@ -35,7 +36,8 @@ AeroGuide is an aviation and airport intelligence site for India that combines:
 
 **Goals (this phase)**
 - A production-quality, responsive site across five sections: Home, Live Flights, Airports, Lounges, Cards.
-- Real live positions where licensing allows. A clearly labelled demo mode otherwise.
+- Real live positions from open ADS-B networks. A clearly labelled demo mode for development.
+- Runs entirely on free tiers ($0).
 - Structured, sourced content with verification metadata.
 - A deterministic eligibility engine with policy history.
 - An architecture that can later expose services as AI tools.
@@ -43,7 +45,8 @@ AeroGuide is an aviation and airport intelligence site for India that combines:
 **Non-goals (this phase)**
 - Any AI or LLM feature (chat, RAG, embeddings, agents). See [ADR-0008](../decisions/0008-defer-ai-integration.md).
 - User accounts, saved flights and push alerts (backlog).
-- Booking, payments, affiliate checkout.
+- Booking, payments, affiliate checkout, ads or any other commercial use.
+- Airline schedules, gates, delays, cancellations and punctuality (no open data source exists).
 - Native mobile apps.
 - Coverage outside India.
 
@@ -68,20 +71,30 @@ IDs are referenced by the backlog and tests. **P0** = MVP, **P1** = MVP if time 
 | LIVE-3 | Select an aircraft to open the info panel (fields below) | P0 |
 | LIVE-4 | Draw the route (origin → aircraft → destination) when a route is known, styled as "reported" if unverified | P0 |
 | LIVE-5 | Search by callsign, flight number or registration | P0 |
-| LIVE-6 | Filters: airline, departure airport, arrival airport, status | P0 (airline). P1 (others, which need operational data) |
+| LIVE-6 | Filters: airline, departure airport, arrival airport, status | P0 (airline, observed state: airborne or on ground). P1 (departure and arrival airport, based on *reported* routes and labelled as such) |
 | LIVE-7 | Always-visible data-source badge and last-updated time. **DEMO DATA** label whenever simulated data is shown | P0 |
 | LIVE-8 | Stale handling. A position older than 60 s is shown faded. Older than 5 min it is hidden from the map but kept in search with "last seen" | P0 |
 | LIVE-9 | The map still works with no live data: basemap, airports layer, an empty state that explains why | P0 |
-| LIVE-10 | Updates without reload (polling ≤15 s at first, see [ADR-0005](../decisions/0005-live-updates-polling-first.md)) | P0 |
+| LIVE-10 | Updates without reload (polling every 15 s, see [ADR-0005](../decisions/0005-live-updates-polling-first.md)) | P0 |
+| LIVE-11 | A "waking up" state while the free-tier API cold-starts | P0 |
 
-**Info panel fields:** flight number, airline, aircraft type, origin, destination, current position, altitude, ground speed, heading, departure information, arrival information, estimated arrival, status, last updated. **Each field shows "—" or "Not available" when the source doesn't provide it. Nothing is inferred and shown as fact.** ETA is shown only when computed from live data, and is labelled "estimated".
+**Info panel fields:** flight number, airline, aircraft type, origin, destination, current position, altitude, ground speed, heading, departure information, arrival information, estimated arrival, status, last updated.
+
+With open data:
+- Origin and destination are a **reported route** (community data), labelled as such.
+- Departure and arrival *times* show **"Not available from open data sources"**.
+- Status is the **observed state** (airborne, on ground, not currently tracked).
+- Estimated arrival is computed from live position and speed, and labelled "estimated from live position".
+
+**Nothing is inferred and shown as fact.**
 
 ### Flight details (`/flight/[id]`)
 | ID | Requirement | Pri |
 |---|---|---|
-| FLT-1 | `[id]` = IATA flight number (for example `AI101`), with an optional `?date=YYYY-MM-DD` (IST) | P0 |
-| FLT-2 | Identification, airline, origin and destination, status, scheduled and estimated departure and arrival, duration, aircraft, route map, source, updated time | P0 |
-| FLT-3 | If no operational provider is configured: show live position data if any, and say clearly that schedule data isn't available | P0 |
+| FLT-1 | `[id]` = IATA flight number (for example `AI101`) or callsign | P0 |
+| FLT-2 | Identification, airline, reported origin and destination, observed state, live position, aircraft, estimated arrival (from live data), route map, source, updated time | P0 |
+| FLT-3 | Recent observed flights for that callsign (OpenSky first-seen and last-seen times, previous days) | P1 |
+| FLT-5 | Scheduled and estimated departure and arrival, and duration: shown as **"Not available from open data sources"** | P0 |
 | FLT-4 | 404 and "not found today" states | P0 |
 
 ### Airports (`/airports`, `/airport/[code]`)
@@ -92,6 +105,7 @@ IDs are referenced by the backlog and tests. **P0** = MVP, **P1** = MVP if time 
 | APT-3 | Detail page sections: overview, code and location, terminals, airlines by terminal, lounges, dining, shopping, transport, facilities, passenger info | P0 |
 | APT-4 | Each section and record shows its source and verification date. Unverified or missing data is marked as such | P0 |
 | APT-5 | Small live map of nearby traffic | P1 |
+| APT-7 | "Flights observed yesterday" list (OpenSky movements), labelled with source and date | P1 |
 | APT-6 | Initial airports: DEL, BOM, BLR, HYD, MAA, COK, JAI | P0 |
 
 ### Lounges (`/lounges`, `/lounge/[slug]`)
@@ -119,7 +133,9 @@ IDs are referenced by the backlog and tests. **P0** = MVP, **P1** = MVP if time 
 | Responsive | 360 px to 1920 px. The live panel becomes a bottom sheet on mobile |
 | SEO | Server-rendered airport, lounge and card pages with structured data |
 | Security | No secrets in the frontend. Provider keys server-side only. Rate limiting on public API. OWASP ASVS L1 baseline |
-| Reliability | Content pages work if the flight provider is down. The live page degrades to an empty or demo state with an explanation |
+| Reliability | Content pages are static or ISR and work if the API is asleep or a data source is down. The live page degrades to a "waking", "delayed" or "unavailable" state with an explanation |
+| Cost | $0. Free tiers only ([ADR-0012](../decisions/0012-zero-budget-hosting.md)) |
+| Data freshness | A weekly automated data check ([ADR-0013](../decisions/0013-weekly-data-check.md)) |
 | Data integrity | Provenance on every mutable record (see [ADR-0006](../decisions/0006-content-provenance-and-verification.md)) |
 | Observability | Structured logs, provider health and freshness metrics, error tracking |
 
@@ -132,6 +148,7 @@ IDs are referenced by the backlog and tests. **P0** = MVP, **P1** = MVP if time 
 
 ## 8. Constraints and dependencies
 
-- Flight data licensing depends on whether AeroGuide is commercial. See [provider research](../research/aviation-data-providers.md).
-- Content accuracy depends on an ongoing manual verification process.
+- Flight data is limited to open sources (adsb.lol, OpenSky, adsbdb), with their attribution and licence terms. See [provider research](../research/aviation-data-providers.md).
+- Content accuracy depends on re-verification by a person, prompted by the weekly data check.
+- Free-tier limits (cold starts, database size, Redis command cap) shape the design ([ADR-0012](../decisions/0012-zero-budget-hosting.md)).
 - The tech stack is fixed by the project brief (see [system architecture](../architecture/system-architecture.md)).

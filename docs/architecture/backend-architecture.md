@@ -23,9 +23,10 @@ app/
 │   └── eligibility/        # engine.py (pure), rules.py (typed rule models), explain.py
 ├── providers/
 │   ├── positions/          # base.py (Protocol), demo.py, adsblol.py, opensky.py
-│   ├── operational/        # base.py (Protocol), aeroapi.py, aerodatabox.py, none.py
+│   ├── flight_info/        # base.py (Protocol), adsbdb.py (routes), opensky.py (airport movements)
 │   └── registry.py         # builds providers from settings
-├── workers/                # ingest_positions.py, staleness_report.py
+├── ingestion/              # on-demand snapshot refresh, single-flight lock, trail ring buffer (ADR-0012)
+├── jobs/                   # data_check.py: weekly job run by GitHub Actions (ADR-0013)
 └── seed/                   # loader + validation (content lives in /data, see ADR-0007)
 migrations/                 # Alembic
 tests/
@@ -52,11 +53,14 @@ class PositionProvider(Protocol):
     is_demo: bool
     async def fetch(self, area: BBox) -> PositionBatch: ...   # normalised AircraftState list + fetched_at
 
-class OperationalProvider(Protocol):
+class FlightInfoProvider(Protocol):
     name: str
-    async def flight(self, flight_number: str, date: date) -> FlightRecord | None: ...
     async def route_for_callsign(self, callsign: str) -> RouteRecord | None: ...
+    async def airport_movements(self, icao: str, day: date) -> list[ObservedMovement]: ...
+    async def schedule(self, flight_number: str, day: date) -> FlightRecord | None: ...  # None for all open sources
 ```
+
+Only open, free sources are used ([ADR-0004](../decisions/0004-flight-provider-abstraction.md)). `schedule()` is kept in the interface so a schedule source could be added later without changing services.
 
 `AircraftState` fields: `icao24`, `callsign`, `registration`, `type_code`, `lat`, `lon`, `alt_baro_ft`, `on_ground`, `gs_kt`, `track_deg`, `vrate_fpm`, `squawk`, `position_time`, `source`. **Every field is nullable except `icao24`, `lat`, `lon` and `position_time`.** Nothing is filled in with a guessed default.
 
@@ -66,9 +70,10 @@ class OperationalProvider(Protocol):
 |---|---|---|
 | GET | `/api/v1/health`, `/api/v1/health/data` | Liveness and data freshness |
 | GET | `/api/v1/positions?bbox=` | Latest positions as GeoJSON + `meta` |
-| GET | `/api/v1/positions/{icao24}` | Single aircraft latest state (+ recent trail, P1) |
+| GET | `/api/v1/positions/{icao24}` | Single aircraft latest state + reported route (+ 15-min trail, P1) |
 | GET | `/api/v1/flights/search?q=` | Search by flight number, callsign or registration |
-| GET | `/api/v1/flights/{flight_number}?date=` | Flight details |
+| GET | `/api/v1/flights/{flight_number}` | Flight page data: live state, reported route, recent observed flights |
+| GET | `/api/v1/airports/{iata}/movements` | Flights observed at the airport yesterday (OpenSky) |
 | GET | `/api/v1/airports?q=&region=&city=` | Airport search |
 | GET | `/api/v1/airports/{iata}` | Airport detail (terminals, airlines, facilities, transport, sources) |
 | GET | `/api/v1/airports/{iata}/terminals` | Terminal information |
@@ -82,4 +87,4 @@ Full details are in [docs/api/api-overview.md](../api/api-overview.md).
 
 ## Errors
 
-Errors use RFC 9457 problem-details JSON (`type`, `title`, `status`, `detail`, `instance`). Upstream provider failures map to `503` with `retry_after`. They are never turned into empty "success" responses that look like "no flights".
+Errors use RFC 9457 problem-details JSON (`type`, `title`, `status`, `detail`, `instance`). Upstream source failures map to `503` with `retry_after`. They are never turned into empty "success" responses that look like "no flights".

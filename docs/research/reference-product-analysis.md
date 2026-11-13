@@ -1,8 +1,7 @@
-# VIMANA reference analysis
+# Reference product analysis
 
 | | |
 |---|---|
-
 | Inspected | 2026-11-13 |
 | Purpose | Functional and UX reference for AeroGuide. **We use it for function and UX only.** We do not copy its code, branding, copy, assets or data. |
 
@@ -10,11 +9,11 @@
 
 - Pages fetched: `/`, `/airport/del`, `/lounge-access`, `robots.txt`, `sitemap.xml`.
 - The public JS bundle was skimmed for the host names it calls and its UI concepts (data source badges, demo mode, staleness). No code was kept.
-- `robots.txt` disallows `/api/`. We did not call VIMANA's API and we will not scrape its data.
+- `robots.txt` disallows `/api/`. We did not call the reference product's API and we will not scrape its data.
 
 ## Information architecture
 
-| Area | VIMANA URL | What it holds |
+| Area | Reference URL | What it holds |
 |---|---|---|
 | Live map | `/` | Full-screen radar map over India. The map is the home page. |
 | Airport guides | `/airports`, `/airport/{iata}` (16 airports: DEL, BOM, BLR, HYD, MAA, CCU, COK, AMD, GOX, GOI, PNQ, JAI, LKO, GAU, TRV, IXC) | Terminal by airline, lounges, food and shops (after security, before security, arrivals), links to other airports |
@@ -79,6 +78,6 @@ Navigation is minimal: three text links (live map, airport guides, lounge access
 
 ## Things we must not do
 
-- Reuse the VIMANA name, wordmark, fonts, colours, copy or screenshots.
+- Reuse the reference product's name, wordmark, fonts, colours, copy or screenshots.
 - Copy its airport, lounge or card datasets. Every AeroGuide fact must trace to a primary source (see the [data-source research](./indian-airport-data-sources.md)).
 - Call its `/api/` endpoints.

@@ -35,4 +35,15 @@ Last updated: 2026-11-13. Status: planned (no tests yet; tooling arrives in Stag
 ## Provider adapters
 
 - Recorded HTTP fixtures (respx). No live calls in CI.
-- An optional nightly live smoke job (manual dispatch) with secrets, to detect upstream API changes.
+- Live smoke checks against adsb.lol, OpenSky and adsbdb run in the **weekly data-check job** ([ADR-0013](../decisions/0013-weekly-data-check.md)) to detect upstream API changes.
+
+## On-demand ingestion
+
+- Single-flight lock: N concurrent requests on a stale snapshot cause exactly one upstream sweep.
+- No upstream calls are made while nobody is requesting positions.
+- Redis snapshot writes happen at most once every 60 s.
+
+## Weekly data-check job
+
+- Unit tests for staleness calculation and content-hash change detection.
+- A dry run (`--dry-run`) against a seeded test DB in CI that prints the issue body without opening an issue.

@@ -12,7 +12,7 @@ Next.js (App Router), TypeScript strict, Tailwind CSS, shadcn/ui (Radix primitiv
 |---|---|---|
 | `/` | Server component, ISR (revalidate 1 h) | Featured airports, lounges and cards from the API |
 | `/live` | Server shell + **client-only** map (`dynamic(..., { ssr: false })`) | Positions polled through TanStack Query |
-| `/flight/[id]` | Server component, revalidate 60 s, with client refresh | Flight service |
+| `/flight/[id]` | Server shell + client refresh | Flight service (observed data only, open sources) |
 | `/airports` | Server component, ISR. Search and filters in URL params | Airport search API |
 | `/airport/[code]` | Server component, ISR + `generateStaticParams` for seeded airports | Airport detail API |
 | `/lounges`, `/lounge/[slug]` | Same pattern | Lounge APIs |
@@ -53,10 +53,10 @@ src/
 ## Live map design
 
 - **Rendering:** one GeoJSON source, `aircraft`, rendered as a **symbol layer** (SDF plane icon, `icon-rotate: ['get','track']`, `icon-rotation-alignment: map`, colour from an altitude expression). This handles thousands of aircraft on the GPU. DOM markers are avoided.
-- **Update loop:** `usePositions(bbox)` with a 10 s `refetchInterval`, paused when the tab is hidden. Each update calls `source.setData()`. Optional client-side dead reckoning between polls, applied only to positions under 30 s old.
+- **Update loop:** `usePositions(bbox)` with a 15 s `refetchInterval`, paused when the tab is hidden. Each update calls `source.setData()`. Optional client-side dead reckoning between polls, applied only to positions under 30 s old.
 - **Selection:** `feature-state` highlight plus a URL param `?f={icao24}`, so a selected flight can be linked. The panel is a right sidebar on desktop and a bottom sheet on mobile.
 - **Accessibility:** a list view of aircraft in the viewport (sortable, keyboard-navigable) as an alternative to the map. The selected-flight panel is a focus-managed dialog region.
-- **States:** loading skeleton; `live`; `demo` (badge); `degraded` (stale snapshot, with a banner); `unavailable` (basemap and airports still shown, with an explanation).
+- **States:** loading skeleton; `waking` ("Waking up the live data service…" while the free-tier API cold-starts); `live`; `demo` (badge); `degraded` (stale snapshot, with a banner); `unavailable` (basemap and airports still shown, with an explanation).
 
 ## Visual system
 

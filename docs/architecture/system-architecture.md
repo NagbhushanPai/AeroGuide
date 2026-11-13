@@ -2,58 +2,65 @@
 
 Last updated: 2026-11-13. Status: proposed (Stage 0).
 
+**Constraints:** AeroGuide is non-commercial, has a **zero budget**, and uses **open data only**.
+
 ## Overview
 
 AeroGuide is a **modular monolith** ([ADR-0002](../decisions/0002-modular-monolith-monorepo.md)) made of:
 
 - a Next.js web app,
-- one FastAPI codebase deployed as two processes (an **API** and a **worker**),
+- one FastAPI codebase running as a single API process,
 - PostgreSQL + PostGIS for durable data,
-- Redis for live positions and caching.
+- Redis for small shared caches.
+
+Live positions are fetched **on demand** while people are viewing the map ([ADR-0012](../decisions/0012-zero-budget-hosting.md)). Scheduled checks run on GitHub Actions ([ADR-0013](../decisions/0013-weekly-data-check.md)).
 
 ```mermaid
 flowchart LR
   subgraph Client
     B[Browser]
   end
-  subgraph Vercel
-    W[Next.js web<br/>RSC pages + client map]
+  subgraph "Vercel (Hobby)"
+    W[Next.js web<br/>static/ISR pages + client map]
   end
-  subgraph "Render / Railway"
-    A[FastAPI API<br/>/api/v1]
-    K[Worker<br/>position ingestion<br/>staleness jobs]
+  subgraph "Render (free web service)"
+    A[FastAPI API /api/v1<br/>in-memory live snapshot<br/>on-demand ingestion]
+  end
+  subgraph "GitHub Actions"
+    J[Weekly data check<br/>cron Mon 03:00 UTC]
   end
   subgraph Data
-    P[(PostgreSQL + PostGIS)]
-    R[(Redis)]
+    P[(Supabase Postgres + PostGIS)]
+    R[(Upstash Redis)]
   end
-  subgraph External
-    FP[Position providers<br/>adsb.lol / OpenSky / demo]
-    OP[Operational provider<br/>AeroAPI / AeroDataBox]
-    T[Basemap tiles<br/>OpenFreeMap / PMTiles]
+  subgraph "Open data"
+    FP[Positions<br/>adsb.lol · OpenSky]
+    FI[Flight info<br/>adsbdb routes · OpenSky movements]
+    T[Basemap tiles<br/>OpenFreeMap]
   end
 
-  B -->|HTML / RSC| W
-  B -->|live polling via TanStack Query| A
+  B -->|HTML| W
+  B -->|poll positions every 15 s| A
   B -->|vector tiles| T
-  W -->|server fetch, ISR| A
+  W -->|build/ISR fetch| A
   A --> P
-  A --> R
-  A -->|on-demand, cached| OP
-  K -->|poll every ~10 s| FP
-  K -->|snapshot + GEO index| R
-  K -->|sampled history| P
+  A -->|route + snapshot cache| R
+  A -->|on demand, ≤ 1 sweep / 15 s| FP
+  A -->|on demand, cached| FI
+  J -->|read-only checks| P
+  J -->|smoke checks| FP
+  J -->|opens issue| GH[GitHub issue: data-check]
 ```
 
 ## Responsibilities
 
 | Component | Owns | Doesn't do |
 |---|---|---|
-| **Web** | Rendering, routing, SEO, map UI, client state | Business rules, holding provider credentials, eligibility logic |
-| **API** | REST contracts, validation, services (airports, lounges, cards, eligibility, flights), caching | Polling providers in request paths (except on-demand operational lookups) |
-| **Worker** | Polling position providers, normalising, writing Redis, sampling history, staleness reports | Serving HTTP |
-| **Postgres + PostGIS** | Reference and content data, policy versions, provenance, sampled positions | Hot live state |
-| **Redis** | Latest position snapshot, GEO index, response caches, rate-limit counters | Durable records |
+| **Web** | Rendering, routing, SEO, map UI, client state | Business rules, provider calls, eligibility logic |
+| **API** | REST contracts, validation, services, on-demand ingestion with a single-flight lock, in-memory snapshot and rate limits | Background polling while nobody is viewing |
+| **Weekly job** | Staleness report, source-link and content-change checks, seed validation, provider smoke checks | Editing any data |
+| **Postgres + PostGIS** | Reference and content data, policy versions, provenance, source-check results | Live positions (no history on the free tier) |
+| **Redis** | Route cache, airport-movements cache, warm-start snapshot (written ≤ 1/min) | Per-request work (the command budget is 500K a month) |
 
 ## Key decisions
 
@@ -62,7 +69,7 @@ flowchart LR
 | ADR format | [0001](../decisions/0001-record-architecture-decisions.md) |
 | Modular monolith in a monorepo | [0002](../decisions/0002-modular-monolith-monorepo.md) |
 | Stack and tooling (pnpm, uv) | [0003](../decisions/0003-technology-stack-and-tooling.md) |
-| Flight provider abstraction and data classes | [0004](../decisions/0004-flight-provider-abstraction.md) |
+| Provider abstraction, open sources only | [0004](../decisions/0004-flight-provider-abstraction.md) |
 | Polling before push | [0005](../decisions/0005-live-updates-polling-first.md) |
 | Provenance and verification on content | [0006](../decisions/0006-content-provenance-and-verification.md) |
 | Content as reviewed seed files | [0007](../decisions/0007-content-as-reviewed-seed-files.md) |
@@ -70,10 +77,13 @@ flowchart LR
 | Deterministic, versioned eligibility engine | [0009](../decisions/0009-deterministic-eligibility-engine.md) |
 | MapLibre symbol layer and basemap choice | [0010](../decisions/0010-map-rendering-and-basemap.md) |
 | Demo mode is explicit, never an automatic fallback | [0011](../decisions/0011-demo-mode-is-explicit.md) |
+| Zero-budget hosting, on-demand ingestion | [0012](../decisions/0012-zero-budget-hosting.md) |
+| Weekly data check job | [0013](../decisions/0013-weekly-data-check.md) |
 
 ## Cross-cutting concerns
 
 - **Config:** twelve-factor env vars (`pydantic-settings` in the API, `NEXT_PUBLIC_*` only for non-secret values in the web app).
-- **Security:** provider keys are held only by the API and worker. CORS allows only the web origin. Rate limiting is per IP on public endpoints (Redis token bucket). Strict input validation via Pydantic. CSP headers on the web app.
-- **Observability:** JSON logs with request IDs. `/api/v1/health` (liveness) and `/api/v1/health/data` (provider freshness and the age of the last snapshot). Error tracking (Sentry or similar, still to be chosen).
-- **Time:** everything is stored in UTC and displayed in IST (`Asia/Kolkata`) by default, labelled "IST".
+- **Security:** no secrets in the frontend. The OpenSky client credentials and DB URLs live only in the Render, Vercel and GitHub secret stores. CORS allows only the web origin. Per-IP rate limiting (in memory). Strict Pydantic validation. CSP headers.
+- **Observability:** JSON logs with request IDs. `/api/v1/health` (liveness) and `/api/v1/health/data` (snapshot age, active source, last upstream error).
+- **Time:** stored in UTC and displayed in IST (`Asia/Kolkata`) by default, labelled "IST".
+- **Licences:** AeroGuide code is MIT. Third-party data keeps its own licence (for example adsb.lol is ODbL, map data is © OpenStreetMap contributors) and is credited in the UI.

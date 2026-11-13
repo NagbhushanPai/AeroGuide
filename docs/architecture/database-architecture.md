@@ -14,10 +14,10 @@ Last updated: 2026-11-13. Status: proposed. The entity details are in [docs/data
 
 | Domain | Tables |
 |---|---|
-| Provenance | `sources`, `record_sources` |
+| Provenance | `sources`, `record_sources`, `source_checks` (weekly job results, [ADR-0013](../decisions/0013-weekly-data-check.md)) |
 | Airports | `airports`, `terminals`, `terminal_airlines`, `airport_facilities`, `airport_transport`, `airport_outlets` |
 | Aviation reference | `airlines`, `aircraft_types`, `aircraft` |
-| Flights | `flights`, `flight_positions` (partitioned) |
+| Flights | `flights`, `flight_positions` (partitioned; **unused on the free tier**, see [ADR-0012](../decisions/0012-zero-budget-hosting.md)) |
 | Lounges | `lounges`, `amenities`, `lounge_amenities`, `access_programs`, `lounge_access_methods` (versioned) |
 | Cards | `banks`, `card_networks`, `credit_cards`, `card_variants`, `lounge_policies` (versioned), `policy_rules` |
 
@@ -39,4 +39,4 @@ The policy-history requirement is met by the version rows themselves: `lounge_po
 
 ## Hosting
 
-Supabase (managed Postgres with PostGIS available) is the default target. Any managed Postgres ≥ 15 with PostGIS works. Connection pooling goes through the provider's pooler. Use session mode for Alembic and transaction mode for the API.
+Supabase **free tier** (500 MB, PostGIS available) is the target. Content data for the MVP is a few MB, so it fits easily. Position history is the only thing that wouldn't fit, and it's disabled. Any managed Postgres ≥ 15 with PostGIS works. Connection pooling goes through the provider's pooler. Use session mode for Alembic and transaction mode for the API.
