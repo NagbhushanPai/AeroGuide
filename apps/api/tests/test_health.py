@@ -6,7 +6,9 @@ from app.api.deps import AppResources
 from app.core.config import Settings
 from app.database.redis import create_redis
 from app.database.session import create_engine
+from app.ingestion.live import LiveService
 from app.main import create_app
+from app.providers.positions.demo import DemoProvider
 from app.services.health import check_redis, get_health
 
 
@@ -57,7 +59,13 @@ async def test_health_endpoint_returns_200_with_degraded_body() -> None:
     settings = Settings(environment="test", database_url=UNREACHABLE_DB, health_check_timeout_s=2.0)
     app = create_app(settings)
     engine = create_engine(UNREACHABLE_DB)
-    app.state.resources = AppResources(settings=settings, engine=engine, redis=FakeRedis(True))  # type: ignore[arg-type]
+    live = LiveService([DemoProvider()], None, None)
+    app.state.resources = AppResources(
+        settings=settings,
+        engine=engine,
+        redis=FakeRedis(True),  # type: ignore[arg-type]
+        live=live,
+    )
     try:
         transport = httpx.ASGITransport(app=app)
         async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:

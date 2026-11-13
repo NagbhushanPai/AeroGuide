@@ -7,19 +7,19 @@ const byHref = (href: string) => mainNav.find((item) => item.href === href)!;
 describe("mainNav", () => {
   it("has the five primary sections in order", () => {
     expect(mainNav.map((item) => item.label)).toEqual([
-      "Home",
-      "Live Flights",
+      "Live Map",
       "Airports",
       "Lounges",
       "Cards",
+      "About",
     ]);
   });
 });
 
 describe("isActive", () => {
-  it("matches Home only on the root path", () => {
+  it("matches the live map only on the root path", () => {
     expect(isActive(byHref("/"), "/")).toBe(true);
-    expect(isActive(byHref("/"), "/live")).toBe(false);
+    expect(isActive(byHref("/"), "/airports")).toBe(false);
   });
 
   it("matches a section and its nested pages", () => {
