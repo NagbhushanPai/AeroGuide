@@ -2,7 +2,9 @@
 
 Last updated: 2026-11-13. This document is updated whenever a migration changes it.
 
-**Implemented (migration 0002):** `sources`, `record_sources`, `source_checks`, `airports`, `terminals`, `airlines`, `terminal_airlines`. Everything else is still proposed (Stages 4 and 5).
+**Implemented (migration 0002):** `sources`, `record_sources`, `source_checks`, `airports`, `terminals`, `airlines`, `terminal_airlines`.
+
+**Implemented (migration 0003):** `osm_terminals` (provenance mixin; unique `osm_ref`) and `airport_sightings` (`bigint` identity; unique (`airport_id`, `airline_icao`, `icao24`, `service_date`); index (`airport_id`, `service_date`); rows older than 45 days are deleted by the live service). Both are deliberately separate from `terminals` and `terminal_airlines`, so mapped or observed data can't be mistaken for a verified assignment. Everything else is still proposed (Stages 4 and 5).
 
 Differences from the first proposal, decided while implementing:
 

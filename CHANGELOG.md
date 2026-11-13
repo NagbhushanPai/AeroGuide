@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (terminals and airlines from open data)
+- Terminals as mapped in OpenStreetMap: `scripts/build_osm_terminals.py` builds `apps/api/data/osm_terminals.yaml` (92 passenger terminals at 66 airports), seeded into a new `osm_terminals` table, unverified and credited to OpenStreetMap contributors (ODbL). Shown on airport guides apart from verified terminals.
+- Airlines seen at each airport: the live service records aircraft with airline callsigns on the ground or below 3,000 ft within 6 km of an airport, once per aircraft, airline, airport and IST day (`airport_sightings`, kept 45 days). `GET /api/v1/airports/{code}/airlines-seen?days=7` and an "Airlines seen here" section on guides, with the method and its gaps stated.
+
 ### Added (Stage 3: airports)
 - Database: sources, source checks, record sources, airports, terminals, airlines and terminal airlines (migration 0002), each fact-bearing table with provenance and a "verified needs evidence" check.
 - Seed content in `apps/api/data/`: 116 Indian airports with scheduled service (OurAirports geodata, marked unverified), sources, and guide files for DEL, BOM, BLR, HYD, MAA, COK and JAI with their official websites. No terminals yet: they need checking against official sources.

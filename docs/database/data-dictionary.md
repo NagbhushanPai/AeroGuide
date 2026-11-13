@@ -29,6 +29,16 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 | `airport_outlets.zone` | `airside` (after security), `landside` (before security), `arrivals` |
 | `airport_facilities.category` | For example `wifi`, `medical`, `prayer_room`, `accessibility`, `baggage_wrap`, `forex`, `pharmacy` |
 
+## Open data about airports
+
+| Table.field | Meaning |
+|---|---|
+| `osm_terminals` | A terminal building mapped in OpenStreetMap (`aeroway=terminal` inside the aerodrome). Named passenger terminals only; cargo, freight, general-aviation and VIP buildings are left out by name. Always `unverified` |
+| `osm_terminals.osm_ref` | The OSM element, for example `way/51419058`, linked as `https://www.openstreetmap.org/way/51419058` |
+| `airport_sightings` | One aircraft of one airline seen at one airport on one IST day: on the ground, or below 3,000 ft within 6 km of the reference point, in the live ADS-B snapshot. An observation while the live service ran; never a schedule or terminal claim |
+| `airport_sightings.airline_icao` | The callsign's three-letter prefix when it's followed by a digit (`IGO6123` → `IGO`). Registrations and other callsigns are ignored |
+| `airport_sightings.airline_name` | From the community route lookup when one was made for that callsign. Often `null` |
+
 ## Flights
 
 | Table.field | Meaning |

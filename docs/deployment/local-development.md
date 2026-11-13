@@ -75,6 +75,8 @@ Never commit `.env` files. Only `.env.example` files are tracked.
 ## Airport data
 
 - `apps/api/data/airports.yaml` and `apps/web/public/data/airports-in.geojson` are both generated from OurAirports by `python scripts/build_airport_data.py airports.csv` (see the script's docstring for the download URL). Regenerate them together.
+- `python scripts/build_osm_terminals.py` refreshes `apps/api/data/osm_terminals.yaml` from OpenStreetMap (one Overpass API request). Fix wrong terminals in OpenStreetMap itself, not in the file.
+- With the live map open, the API records airline sightings near airports every sweep and writes them every 5 minutes (`SIGHTINGS_ENABLED`, `SIGHTINGS_FLUSH_INTERVAL_S`).
 - The integration tests' migration test downgrades to an empty database. Run `pnpm seed` again afterwards if you want data in your local database.
 - The live map's airport search reads the static GeoJSON, so it works without the API. The `/airports` pages need the API and a seeded database.
 

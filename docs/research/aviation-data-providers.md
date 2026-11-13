@@ -76,6 +76,15 @@ These fields show **"Not available from open data sources"**. The only status sh
 
 On Render's free tier, outgoing requests share IP addresses with other apps. adsb.lol answered `429` on the **second** request of a sweep, and OpenSky requests failed. A single community source isn't enough from shared hosting, which is why adsb.fi was added as a second source with the same data format.
 
+### Terminals and airlines (2026-11-14)
+
+No open dataset says which airline uses which terminal. AeroGuide uses two open substitutes, each labelled for what it is:
+
+- **OpenStreetMap terminals** (ODbL 1.0, credit "© OpenStreetMap contributors"): named `aeroway=terminal` buildings inside each aerodrome, via one Overpass API query per refresh. Good coverage at large Indian airports; names are as mapped and may be out of date.
+- **Airlines seen at airports**: derived from the live ADS-B snapshot we already fetch. Shows which airlines operate at an airport, not their terminal. Only collected while the free API is awake.
+
+Verified terminal assignments still need a person reading the airport's or airline's official page ([CONTRIBUTING.md](../../CONTRIBUTING.md)).
+
 ## Open questions
 
 1. Does adsb.lol's ODbL licence and its terms fit our use (display plus short-lived caching, no redistribution of a database)? Ask the project.
