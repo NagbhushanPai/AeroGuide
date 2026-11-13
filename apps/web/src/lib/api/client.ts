@@ -15,6 +15,16 @@ export type SourceRef = components["schemas"]["SourceRef"];
 export type TerminalOut = components["schemas"]["TerminalOut"];
 export type MappedTerminals = components["schemas"]["MappedTerminals"];
 export type AirlinesSeen = components["schemas"]["AirlinesSeen"];
+export type LoungeSummary = components["schemas"]["LoungeSummary"];
+export type LoungeList = components["schemas"]["LoungeList"];
+export type LoungeDetail = components["schemas"]["LoungeDetail"];
+export type CardSummary = components["schemas"]["CardSummary"];
+export type CardList = components["schemas"]["CardList"];
+export type CardDetail = components["schemas"]["CardDetail"];
+export type PolicyOut = components["schemas"]["PolicyOut"];
+export type EligibilityRequest = components["schemas"]["EligibilityRequest"];
+export type EligibilityResponse = components["schemas"]["EligibilityResponse"];
+export type EligibilityStatus = components["schemas"]["LoungeResult"]["status"];
 export type Region = AirportSummary["region"];
 
 export const REGIONS: readonly Region[] = [
@@ -99,6 +109,48 @@ export async function fetchAirlinesSeen(
     if (err instanceof ApiError && err.status === 404) return null;
     throw err;
   }
+}
+
+async function nullOn404<T>(p: Promise<T>): Promise<T | null> {
+  try {
+    return await p;
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
+}
+
+export function fetchLounges(airport?: string, signal?: AbortSignal): Promise<LoungeList> {
+  const qs = airport ? `?airport=${encodeURIComponent(airport)}` : "";
+  return getJson<LoungeList>(`/api/v1/lounges${qs}`, signal);
+}
+
+export function fetchLounge(slug: string, signal?: AbortSignal): Promise<LoungeDetail | null> {
+  return nullOn404(getJson<LoungeDetail>(`/api/v1/lounges/${encodeURIComponent(slug)}`, signal));
+}
+
+export function fetchCards(signal?: AbortSignal): Promise<CardList> {
+  return getJson<CardList>("/api/v1/cards", signal);
+}
+
+export function fetchCard(slug: string, signal?: AbortSignal): Promise<CardDetail | null> {
+  return nullOn404(getJson<CardDetail>(`/api/v1/cards/${encodeURIComponent(slug)}`, signal));
+}
+
+/** Nothing in the request is stored by the API. Null for an unknown airport. */
+export async function checkEligibility(
+  body: EligibilityRequest,
+  signal?: AbortSignal,
+): Promise<EligibilityResponse | null> {
+  const res = await fetch(`${API_BASE_URL}/api/v1/eligibility`, {
+    method: "POST",
+    signal,
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new ApiError(res.status, `${res.status} ${res.statusText}`);
+  return (await res.json()) as EligibilityResponse;
 }
 
 /** Resolves to null when the aircraft is no longer tracked (404). */

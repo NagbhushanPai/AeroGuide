@@ -39,16 +39,16 @@ const features: readonly Feature[] = [
   {
     href: "/lounges",
     title: "Lounges",
-    description: "Find lounges by airport, terminal and amenities.",
+    description: "Lounges by airport and terminal, with hours and the programmes they accept.",
     icon: Sofa,
-    available: false,
+    available: true,
   },
   {
     href: "/cards",
     title: "Card lounge access",
     description: "Which credit cards get you in, under which conditions, and when.",
     icon: CreditCard,
-    available: false,
+    available: true,
   },
 ];
 

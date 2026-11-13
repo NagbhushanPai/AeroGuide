@@ -1,15 +1,6 @@
 "use client";
 
-import {
-  ArrowLeft,
-  DoorOpen,
-  ExternalLink,
-  Info,
-  MapPin,
-  Plane,
-  SearchX,
-  Sofa,
-} from "lucide-react";
+import { ArrowLeft, DoorOpen, ExternalLink, Info, MapPin, Plane, SearchX } from "lucide-react";
 import Link from "next/link";
 
 import { EmptyState } from "@/components/data/empty-state";
@@ -19,6 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AirportDetail, SourceRef, TerminalOut } from "@/lib/api/client";
+
+import { AirportLounges } from "@/components/lounges/lounge-list";
 
 import { AirlinesSeen } from "./airlines-seen";
 import { MappedTerminals } from "./mapped-terminals";
@@ -167,17 +160,7 @@ function Guide({ airport: a }: { airport: AirportDetail }) {
 
       <AirlinesSeen code={a.iata} />
 
-      <section aria-labelledby="lounges-heading" className="space-y-2">
-        <h2 id="lounges-heading" className="flex items-center gap-2 text-xl font-semibold">
-          <Sofa aria-hidden="true" className="size-5 text-primary" /> Lounges
-        </h2>
-        <p className="text-sm text-muted-foreground">
-          Lounge guides are planned for a later stage.{" "}
-          <Link href="/lounges" className="underline underline-offset-2 hover:text-foreground">
-            About lounges
-          </Link>
-        </p>
-      </section>
+      <AirportLounges iata={a.iata} />
     </article>
   );
 }

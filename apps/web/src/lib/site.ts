@@ -2,6 +2,9 @@ export const siteConfig = {
   name: "AeroGuide",
   description:
     "Live flights, airport guides, lounges and card lounge access for India. Open data, sourced and dated.",
+  repoUrl: "https://github.com/NagbhushanPai/AeroGuide",
+  contributeUrl:
+    "https://github.com/NagbhushanPai/AeroGuide/blob/main/CONTRIBUTING.md#adding-lounges-and-cards",
 } as const;
 
 export type NavItem = {

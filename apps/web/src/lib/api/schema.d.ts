@@ -121,10 +121,133 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/lounges": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List lounges */
+    get: operations["lounges_api_v1_lounges_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/lounges/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lounge */
+    get: operations["lounge_api_v1_lounges__slug__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/cards": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** List cards */
+    get: operations["cards_api_v1_cards_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/cards/{slug}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Card */
+    get: operations["card_api_v1_cards__slug__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/access-programs": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Lounge programmes */
+    get: operations["programs_api_v1_access_programs_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/eligibility": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Check lounge access for your cards
+     * @description Runs the deterministic eligibility engine for each card against every lounge we list at the airport. Answers are yes, no or depends, each with the checks behind it. Nothing in the request is stored or logged. Never send card numbers.
+     */
+    post: operations["eligibility_api_v1_eligibility_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
+    /** Acceptance */
+    Acceptance: {
+      program: components["schemas"]["ProgramRef"];
+      /** Paid Price */
+      paid_price: number | null;
+      /** Currency */
+      currency: string | null;
+      /** Paid Duration Min */
+      paid_duration_min: number | null;
+      /**
+       * Valid From
+       * Format: date
+       */
+      valid_from: string;
+      /** Valid To */
+      valid_to: string | null;
+      provenance: components["schemas"]["Provenance"];
+    };
     /** AircraftDetail */
     AircraftDetail: {
       aircraft: components["schemas"]["AircraftState"];
@@ -399,6 +522,100 @@ export interface components {
        */
       status: "verified" | "outdated" | "unverified" | "unavailable";
     };
+    /** AmenityRef */
+    AmenityRef: {
+      /** Code */
+      code: string;
+      /** Label */
+      label: string;
+    };
+    /** BankRef */
+    BankRef: {
+      /** Slug */
+      slug: string;
+      /** Name */
+      name: string;
+      /** Url */
+      url: string;
+    };
+    /** CardDetail */
+    CardDetail: {
+      /** Slug */
+      slug: string;
+      /** Name */
+      name: string;
+      bank: components["schemas"]["BankRef"];
+      /** Network */
+      network: string;
+      /** Status */
+      status: string;
+      /**
+       * Domestic
+       * @description Summary of the domestic benefit in force today
+       */
+      domestic: string | null;
+      /** International */
+      international: string | null;
+      /** Product Url */
+      product_url: string;
+      provenance: components["schemas"]["Provenance"];
+      /**
+       * Policies
+       * @description Every version, newest first
+       */
+      policies: components["schemas"]["PolicyOut"][];
+    };
+    /** CardFacts */
+    CardFacts: {
+      /** Visits Used */
+      visits_used?: number | null;
+      /** Spend Inr */
+      spend_inr?: number | null;
+    };
+    /** CardList */
+    CardList: {
+      /** Items */
+      items: components["schemas"]["CardSummary"][];
+      /** Banks */
+      banks: components["schemas"]["BankRef"][];
+    };
+    /** CardResult */
+    CardResult: {
+      card: components["schemas"]["CardSummary"];
+      /** Lounges */
+      lounges: components["schemas"]["LoungeResult"][];
+    };
+    /** CardSummary */
+    CardSummary: {
+      /** Slug */
+      slug: string;
+      /** Name */
+      name: string;
+      bank: components["schemas"]["BankRef"];
+      /** Network */
+      network: string;
+      /** Status */
+      status: string;
+      /**
+       * Domestic
+       * @description Summary of the domestic benefit in force today
+       */
+      domestic: string | null;
+      /** International */
+      international: string | null;
+    };
+    /** CheckOut */
+    CheckOut: {
+      /** Rule */
+      rule: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "yes" | "no" | "depends";
+      /** Message */
+      message: string;
+    };
     /** ComponentHealth */
     ComponentHealth: {
       /**
@@ -416,6 +633,64 @@ export interface components {
        * @description Error summary when status is 'error'.
        */
       detail?: string | null;
+    };
+    /**
+     * EligibilityRequest
+     * @description Nothing here is stored. No card numbers: only which card products you hold.
+     */
+    EligibilityRequest: {
+      /** Cards */
+      cards: string[];
+      /** Airport */
+      airport: string;
+      /**
+       * On
+       * @description Travel date; default today (IST)
+       */
+      on?: string | null;
+      /**
+       * Scope
+       * @enum {string}
+       */
+      scope: "domestic" | "international";
+      /**
+       * Guests
+       * @default 0
+       */
+      guests: number;
+      /**
+       * Facts
+       * @description Keyed by card slug
+       */
+      facts?: {
+        [key: string]: components["schemas"]["CardFacts"];
+      };
+    };
+    /** EligibilityResponse */
+    EligibilityResponse: {
+      /** Airport */
+      airport: string;
+      /**
+       * On
+       * Format: date
+       */
+      on: string;
+      /**
+       * Scope
+       * @enum {string}
+       */
+      scope: "domestic" | "international";
+      /**
+       * Lounges Listed
+       * @description Lounges we have records for at this airport
+       */
+      lounges_listed: number;
+      /** Results */
+      results: components["schemas"]["CardResult"][];
+      /** Unknown Cards */
+      unknown_cards: string[];
+      /** Disclaimer */
+      disclaimer: string;
     };
     /** HTTPValidationError */
     HTTPValidationError: {
@@ -440,6 +715,115 @@ export interface components {
       /** Version */
       version: string;
       checks: components["schemas"]["HealthChecks"];
+    };
+    /** LoungeDetail */
+    LoungeDetail: {
+      /** Slug */
+      slug: string;
+      /** Name */
+      name: string;
+      /** Iata */
+      iata: string;
+      /** Terminal */
+      terminal: string | null;
+      /**
+       * Scope
+       * @enum {string}
+       */
+      scope: "domestic" | "international" | "both";
+      /**
+       * Side
+       * @enum {string}
+       */
+      side: "airside" | "landside";
+      /**
+       * Status
+       * @description Verification status of the lounge record
+       */
+      status: string;
+      /**
+       * Programs
+       * @description Names of programmes accepted today
+       */
+      programs: string[];
+      /** Airport Name */
+      airport_name: string;
+      /** Operator */
+      operator: string | null;
+      /** Location Text */
+      location_text: string | null;
+      /** Nearest Gate */
+      nearest_gate: string | null;
+      /**
+       * Opening Hours
+       * @description {mode: 24h} or {mode: weekly, periods: [...]}; null means not verified
+       */
+      opening_hours: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * Amenities
+       * @description Only what the source states
+       */
+      amenities: components["schemas"]["AmenityRef"][];
+      /** Accepts */
+      accepts: components["schemas"]["Acceptance"][];
+      provenance: components["schemas"]["Provenance"];
+    };
+    /** LoungeList */
+    LoungeList: {
+      /** Items */
+      items: components["schemas"]["LoungeSummary"][];
+    };
+    /** LoungeResult */
+    LoungeResult: {
+      lounge: components["schemas"]["LoungeSummary"];
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "yes" | "no" | "depends";
+      /** Checks */
+      checks: components["schemas"]["CheckOut"][];
+      /** Via Programs */
+      via_programs: string[];
+      /** Guests Covered */
+      guests_covered: number | null;
+      /** Entry */
+      entry: string[];
+      /** Policy Summary */
+      policy_summary: string | null;
+    };
+    /** LoungeSummary */
+    LoungeSummary: {
+      /** Slug */
+      slug: string;
+      /** Name */
+      name: string;
+      /** Iata */
+      iata: string;
+      /** Terminal */
+      terminal: string | null;
+      /**
+       * Scope
+       * @enum {string}
+       */
+      scope: "domestic" | "international" | "both";
+      /**
+       * Side
+       * @enum {string}
+       */
+      side: "airside" | "landside";
+      /**
+       * Status
+       * @description Verification status of the lounge record
+       */
+      status: string;
+      /**
+       * Programs
+       * @description Names of programmes accepted today
+       */
+      programs: string[];
     };
     /** MappedTerminal */
     MappedTerminal: {
@@ -475,6 +859,32 @@ export interface components {
       type: "Point";
       /** Coordinates */
       coordinates: [number, number];
+    };
+    /** PolicyOut */
+    PolicyOut: {
+      /**
+       * Scope
+       * @enum {string}
+       */
+      scope: "domestic" | "international";
+      /**
+       * Valid From
+       * Format: date
+       */
+      valid_from: string;
+      /** Valid To */
+      valid_to: string | null;
+      /** In Force */
+      in_force: boolean;
+      /** Summary */
+      summary: string;
+      /** Rules */
+      rules: {
+        [key: string]: unknown;
+      }[];
+      /** Unmodelled Terms */
+      unmodelled_terms: string | null;
+      provenance: components["schemas"]["Provenance"];
     };
     /** PositionsMeta */
     PositionsMeta: {
@@ -515,6 +925,22 @@ export interface components {
       /** Features */
       features: components["schemas"]["AircraftFeature"][];
       meta: components["schemas"]["PositionsMeta"];
+    };
+    /** ProgramList */
+    ProgramList: {
+      /** Items */
+      items: components["schemas"]["ProgramRef"][];
+    };
+    /** ProgramRef */
+    ProgramRef: {
+      /** Key */
+      key: string;
+      /** Name */
+      name: string;
+      /** Kind */
+      kind: string;
+      /** Url */
+      url: string | null;
     };
     /** Provenance */
     Provenance: {
@@ -874,6 +1300,247 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AirlinesSeen"];
+        };
+      };
+      /** @description Unknown airport */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  lounges_api_v1_lounges_get: {
+    parameters: {
+      query?: {
+        airport?: string | null;
+        program?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LoungeList"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  lounge_api_v1_lounges__slug__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["LoungeDetail"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  cards_api_v1_cards_get: {
+    parameters: {
+      query?: {
+        bank?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CardList"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  card_api_v1_cards__slug__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CardDetail"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  programs_api_v1_access_programs_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["ProgramList"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  eligibility_api_v1_eligibility_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EligibilityRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EligibilityResponse"];
         };
       };
       /** @description Unknown airport */

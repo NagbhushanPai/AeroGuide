@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
-import { Sofa } from "lucide-react";
 
-import { ComingSoonPage } from "@/components/layout/coming-soon-page";
+import { PageHeader } from "@/components/layout/page-header";
+import { LoungeDirectory } from "@/components/lounges/lounge-list";
 
-export const metadata: Metadata = { title: "Lounges" };
+export const metadata: Metadata = {
+  title: "Lounges",
+  description: "Airport lounges in India: where they are, when they open and how to get in.",
+};
 
 export default function LoungesPage() {
   return (
-    <ComingSoonPage
-      title="Lounges"
-      description="Airport lounges by airport, terminal and amenities."
-      icon={Sofa}
-      stage={5}
-      planned="A lounge directory with locations, opening hours, amenities and accepted access methods, each with its source."
-    />
+    <div className="mx-auto max-w-6xl px-4 py-12">
+      <PageHeader
+        title="Lounges"
+        description="Where each lounge is, when it opens and which programmes it accepts, from the lounge operator's own pages."
+      />
+      <LoungeDirectory />
+    </div>
   );
 }
