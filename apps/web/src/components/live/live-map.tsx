@@ -26,6 +26,8 @@ type LiveMapProps = {
   features: AircraftFeature[];
   selected: string | null;
   onSelect: (icao24: string | null) => void;
+  /** An airport dot was clicked (IATA code). */
+  onAirportSelect: (iata: string) => void;
   layers: LayerVisibility;
   route: ReportedRoute | null;
   flyTo: FlyTarget | null;
@@ -236,6 +238,7 @@ export function LiveMap({
   features,
   selected,
   onSelect,
+  onAirportSelect,
   layers,
   route,
   flyTo,
@@ -247,9 +250,25 @@ export function LiveMap({
   const theme = resolvedTheme === "light" ? "light" : "dark";
 
   // Latest props, read by handlers that outlive a render (style reloads, clicks).
-  const latest = useRef({ features, selected, onSelect, layers, route, weatherTilesUrl });
+  const latest = useRef({
+    features,
+    selected,
+    onSelect,
+    onAirportSelect,
+    layers,
+    route,
+    weatherTilesUrl,
+  });
   useLayoutEffect(() => {
-    latest.current = { features, selected, onSelect, layers, route, weatherTilesUrl };
+    latest.current = {
+      features,
+      selected,
+      onSelect,
+      onAirportSelect,
+      layers,
+      route,
+      weatherTilesUrl,
+    };
   });
   const prevSelected = useRef<string | null>(null);
 
@@ -291,8 +310,16 @@ export function LiveMap({
       const hit = map.queryRenderedFeatures(e.point, { layers: ["aircraft"] });
       if (hit.length === 0) latest.current.onSelect(null);
     });
-    map.on("mouseenter", "aircraft", () => (map.getCanvas().style.cursor = "pointer"));
-    map.on("mouseleave", "aircraft", () => (map.getCanvas().style.cursor = ""));
+    // Airports sit under the aircraft; an aircraft wins when both are under the pointer.
+    map.on("click", "airports-dot", (e: MapLayerMouseEvent) => {
+      if (map.queryRenderedFeatures(e.point, { layers: ["aircraft"] }).length) return;
+      const iata = e.features?.[0]?.properties?.iata as string | undefined;
+      if (iata) latest.current.onAirportSelect(iata);
+    });
+    for (const layer of ["aircraft", "airports-dot"]) {
+      map.on("mouseenter", layer, () => (map.getCanvas().style.cursor = "pointer"));
+      map.on("mouseleave", layer, () => (map.getCanvas().style.cursor = ""));
+    }
 
     return () => {
       map.remove();
@@ -343,7 +370,7 @@ export function LiveMap({
     setWeather(map, weatherTilesUrl, layers.weather);
   }, [layers, weatherTilesUrl]);
 
-  // Fly to a flight chosen from the list.
+  // Fly to a flight or airport chosen from a list or search.
   useEffect(() => {
     if (!flyTo) return;
     const map = mapRef.current;

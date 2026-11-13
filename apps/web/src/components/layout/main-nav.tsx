@@ -7,13 +7,16 @@ import { cn } from "@/lib/utils";
 import { isActive, mainNav } from "@/lib/site";
 
 export function MainNav() {
-  const pathname = usePathname();
+  return <MainNavLinks pathname={usePathname()} />;
+}
 
+/** `pathname` is null while it isn't known yet (Suspense fallback): nothing is marked active. */
+export function MainNavLinks({ pathname }: { pathname: string | null }) {
   return (
     <nav aria-label="Main" className="-mx-2 overflow-x-auto">
       <ul className="flex min-w-max items-center gap-1 px-2">
         {mainNav.map((item) => {
-          const active = isActive(item, pathname);
+          const active = pathname !== null && isActive(item, pathname);
           return (
             <li key={item.href}>
               <Link

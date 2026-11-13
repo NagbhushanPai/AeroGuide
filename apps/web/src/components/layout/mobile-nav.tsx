@@ -18,7 +18,11 @@ import { cn } from "@/lib/utils";
 import { isActive, mainNav, siteConfig } from "@/lib/site";
 
 export function MobileNav() {
-  const pathname = usePathname();
+  return <MobileNavMenu pathname={usePathname()} />;
+}
+
+/** `pathname` is null while it isn't known yet (Suspense fallback): nothing is marked active. */
+export function MobileNavMenu({ pathname }: { pathname: string | null }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,7 +40,7 @@ export function MobileNav() {
         <nav aria-label="Mobile" className="px-4">
           <ul className="space-y-1">
             {mainNav.map((item) => {
-              const active = isActive(item, pathname);
+              const active = pathname !== null && isActive(item, pathname);
               return (
                 <li key={item.href}>
                   <Link

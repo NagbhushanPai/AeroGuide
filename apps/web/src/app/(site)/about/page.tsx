@@ -31,9 +31,10 @@ const features: readonly Feature[] = [
   {
     href: "/airports",
     title: "Airport guides",
-    description: "Terminals, airlines, food, shops and transport, with sources.",
+    description:
+      "Indian airports with scheduled service. Guides add terminals and airlines, with sources.",
     icon: Building2,
-    available: false,
+    available: true,
   },
   {
     href: "/lounges",

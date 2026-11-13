@@ -1,6 +1,8 @@
+import { Suspense } from "react";
+
 import { Logo } from "./logo";
-import { MainNav } from "./main-nav";
-import { MobileNav } from "./mobile-nav";
+import { MainNav, MainNavLinks } from "./main-nav";
+import { MobileNav, MobileNavMenu } from "./mobile-nav";
 import { ThemeToggle } from "./theme-toggle";
 
 export function SiteHeader() {
@@ -10,10 +12,15 @@ export function SiteHeader() {
         <Logo />
         <div className="flex items-center gap-1">
           <div className="hidden sm:block">
-            <MainNav />
+            {/* On routes with request-time params (/airports/DEL) the pathname streams in. */}
+            <Suspense fallback={<MainNavLinks pathname={null} />}>
+              <MainNav />
+            </Suspense>
           </div>
           <ThemeToggle />
-          <MobileNav />
+          <Suspense fallback={<MobileNavMenu pathname={null} />}>
+            <MobileNav />
+          </Suspense>
         </div>
       </div>
     </header>

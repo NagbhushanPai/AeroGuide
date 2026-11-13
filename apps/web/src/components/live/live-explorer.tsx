@@ -13,7 +13,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import type { MapAirport } from "@/lib/airports";
 import type { AircraftFeature } from "@/lib/api/client";
+
+import { AirportCard } from "./airport-card";
+import { AirportSearch, useMapAirports } from "./airport-search";
 
 import { AlertsMenu, EventToasts } from "./alerts-menu";
 import { FlightList } from "./flight-list";
@@ -46,6 +50,25 @@ export function LiveExplorer() {
     airports: true,
   });
   const [listOpen, setListOpen] = useState(false);
+  // undefined: the visitor hasn't picked or closed an airport yet, so a "/?airport=DEL" link
+  // (from an airport guide) decides. It's read once; the server render has no URL and shows none.
+  const [airportChoice, setAirport] = useState<MapAirport | null | undefined>(undefined);
+  const [linkedCode] = useState(() =>
+    typeof window === "undefined"
+      ? null
+      : (new URLSearchParams(window.location.search).get("airport")?.toUpperCase() ?? null),
+  );
+  const mapAirports = useMapAirports();
+  const linked = useMemo(
+    () => (linkedCode ? (mapAirports.data?.find((a) => a.iata === linkedCode) ?? null) : null),
+    [linkedCode, mapAirports.data],
+  );
+  const airport = airportChoice === undefined ? linked : airportChoice;
+  const linkedFlyTo = useMemo<FlyTarget | null>(
+    () => (linked ? { lon: linked.lon, lat: linked.lat, key: 0 } : null),
+    [linked],
+  );
+  const mapFlyTo = flyTo ?? (airportChoice === undefined ? linkedFlyTo : null);
 
   const weather = useWeatherTiles(layers.weather);
   const detail = useAircraft(selected);
@@ -64,9 +87,24 @@ export function LiveExplorer() {
         const [lon, lat] = f.geometry.coordinates;
         setFlyTo({ lon, lat, key: Date.now() });
       }
+      setAirport(null);
       setListOpen(false);
     },
     [features],
+  );
+
+  const focusAirport = useCallback((a: MapAirport) => {
+    setSelected(null);
+    setAirport(a);
+    setFlyTo({ lon: a.lon, lat: a.lat, key: Date.now() });
+  }, []);
+
+  const selectAirportCode = useCallback(
+    (iata: string) => {
+      const a = mapAirports.data?.find((x) => x.iata === iata);
+      if (a) focusAirport(a);
+    },
+    [mapAirports.data, focusAirport],
   );
 
   const list = (
@@ -119,10 +157,14 @@ export function LiveExplorer() {
         <LiveMap
           features={features}
           selected={selected}
-          onSelect={setSelected}
+          onSelect={(id) => {
+            setSelected(id);
+            if (id) setAirport(null);
+          }}
+          onAirportSelect={selectAirportCode}
           layers={layers}
           route={detail.data?.reported_route ?? null}
-          flyTo={flyTo}
+          flyTo={mapFlyTo}
           weatherTilesUrl={weather.data?.url ?? null}
         />
 
@@ -160,6 +202,7 @@ export function LiveExplorer() {
               </SheetContent>
             </Sheet>
             <LayerToggles value={layers} onChange={setLayers} />
+            <AirportSearch onSelect={focusAirport} className="w-40 sm:w-60" />
           </div>
           <div className="pointer-events-auto flex items-center gap-2 rounded-full border bg-background/90 py-1 pr-1 pl-3 backdrop-blur">
             <IstClock />
@@ -209,6 +252,13 @@ export function LiveExplorer() {
               }
               onClose={() => setSelected(null)}
             />
+          </div>
+        ) : null}
+
+        {/* Selected airport (only when no flight is open) */}
+        {airport && !selectedFeature ? (
+          <div className="absolute inset-x-2 bottom-2 z-20 md:inset-x-auto md:top-16 md:right-3 md:bottom-auto md:w-80">
+            <AirportCard airport={airport} onClose={() => setAirport(null)} />
           </div>
         ) : null}
 

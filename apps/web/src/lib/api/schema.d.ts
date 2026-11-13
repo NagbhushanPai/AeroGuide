@@ -61,6 +61,46 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/airports": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Search airports
+     * @description Indian airports with scheduled passenger service. `q` matches IATA or ICAO codes exactly, and name, city or state partially (typo-tolerant). Exact code matches rank first.
+     */
+    get: operations["list_airports_api_v1_airports_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/airports/{code}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Airport detail
+     * @description By IATA (3 letters) or ICAO (4 letters) code, with terminals and provenance.
+     */
+    get: operations["airport_detail_api_v1_airports__code__get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -176,6 +216,114 @@ export interface components {
        */
       is_demo: boolean;
     };
+    /**
+     * AirlineOperation
+     * @enum {string}
+     */
+    AirlineOperation: "domestic" | "international" | "both";
+    /** AirlineRef */
+    AirlineRef: {
+      /** Icao */
+      icao: string;
+      /** Iata */
+      iata: string | null;
+      /** Name */
+      name: string;
+    };
+    /** AirportDetail */
+    AirportDetail: {
+      /** Iata */
+      iata: string;
+      /** Icao */
+      icao: string | null;
+      /** Name */
+      name: string;
+      /** City */
+      city: string | null;
+      /** State */
+      state: string | null;
+      region: components["schemas"]["Region"];
+      /** Lat */
+      lat: number;
+      /** Lon */
+      lon: number;
+      /**
+       * Size
+       * @enum {string}
+       */
+      size: "large" | "medium" | "small";
+      /**
+       * Has Guide
+       * @description A curated guide exists (terminals and airlines).
+       */
+      has_guide: boolean;
+      /**
+       * Status
+       * @description Verification status of the airport's geodata.
+       * @enum {string}
+       */
+      status: "verified" | "outdated" | "unverified" | "unavailable";
+      /** Elevation Ft */
+      elevation_ft: number | null;
+      /** Timezone */
+      timezone: string;
+      /** @description The operator's official website, where travellers should confirm details. */
+      official_source: components["schemas"]["SourceRef"] | null;
+      /** @description Provenance of the geodata (codes, coordinates). */
+      provenance: components["schemas"]["Provenance"];
+      /** Terminals */
+      terminals: components["schemas"]["TerminalOut"][];
+      /**
+       * Terminal Note
+       * @description Always shown: terminal assignments change, so travellers must confirm them.
+       */
+      terminal_note: string;
+    };
+    /** AirportList */
+    AirportList: {
+      /** Items */
+      items: components["schemas"]["AirportSummary"][];
+      /** Total */
+      total: number;
+      /** Limit */
+      limit: number;
+      /** Offset */
+      offset: number;
+    };
+    /** AirportSummary */
+    AirportSummary: {
+      /** Iata */
+      iata: string;
+      /** Icao */
+      icao: string | null;
+      /** Name */
+      name: string;
+      /** City */
+      city: string | null;
+      /** State */
+      state: string | null;
+      region: components["schemas"]["Region"];
+      /** Lat */
+      lat: number;
+      /** Lon */
+      lon: number;
+      /**
+       * Size
+       * @enum {string}
+       */
+      size: "large" | "medium" | "small";
+      /**
+       * Has Guide
+       * @description A curated guide exists (terminals and airlines).
+       */
+      has_guide: boolean;
+      /**
+       * Status
+       * @description Verification status of the airport's geodata.
+       * @enum {string}
+       */
+      status: "verified" | "outdated" | "unverified" | "unavailable";
+    };
     /** ComponentHealth */
     ComponentHealth: {
       /**
@@ -269,6 +417,30 @@ export interface components {
       features: components["schemas"]["AircraftFeature"][];
       meta: components["schemas"]["PositionsMeta"];
     };
+    /** Provenance */
+    Provenance: {
+      /**
+       * Status
+       * @description `outdated` is computed: verified, but the re-verification window has passed.
+       * @enum {string}
+       */
+      status: "verified" | "outdated" | "unverified" | "unavailable";
+      /** Verified At */
+      verified_at: string | null;
+      /**
+       * Reverify Due
+       * @description When a verified record should be checked again.
+       */
+      reverify_due: string | null;
+      source: components["schemas"]["SourceRef"] | null;
+      /** Notes */
+      notes: string | null;
+    };
+    /**
+     * Region
+     * @enum {string}
+     */
+    Region: "North" | "Central" | "East" | "West" | "South" | "North-East";
     /**
      * ReportedRoute
      * @description Origin/destination from community data. Never a verified schedule.
@@ -325,6 +497,65 @@ export interface components {
       /** Minutes Remaining */
       minutes_remaining?: number | null;
     };
+    /** SourceRef */
+    SourceRef: {
+      /** Name */
+      name: string;
+      /** Url */
+      url: string;
+      /** Publisher */
+      publisher: string | null;
+      source_type: components["schemas"]["SourceType"];
+      /**
+       * Retrieved At
+       * Format: date
+       */
+      retrieved_at: string;
+    };
+    /**
+     * SourceType
+     * @enum {string}
+     */
+    SourceType:
+      | "official_airport"
+      | "aai"
+      | "airline"
+      | "bank"
+      | "lounge_operator"
+      | "network_program"
+      | "licensed_provider"
+      | "secondary";
+    /** TerminalAirlineOut */
+    TerminalAirlineOut: {
+      airline: components["schemas"]["AirlineRef"];
+      operation: components["schemas"]["AirlineOperation"];
+      /** Scope Note */
+      scope_note: string | null;
+      /**
+       * Valid From
+       * Format: date
+       */
+      valid_from: string;
+      /** Valid To */
+      valid_to: string | null;
+      provenance: components["schemas"]["Provenance"];
+    };
+    /** TerminalOut */
+    TerminalOut: {
+      /** Code */
+      code: string;
+      /** Name */
+      name: string;
+      role: components["schemas"]["TerminalRole"];
+      provenance: components["schemas"]["Provenance"];
+      /** Airlines */
+      airlines: components["schemas"]["TerminalAirlineOut"][];
+    };
+    /**
+     * TerminalRole
+     * @enum {string}
+     */
+    TerminalRole: "domestic" | "international" | "mixed";
     /** ValidationError */
     ValidationError: {
       /** Location */
@@ -434,6 +665,93 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
         };
+      };
+    };
+  };
+  list_airports_api_v1_airports_get: {
+    parameters: {
+      query?: {
+        q?: string | null;
+        region?: components["schemas"]["Region"] | null;
+        guides_only?: boolean;
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AirportList"];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  airport_detail_api_v1_airports__code__get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AirportDetail"];
+        };
+      };
+      /** @description Unknown airport */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };
