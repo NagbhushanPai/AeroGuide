@@ -8,21 +8,29 @@ flowchart TB
   CI -->|preview| VP[Vercel preview]
   CI -->|main green| VD[Vercel Hobby<br/>apps/web]
   CI -->|main green → deploy hook| RA[Render free web service<br/>apps/api]
-  CRON[GitHub Actions<br/>weekly-data-check.yml] -->|read-only| SB
-  RA -->|pre-deploy: alembic upgrade head| SB[(Supabase free<br/>Postgres + PostGIS)]
+  CRON[GitHub Actions<br/>weekly-data-check.yml] -->|reads YAML, opens issue| GH
+  DD[GitHub Actions<br/>deploy-data.yml] -->|alembic upgrade head + seed| SB[(Supabase free<br/>Postgres + PostGIS)]
+  RA --> SB
   RA --> RD[(Upstash Redis free)]
 ```
 
 | Component | Target (free tier) | Notes |
 |---|---|---|
 | Web | Vercel Hobby | Root `apps/web`. Non-commercial use only, which matches AeroGuide. Content pages are static or ISR, so they work while the API sleeps |
-| API | Render free web service | Docker image from `apps/api`. Sleeps after 15 min idle, about 1 min cold start. Health check at `/api/v1/health`. Pre-deploy runs migrations |
+| API | Render free web service | Docker image from `apps/api`. Sleeps after 15 min idle, about 1 min cold start. Health check at `/api/v1/health`. The free tier has no pre-deploy command, so migrations and seed run from `deploy-data.yml` |
 | Postgres | Supabase free | 500 MB, PostGIS enabled. Pauses after 1 week without DB activity ([ADR-0013](../decisions/0013-weekly-data-check.md) covers this risk) |
 | Redis | Upstash free | 500K commands a month. **No payment card added**, so it can't upgrade to paid usage |
-| Jobs | GitHub Actions (free for public repos) | Weekly data check. CI |
+| Jobs | GitHub Actions (free for public repos) | CI. Weekly data check. Deploy data (migrations + seed on changes to `main`, skipped until the `DATABASE_URL` secret exists) |
 | Map tiles | OpenFreeMap | Free, no key |
 
 There is **no background worker** (Render has no free one). Live ingestion runs on demand inside the API.
+
+## Connecting the database (Supabase)
+
+1. Create a free Supabase project (region: Mumbai, `ap-south-1`). In *Database → Extensions*, PostGIS, pg_trgm and btree_gist can stay off: migration 0001 enables them.
+2. Copy the **session pooler** connection string (port 5432; the direct host is IPv6-only and the transaction pooler on 6543 breaks asyncpg's prepared statements). Change the scheme to `postgresql+asyncpg://` and add `?ssl=require`.
+3. Add it as the GitHub repository secret `DATABASE_URL`, then run *Actions → Deploy data → Run workflow* once.
+4. Add the same value as `DATABASE_URL` in the Render service's environment. Render redeploys, and `/api/v1/health` reports the database and PostGIS as `ok`.
 
 ## Environments
 
@@ -30,7 +38,7 @@ There is **no background worker** (Render has no free one). Live ingestion runs 
 
 ## Secrets
 
-Secrets live only in the Vercel, Render and GitHub Actions secret stores: `DATABASE_URL`, `DATABASE_URL_READONLY`, `REDIS_URL`, `OPENSKY_CLIENT_ID`, `OPENSKY_CLIENT_SECRET`. `.env.example` documents every variable without values. gitleaks runs in CI.
+Secrets live only in the Vercel, Render and GitHub Actions secret stores: `DATABASE_URL` (Render and GitHub), `REDIS_URL`, `OPENSKY_CLIENT_ID`, `OPENSKY_CLIENT_SECRET`. `.env.example` documents every variable without values. gitleaks runs in CI.
 
 ## Free-tier risks
 

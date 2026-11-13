@@ -44,9 +44,9 @@ Last updated: 2026-11-13. Status: proposed contract. The generated OpenAPI spec 
 ### Airports
 | | |
 |---|---|
-| `GET /airports?q=&city=&region=` | Airport summaries |
-| `GET /airports/{iata}` | Overview, location, terminals (with airlines), facilities, transport, outlets and passenger info, each with provenance |
-| `GET /airports/{iata}/terminals` | Terminals and airline assignments |
+| `GET /airports?q=&region=&guides_only=&limit=&offset=` | **Implemented.** Airport summaries. `q` matches IATA/ICAO exactly and name, city or state partially, typo-tolerant (pg_trgm). Exact codes rank first. `503` (never an empty list) when the database is down |
+| `GET /airports/{code}` | **Implemented.** By IATA or ICAO. Location, codes, official website, geodata provenance, terminals with current airline assignments, each with provenance and a computed `outdated` status. Always includes `terminal_note` |
+| `GET /airports/{iata}` (later) | Facilities, transport, outlets and passenger info, each with provenance |
 | `GET /airports/{iata}/movements` | Flights observed at the airport yesterday (OpenSky, previous-day batch), with source and date |
 
 ### Lounges

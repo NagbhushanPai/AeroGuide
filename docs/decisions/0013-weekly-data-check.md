@@ -28,6 +28,17 @@ A GitHub Actions workflow, `.github/workflows/weekly-data-check.yml`:
 
 Content hashes and last-check results are stored in a small `source_checks` table, written by a separate least-privilege role used only by this job. That table is the job's only write.
 
+## Implementation note (2026-11-13, Stage 3)
+
+The first version reads the **YAML seed files** (the reviewed source of truth, [ADR-0007](./0007-content-as-reviewed-seed-files.md)) instead of the production database, so it works before a database exists and needs no database secret:
+
+- Staleness and the review queue are computed from the YAML. The 116 OurAirports rows are reported as a count, not listed: they are always `unverified` because their source is secondary.
+- Last week's content hashes are stored in a hidden comment at the end of the issue body and read back the next week. `source_checks` exists in the schema for a later database-backed version.
+- Sources whose `robots.txt` disallows automated access are not fetched. They're listed as "check by hand".
+- Code: `apps/api/app/jobs/data_check.py`. Workflow: `.github/workflows/weekly-data-check.yml`. Run locally with `pnpm data-check`.
+
+The database keep-alive concern is unchanged. The `deploy-data.yml` runs and normal API traffic count as activity.
+
 ## Consequences
 - $0 cost. Staleness is visible every week without a person having to remember to check.
 - Source pages that change cosmetically will cause false positives. The hash is computed over extracted main text, not raw HTML, to reduce noise.

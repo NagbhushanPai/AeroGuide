@@ -15,7 +15,12 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 
 | Table.field | Meaning |
 |---|---|
-| `airports.region` | Grouping used by directory filters: North, West, South, East, North-East, Central |
+| `airports.region` | Grouping used by directory filters: North, Central, East, West, South, North-East. Follows the Zonal Councils (States Reorganisation Act, 1956) plus the North Eastern Council. Island union territories are grouped with the South. Mapping: `apps/api/app/core/india.py` |
+| `airports.size` | OurAirports size class. Orders the directory, large first |
+| `airports.has_guide` | A curated guide file exists for the airport (`data/airport_guides/{IATA}.yaml`) |
+| `airports.official_source_id` | The operator's official website, where travellers should confirm details. `null` when it isn't confirmed |
+| `airports` provenance | Geodata comes from OurAirports, a secondary source, so every airport is `unverified` until cross-checked against AIP India |
+| `sources.key` | Stable handle used by the seed files, for example `del-official` |
 | `airports.location` | Aerodrome reference point, `geography(Point,4326)` |
 | `airports.timezone` | IANA zone, `Asia/Kolkata` for all initial airports |
 | `terminals.role` | Main use of the terminal *as published by the operator* |

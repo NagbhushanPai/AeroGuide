@@ -22,6 +22,7 @@ cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env.local
 pnpm up                            # Postgres+PostGIS and Redis (docker compose)
 pnpm migrate                       # alembic upgrade head
+pnpm seed                          # load apps/api/data (airports, sources) into Postgres
 ```
 
 Then, in two terminals:
@@ -37,12 +38,15 @@ pnpm dev:web    # http://localhost:3000
 |---|---|---|
 | `make up` / `make down` | `pnpm up` / `pnpm down` | Start or stop local services |
 | `make migrate` | `pnpm migrate` | Apply migrations |
+| `make seed` | `pnpm seed` | Load the reviewed YAML content into Postgres (idempotent) |
+| `make seed-check` | `pnpm seed:check` | Validate the YAML content, no database needed |
+| `make data-check` | `pnpm data-check` | Run the weekly data check locally (writes `apps/api/data-check-report.md`) |
 | `make dev-web` / `make dev-api` | `pnpm dev:web` / `pnpm dev:api` | Dev servers |
 | `make lint` | `pnpm lint` | ESLint + Ruff |
 | `make fmt` | `pnpm fmt` | Prettier + Ruff format |
 | `make typecheck` | `pnpm typecheck` | `tsc` + mypy |
 | `make test` | `pnpm test` | Unit tests (Vitest + pytest) |
-| `make test-integration` | `pnpm up && pnpm migrate && pnpm test:api:integration` | API tests against real Postgres+PostGIS and Redis |
+| `make test-integration` | `pnpm up && pnpm migrate && pnpm seed && pnpm test:api:integration` | API tests against real Postgres+PostGIS and Redis |
 | `make build` | `pnpm build:web` | Production build of the web app |
 | — | `pnpm --filter web test:e2e` | Playwright smoke tests (run `pnpm build:web` first; needs `pnpm --filter web exec playwright install chromium` once) |
 
@@ -67,6 +71,12 @@ Never commit `.env` files. Only `.env.example` files are tracked.
 - `pnpm dev` and `pnpm build` in `apps/web` copy MapLibre's web worker into `public/vendor/` (git-ignored) first.
 - Set `POSITION_PROVIDERS=demo` in `apps/api/.env` to work offline with clearly labelled simulated aircraft.
 - The first request after the API starts waits for one upstream sweep (about 10 s). After that, data is served instantly and refreshed in the background once a minute.
+
+## Airport data
+
+- `apps/api/data/airports.yaml` and `apps/web/public/data/airports-in.geojson` are both generated from OurAirports by `python scripts/build_airport_data.py airports.csv` (see the script's docstring for the download URL). Regenerate them together.
+- The integration tests' migration test downgrades to an empty database. Run `pnpm seed` again afterwards if you want data in your local database.
+- The live map's airport search reads the static GeoJSON, so it works without the API. The `/airports` pages need the API and a seeded database.
 
 ## Notes
 

@@ -4,6 +4,18 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (Stage 3: airports)
+- Database: sources, source checks, record sources, airports, terminals, airlines and terminal airlines (migration 0002), each fact-bearing table with provenance and a "verified needs evidence" check.
+- Seed content in `apps/api/data/`: 116 Indian airports with scheduled service (OurAirports geodata, marked unverified), sources, and guide files for DEL, BOM, BLR, HYD, MAA, COK and JAI with their official websites. No terminals yet: they need checking against official sources.
+- Seed loader (`pnpm seed`, `pnpm seed:check`): validates every schema and provenance rule, upserts idempotently, removes deleted content.
+- API: `GET /api/v1/airports` (typo-tolerant search, region and guide filters) and `GET /api/v1/airports/{code}` (IATA or ICAO, with provenance).
+- Web: airport directory (`/airports`) and guide pages (`/airports/DEL`) with verification status and sources on every record. Airport search and airport cards on the live map; guides link back with `/?airport=DEL`.
+- Weekly data check workflow: review queue, source link and content-change checks, seed validation and provider checks, reported in one `data-check` issue.
+- Deploy data workflow: migrations and seed on changes to `main` (needs the `DATABASE_URL` secret).
+
+### Changed
+- `scripts/build_airports_geojson.py` is now `scripts/build_airport_data.py` and writes the map layer and the airport seed from the same rows.
+
 ### Added
 - adsb.fi as a second community position source (`POSITION_PROVIDERS=adsblol,adsbfi,opensky`). A sweep now fails if more than 2 of its 10 regions are missing, instead of showing a partial map.
 

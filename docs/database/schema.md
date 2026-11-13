@@ -1,6 +1,18 @@
 # Schema documentation
 
-Last updated: 2026-11-13. Status: proposed. Stage 3 (airports) and Stage 5 (lounges and cards) migrations will implement this. This document is updated whenever a migration changes it.
+Last updated: 2026-11-13. This document is updated whenever a migration changes it.
+
+**Implemented (migration 0002):** `sources`, `record_sources`, `source_checks`, `airports`, `terminals`, `airlines`, `terminal_airlines`. Everything else is still proposed (Stages 4 and 5).
+
+Differences from the first proposal, decided while implementing:
+
+| Table | Change | Why |
+|---|---|---|
+| `sources` | Added `key` (unique text). `retrieved_at` is a `date` | Seed files refer to sources by a stable handle. Retrieval is recorded per day |
+| `airports` | Added `elevation_ft`, `size` (`large`/`medium`/`small`), `has_guide`, `official_source_id`. `icao` is nullable | Directory ordering, guide listing and the "official website" link. A few airports have no ICAO code |
+| `airports.region` | Text with a check constraint (six values) | Follows the Zonal Councils; see the data dictionary |
+| `terminal_airlines` | `valid_from` is required | It's part of the unique key |
+| `source_checks` | Added `error` | Network failures have no HTTP status |
 
 ## Conventions
 
