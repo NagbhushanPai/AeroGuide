@@ -3,7 +3,12 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { useWaking } from "@/hooks/use-waking";
-import { fetchAirport, fetchAirports, type AirportQuery } from "@/lib/api/client";
+import {
+  fetchAirlinesSeen,
+  fetchAirport,
+  fetchAirports,
+  type AirportQuery,
+} from "@/lib/api/client";
 
 // Airport content only changes when the seed runs, so long client caching is fine.
 const STALE_MS = 10 * 60_000;
@@ -28,4 +33,13 @@ export function useAirport(code: string) {
     ...retry,
   });
   return { ...result, waking: useWaking(result.data === undefined && !result.isError) };
+}
+
+export function useAirlinesSeen(code: string, days = 7) {
+  return useQuery({
+    queryKey: ["airlines-seen", code, days],
+    queryFn: ({ signal }) => fetchAirlinesSeen(code, days, signal),
+    staleTime: 5 * 60_000,
+    ...retry,
+  });
 }

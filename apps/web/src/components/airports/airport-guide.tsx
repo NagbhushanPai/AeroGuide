@@ -20,6 +20,8 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { AirportDetail, SourceRef, TerminalOut } from "@/lib/api/client";
 
+import { AirlinesSeen } from "./airlines-seen";
+import { MappedTerminals } from "./mapped-terminals";
 import { ProvenanceLine } from "./provenance-line";
 import { useAirport } from "./use-airports";
 
@@ -160,7 +162,10 @@ function Guide({ airport: a }: { airport: AirportDetail }) {
             ))}
           </ul>
         )}
+        {a.mapped_terminals ? <MappedTerminals data={a.mapped_terminals} /> : null}
       </section>
+
+      <AirlinesSeen code={a.iata} />
 
       <section aria-labelledby="lounges-heading" className="space-y-2">
         <h2 id="lounges-heading" className="flex items-center gap-2 text-xl font-semibold">

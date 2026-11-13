@@ -101,6 +101,26 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/airports/{code}/airlines-seen": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Airlines seen at an airport
+     * @description Airlines whose aircraft were seen on the ground or low near the airport in community ADS-B data, per IST day. An observation: not a schedule and not a terminal assignment.
+     */
+    get: operations["airport_airlines_seen_api_v1_airports__code__airlines_seen_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -230,6 +250,59 @@ export interface components {
       /** Name */
       name: string;
     };
+    /** AirlineSeen */
+    AirlineSeen: {
+      /**
+       * Icao
+       * @description Airline ICAO code from the callsign prefix
+       */
+      icao: string;
+      /**
+       * Name
+       * @description From community route data when known
+       */
+      name: string | null;
+      /**
+       * Aircraft
+       * @description Distinct aircraft seen
+       */
+      aircraft: number;
+      /** Days Seen */
+      days_seen: number;
+      /**
+       * Last Seen
+       * Format: date-time
+       */
+      last_seen: string;
+    };
+    /** AirlinesSeen */
+    AirlinesSeen: {
+      /** Iata */
+      iata: string;
+      /** Days */
+      days: number;
+      /**
+       * Since
+       * Format: date
+       */
+      since: string;
+      /**
+       * Until
+       * Format: date
+       */
+      until: string;
+      /**
+       * Days With Data
+       * @description Days in the window with any sighting here
+       */
+      days_with_data: number;
+      /** Airlines */
+      airlines: components["schemas"]["AirlineSeen"][];
+      /** Method */
+      method: string;
+      /** Source */
+      source: string;
+    };
     /** AirportDetail */
     AirportDetail: {
       /** Iata */
@@ -273,6 +346,8 @@ export interface components {
       provenance: components["schemas"]["Provenance"];
       /** Terminals */
       terminals: components["schemas"]["TerminalOut"][];
+      /** @description OpenStreetMap terminals, shown separately from verified terminals. */
+      mapped_terminals: components["schemas"]["MappedTerminals"] | null;
       /**
        * Terminal Note
        * @description Always shown: terminal assignments change, so travellers must confirm them.
@@ -365,6 +440,30 @@ export interface components {
       /** Version */
       version: string;
       checks: components["schemas"]["HealthChecks"];
+    };
+    /** MappedTerminal */
+    MappedTerminal: {
+      /** Name */
+      name: string;
+      /** Ref */
+      ref: string | null;
+      /** Lat */
+      lat: number;
+      /** Lon */
+      lon: number;
+      /** Osm Url */
+      osm_url: string;
+    };
+    /**
+     * MappedTerminals
+     * @description Terminal buildings as mapped in OpenStreetMap. Unverified; roles are not stated.
+     */
+    MappedTerminals: {
+      /** Items */
+      items: components["schemas"]["MappedTerminal"][];
+      provenance: components["schemas"]["Provenance"];
+      /** Attribution */
+      attribution: string;
     };
     /** PointGeometry */
     PointGeometry: {
@@ -728,6 +827,53 @@ export interface operations {
         };
         content: {
           "application/json": components["schemas"]["AirportDetail"];
+        };
+      };
+      /** @description Unknown airport */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  airport_airlines_seen_api_v1_airports__code__airlines_seen_get: {
+    parameters: {
+      query?: {
+        days?: number;
+      };
+      header?: never;
+      path: {
+        code: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AirlinesSeen"];
         };
       };
       /** @description Unknown airport */

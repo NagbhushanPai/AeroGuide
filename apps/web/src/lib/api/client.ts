@@ -13,6 +13,8 @@ export type AirportDetail = components["schemas"]["AirportDetail"];
 export type Provenance = components["schemas"]["Provenance"];
 export type SourceRef = components["schemas"]["SourceRef"];
 export type TerminalOut = components["schemas"]["TerminalOut"];
+export type MappedTerminals = components["schemas"]["MappedTerminals"];
+export type AirlinesSeen = components["schemas"]["AirlinesSeen"];
 export type Region = AirportSummary["region"];
 
 export const REGIONS: readonly Region[] = [
@@ -76,6 +78,23 @@ export async function fetchAirport(
 ): Promise<AirportDetail | null> {
   try {
     return await getJson<AirportDetail>(`/api/v1/airports/${encodeURIComponent(code)}`, signal);
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) return null;
+    throw err;
+  }
+}
+
+/** Airlines seen near the airport in the last `days` days. Null for an unknown code. */
+export async function fetchAirlinesSeen(
+  code: string,
+  days = 7,
+  signal?: AbortSignal,
+): Promise<AirlinesSeen | null> {
+  try {
+    return await getJson<AirlinesSeen>(
+      `/api/v1/airports/${encodeURIComponent(code)}/airlines-seen?days=${days}`,
+      signal,
+    );
   } catch (err) {
     if (err instanceof ApiError && err.status === 404) return null;
     throw err;

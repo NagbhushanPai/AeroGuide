@@ -75,6 +75,27 @@ function detail(withTerminal: boolean) {
           },
         ]
       : [],
+    mapped_terminals: withTerminal
+      ? null
+      : {
+          items: [
+            {
+              name: "Test Mapped Terminal",
+              ref: "TM",
+              lat: 28.5,
+              lon: 77.1,
+              osm_url: "https://www.openstreetmap.org/way/1",
+            },
+          ],
+          provenance: {
+            status: "unverified",
+            verified_at: null,
+            reverify_due: null,
+            source: source("OpenStreetMap", "secondary"),
+            notes: null,
+          },
+          attribution: "© OpenStreetMap contributors (ODbL)",
+        },
     terminal_note: "Always confirm the terminal on your boarding pass.",
   };
 }
@@ -91,6 +112,36 @@ async function mockAirports(page: Page, opts: { withTerminal?: boolean; down?: b
   });
   await page.route("**/api/v1/airports/DEL", (r) =>
     r.fulfill({ headers: CORS, json: detail(opts.withTerminal ?? false) }),
+  );
+  await page.route("**/api/v1/airports/DEL/airlines-seen*", (r) =>
+    r.fulfill({
+      headers: CORS,
+      json: {
+        iata: "DEL",
+        days: 7,
+        since: "2026-11-08",
+        until: "2026-11-14",
+        days_with_data: 3,
+        airlines: [
+          {
+            icao: "TST",
+            name: "Test Air",
+            aircraft: 4,
+            days_seen: 2,
+            last_seen: new Date().toISOString(),
+          },
+          {
+            icao: "QQQ",
+            name: null,
+            aircraft: 1,
+            days_seen: 1,
+            last_seen: new Date().toISOString(),
+          },
+        ],
+        method: "Test method: shows which airlines fly here, not which terminal they use.",
+        source: "Test feeds",
+      },
+    }),
   );
   await page.route("**/api/v1/airports/ZZZ", (r) =>
     r.fulfill({ status: 404, headers: CORS, json: { detail: "No airport" } }),
@@ -130,6 +181,22 @@ test("guide without verified terminals says so and links the official site", asy
     "href",
     "https://example.org/source",
   );
+});
+
+test("guide shows mapped terminals and airlines seen, labelled as such", async ({ page }) => {
+  await mockAirports(page);
+  await page.goto("/airports/DEL");
+  await expect(page.getByText("As mapped in OpenStreetMap")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Test Mapped Terminal/ })).toHaveAttribute(
+    "href",
+    "https://www.openstreetmap.org/way/1",
+  );
+  await expect(page.getByText("© OpenStreetMap contributors (ODbL)")).toBeVisible();
+  const seen = page.getByRole("region", { name: "Airlines seen here" });
+  await expect(seen.getByText("Test Air")).toBeVisible();
+  await expect(seen.getByText("Name not reported")).toBeVisible();
+  await expect(seen.getByText(/data on 3 of 7 days/)).toBeVisible();
+  await expect(seen.getByText(/not which terminal/)).toBeVisible();
 });
 
 test("guide shows terminals with their own provenance", async ({ page }) => {
