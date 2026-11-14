@@ -12,8 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-10-04
-  summary: '4 / quarter. From 1 Jul 2026: spend ₹75,000 in the preceding spends quarter (was unconditional).
-    Adani One Platinum is gated the same way; its count was not checked.'
+  summary: '4 / quarter. From 1 Jul 2026: spend ₹75,000 in the preceding spends quarter (was unconditional).'
   rules:
   - type: visit_quota
     count: 4
@@ -27,8 +26,9 @@ policies:
   provenance:
     status: unverified
     source: icici-bank-adani-one-signature-source
-    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
-      against the source yet.
+    notes: 'Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn''t checked it
+      against the source yet. Summary review note moved from the summary: Adani One Platinum is gated the
+      same way; its count was not checked.'
 - scope: international
   valid_from: 2026-10-04
   summary: 2 / year.

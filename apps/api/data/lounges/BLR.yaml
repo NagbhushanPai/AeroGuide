@@ -54,6 +54,35 @@ lounges:
       verified_at: 2026-11-14
       verified_by: claude-code
       notes: Access is permitted 3 hours prior to scheduled flight departure.
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. The list names three 080 Domestic Lounges
+        at T1 (East, West PH1, West PH2); matched by name, not location.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as '080
+        Lounge – East, Domestic Departure, Opposite to Gate 34 East Wing'.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). The list names 'BLR'
+        and '080 Domestic', both Terminal 1 Domestic; matched by name to the 080 Domestic Lounges at T1.
 - slug: 080-domestic-lounge-blr-t1-level-2
   name: 080 Domestic Lounge
   terminal: Terminal 1
@@ -78,6 +107,36 @@ lounges:
       verified_at: 2026-11-14
       verified_by: claude-code
       notes: Access is permitted 3 hours prior to scheduled flight departure.
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. The list names three 080 Domestic Lounges
+        at T1 (East, West PH1, West PH2); matched by name, not location.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). The list also names
+        '080 Lounge - West PH 1' and 'West PH 2' (T1, '2nd Floor ... West Wing'); matched by name, not
+        location.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). The list names 'BLR'
+        and '080 Domestic', both Terminal 1 Domestic; matched by name to the 080 Domestic Lounges at T1.
 - slug: 080-lounge-blr-t2-domestic
   name: 080 Lounge (Domestic T2)
   terminal: Terminal 2
@@ -121,6 +180,34 @@ lounges:
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026). Listed as '080 Domestic
         Lounge, Domestic T2'.
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as '080 Lounge - T2 Domestic Departure'.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as '080
+        Lounge, Domestic Departure, Near Carluccio's Italian Restaurant, Level 4', Terminal 2.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as '080 Domestic',
+        Terminal 2, Domestic.
 - slug: 080-international-lounge-blr-t2
   name: 080 International Lounge
   terminal: Terminal 2
@@ -155,11 +242,43 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as '080 International Lounge - T2 International
+        Departure'.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as '080
+        Lounge, International Departure, After Security Hold Area, Level 4, Opposite Irish House', Terminal
+        2.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as '080 International',
+        Terminal 2, under 'Below lounges are accessible, only with Solitaire, Air+, Air+ Prime, Solitaire
+        Business & White Reserve Credit Cards'.
 - slug: 080-arrival-lounge-blr-t2
   name: 080 Arrival Lounge
   terminal: Terminal 2
   scope: both
   side: landside
+  direction: arrivals
   location_text: Ground Level, Arrivals Hall, Level 0. Follow signs to the lounge
   opening_hours:
     mode: 24h

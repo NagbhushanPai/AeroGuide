@@ -45,6 +45,17 @@ lounges:
       verified_by: claude-code
       notes: 'Max stay: 2 hours. Children under 5 years admitted free. Unlimited guests per cardholder.
         Hot and cold buffet complimentary.'
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Travel Club Lounge', T1 Domestic
+        Departure, though its description reads 'Earth Lounge - T1 Domestic Departure, Cochin'; matched
+        by name.
 - slug: earth-lounge-cok-t3
   name: Earth Lounge
   terminal: Terminal 3
@@ -82,6 +93,35 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Earth Lounge- T3 International
+        Departure'.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Earth
+        Lounge, International Departure, After SHA, 3rd Floor, Near Food Court', Terminal 3.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Earth Lounge',
+        Terminal 3, International.
 - slug: earth-lounge-cok-t1
   name: Earth Lounge
   terminal: Terminal 1
@@ -110,6 +150,25 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Earth
+        Lounge, Domestic Departure, After SHA, 2nd Floor, Near KFC. Terminal 1'.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Earth Lounge',
+        Terminal 1, Domestic.
 - slug: 0484-aero-lounge-cok-t2
   name: 0484 Aero Lounge
   terminal: T2

@@ -12,13 +12,13 @@ provenance:
 policies:
 - scope: international
   valid_from: 2026-11-14
-  summary: 1 lounge pass / quarter on international spend (₹50,000 per Niyo's 2024 note; trackers cite
-    ₹75,000) — verify.
+  summary: 1 lounge pass / quarter on international spend (₹50,000 per Niyo's 2024 note).
   rules: []
   unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
     the bank's own page. Confirm with the bank before relying on it.
   provenance:
     status: unverified
     source: niyo-niyo-global-debit-credit-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: Trackers cite ₹75,000;
+      verify.'

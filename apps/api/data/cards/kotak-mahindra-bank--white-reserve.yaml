@@ -16,21 +16,33 @@ policies:
   rules:
   - type: program_entitlement
     program: kotak-mahindra-bank-lounge-access
+    note: Lounge T&C PDF lists White Reserve Credit Card among cards that "can access Domestic airport
+      lounges without any minimum spend requirement".
   - type: entry_method
     method: card_swipe
     note: 'Lounge programme page: "Present your Credit Card at the lounge"; Lounge T&C: "card validation
-      at the point of entry through a swipe transaction involving a nominal visit validation charge" (Rs.
-      2, non-reversible).'
-  unmodelled_terms: 'Lounge programme page: "Unlimited Domestic lounge access for primary and add-on card
-    holders". Lounge T&C PDF lists White Reserve Credit Card among cards that "can access Domestic airport
-    lounges without any minimum spend requirement" and exempts it from the primary-cardholder-only restriction.
-    Guest charges "Varies from lounge to lounge"; children below 5 free in domestic lounges. No start
-    date for the benefit is given on any page, so valid_from is the retrieval date.'
+      at the point of entry through a swipe transaction involving a nominal visit validation charge".'
+  - type: fee
+    amount: 2
+    currency: INR
+    applies_to: cardholder
+    refundable: false
+    note: 'Lounge programme page: "Visit Validation charges of INR 2/- would be charged at the lounge."
+      Lounge T&C PDF: "Rs. 2 (Non-Reversible)".'
+  - type: add_on_cardholders
+    covered: true
+    note: 'Lounge programme page: "Unlimited Domestic lounge access for primary and add-on card holders".'
+  - type: guest_allowance
+    count: 0
+    note: 'Lounge T&C PDF charges table: guest charges "Varies from lounge to lounge"; children below 5
+      free in domestic lounges.'
   provenance:
     status: verified
     source: kotak-white-reserve-lounge-program
     verified_at: 2026-11-14
     verified_by: claude-code
+    notes: No start date for the benefit is given on any page, so valid_from is the retrieval date. Remodelled
+      2026-11-14 with fee/add-on rule types.
 - scope: international
   valid_from: 2026-11-14
   summary: Unlimited complimentary international lounge access for primary and add-on cardholders via
@@ -38,19 +50,33 @@ policies:
   rules:
   - type: program_entitlement
     program: priority-pass
+    note: 'Lounge programme page: "International Lounge Access- Powered by Priority Pass".'
   - type: entry_method
     method: card_swipe
     note: '"Present your Credit Card / Digital QR code available on the Priority Pass app"; no separate
       Priority Pass card needed, but the Lounge T&C says cardholders "must inform lounge staff that they
-      are accessing the lounge via Priority Pass Membership". A USD 1 visit validation charge is debited
-      and reversed within 7 working days; international transactions must be enabled on the card first.'
-  unmodelled_terms: 'Lounge programme page: "Unlimited International lounge access for primary and add-on
-    card holders", "International Lounge Access- Powered by Priority Pass". Guest charges USD 35 per guest
-    per visit (Lounge T&C PDF charges table; product page footnote says "w.e.f. 01st October, guest charges
-    and charges after complimentary visits are exhausted, will be revised to $35 per guest, per visit",
-    year not stated). No start date for the benefit is given, so valid_from is the retrieval date.'
+      are accessing the lounge via Priority Pass Membership". International transactions must be enabled
+      on the card first.'
+  - type: fee
+    amount: 1
+    currency: USD
+    applies_to: cardholder
+    refundable: true
+    note: '"Visit validation charges of $1.00 will be debited from your credit card and it''ll get auto
+      reversed within 7 working days".'
+  - type: fee
+    amount: 35
+    currency: USD
+    applies_to: guest
+    note: 'Lounge programme page: "A charge of USD 35 per person per visit will be charged for guests."'
+  - type: add_on_cardholders
+    covered: true
+    note: 'Lounge programme page: "Unlimited International lounge access for primary and add-on card holders".'
   provenance:
     status: verified
     source: kotak-white-reserve-lounge-program
     verified_at: 2026-11-14
     verified_by: claude-code
+    notes: No start date for the benefit is given, so valid_from is the retrieval date. The product page
+      footnote says "w.e.f. 01st October, guest charges ... will be revised to $35 per guest, per visit"
+      without a year. Remodelled 2026-11-14 with fee/add-on rule types.

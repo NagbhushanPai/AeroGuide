@@ -16,24 +16,33 @@ policies:
   rules:
   - type: program_entitlement
     program: axis-bank-lounge-set-b
+    note: All eligible lounges are part of Axis Bank lounge program & may get modified / amended / changed
+      / revoked anytime as per Axis Bank's discretion.
   - type: visit_quota
     count: 8
     period: year
     ambiguous: true
     note: Silver tier. The terms give counts per tier but no period; the product page shows them as yearly
-      values.
+      values. The programme PDF says 'The spend based criteria is waived for ... ATLAS Credit Card'.
   - type: entry_method
     method: card_swipe
     note: For domestic lounge access, cardholders can swipe their card at the lounge for access.
+  - type: fee
+    amount: 2
+    currency: INR
+    applies_to: cardholder
+    ambiguous: true
+    note: 'Programme PDF: ''a nominal swipe fee of Rs. 2 for Visa, Rs. 25 for Mastercard and Rs. 2 for
+      Rupay''. The bank doesn''t state the Atlas network, so the amount may be Rs. 25.'
   unmodelled_terms: 'Tiers: Silver 8, Gold 12, Platinum 18 domestic visits. The above number of visits
-    include visits for primary cardholder and guests as well. The spend based criteria is waived for ...
-    ATLAS Credit Card.'
+    include visits for primary cardholder and guests as well.'
   provenance:
     status: verified
     source: axis-atlas-tnc-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The terms state no start date; valid_from is the date checked.
+    notes: The terms state no start date; valid_from is the date checked. Remodelled 2026-11-14 with fee/add-on
+      rule types.
 - scope: international
   valid_from: 2026-11-14
   summary: 4 international lounge visits at the Silver tier (6 at Gold, 12 at Platinum). The bank says

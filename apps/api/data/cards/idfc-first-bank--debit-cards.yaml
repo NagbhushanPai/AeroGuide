@@ -12,7 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-11-14
-  summary: Varies by card. The programme moved to Elite Assist (TFS) — check the IDFC app.
+  summary: Varies by card. The programme moved to Elite Assist (TFS).
   rules: []
   unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
     the bank''s own page. Confirm with the bank before relying on it. Condition reported: The programme
@@ -20,8 +20,9 @@ policies:
   provenance:
     status: unverified
     source: idfc-first-bank-mayura-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The tracker advises checking
+      the IDFC app.'
 - scope: international
   valid_from: 2026-11-14
   summary: Varies.

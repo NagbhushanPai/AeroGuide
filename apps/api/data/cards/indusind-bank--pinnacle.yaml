@@ -13,7 +13,7 @@ policies:
 - scope: domestic
   valid_from: 2026-11-14
   summary: '1 / quarter. From Apr 2026 (first gated quarter Jul–Sep 2026): spend ₹1,50,000 in the previous
-    quarter — the bank notice as reproduced by trackers, verify.'
+    quarter.'
   rules:
   - type: visit_quota
     count: 1
@@ -27,8 +27,9 @@ policies:
   provenance:
     status: unverified
     source: indusind-bank-pinnacle-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The condition is the
+      bank notice as reproduced by trackers; verify.'
 - scope: international
   valid_from: 2026-11-14
   summary: Varies.

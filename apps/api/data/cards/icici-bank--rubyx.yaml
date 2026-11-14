@@ -34,14 +34,17 @@ policies:
   - type: entry_method
     method: card_swipe
     note: MITC lists a card validation charge taken on each eligible card presented at the entrance to
-      the participating lounge; the product page itself gives no access method.
-  unmodelled_terms: '"The benefit is exclusively applicable to the primary Cardholder." For dual Credit
-    Card variants (Mastercard & Amex | Visa & RuPay) "the entitlement includes 1 domestic lounge visits
-    per quarter for each variant."'
+      the participating lounge (Re. 1 on Amex variants; the Visa/Mastercard/RuPay amount is unreadable
+      in the PDF); the product page itself gives no access method.
+  - type: add_on_cardholders
+    covered: false
+    note: '"The benefit is exclusively applicable to the primary Cardholder."'
+  unmodelled_terms: For dual Credit Card variants (Mastercard & Amex | Visa & RuPay) "the entitlement includes
+    1 domestic lounge visits per quarter for each variant."
   provenance:
     status: verified
     source: icici-rubyx-page
     verified_at: 2026-11-14
     verified_by: claude-code
     notes: valid_from is the date the bank's MITC and lounge-criteria page give for the Rs 75,000 spend
-      criteria ("Starting Jan 01, 2025").
+      criteria ("Starting Jan 01, 2025"). Remodelled 2026-11-14 with fee/add-on rule types.

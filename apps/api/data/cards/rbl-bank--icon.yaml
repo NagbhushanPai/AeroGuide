@@ -12,8 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-11-14
-  summary: '2 / quarter. From 1 Jul 2025: spend ₹35,000 in the previous calendar quarter (the gate is
-    the bank FAQ''s; the count is the trackers'').'
+  summary: '2 / quarter. From 1 Jul 2025: spend ₹35,000 in the previous calendar quarter.'
   rules:
   - type: visit_quota
     count: 2
@@ -26,8 +25,9 @@ policies:
   provenance:
     status: unverified
     source: rbl-bank-icon-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The spend gate is from
+      the bank FAQ; the visit count is the trackers''.'
 - scope: international
   valid_from: 2026-11-14
   summary: Varies.

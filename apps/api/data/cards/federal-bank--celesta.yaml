@@ -13,7 +13,7 @@ policies:
 - scope: domestic
   valid_from: 2026-11-14
   summary: '2 / quarter. From 1 Oct 2025: spend ₹60,000 in the previous quarter; add-on cards no longer
-    eligible (the bank''s lounge page could not be read; rule per the tracker citing the bank notice).'
+    eligible.'
   rules:
   - type: visit_quota
     count: 2
@@ -27,8 +27,9 @@ policies:
   provenance:
     status: unverified
     source: federal-bank-celesta-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The bank''s lounge page
+      could not be read; the rule is per the tracker citing the bank notice.'
 - scope: international
   valid_from: 2026-11-14
   summary: 2 / year.

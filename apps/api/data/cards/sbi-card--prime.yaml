@@ -41,7 +41,8 @@ policies:
   - type: visit_quota
     count: 4
     period: year
-    note: 4 complimentary visits per year to International Lounges outside India.
+    note: 4 complimentary visits per year to International Lounges outside India. Usage fee of upto $27+
+      Applicable Taxes will be charged on your SBI Card PRIME after the complimentary visit.
   - type: visit_quota
     count: 2
     period: quarter
@@ -49,11 +50,11 @@ policies:
   - type: entry_method
     method: programme_card
   unmodelled_terms: The standard membership of the Priority Pass Program is complimentary for the first
-    two years. Usage fee of upto $27+ Applicable Taxes will be charged on your SBI Card PRIME after the
-    complimentary visit.
+    two years.
   provenance:
     status: verified
     source: sbi-prime-brochure
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: Brochure is undated; valid_from is the date checked.
+    notes: Brochure is undated; valid_from is the date checked. Remodelled 2026-11-14 with fee/add-on rule
+      types.

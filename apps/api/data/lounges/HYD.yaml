@@ -72,6 +72,34 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Encalm Lounge - T1 Domestic Departure'.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Encalm
+        Lounge, Domestic Departure, After SHA, Level E, opposite Board Gate No. 11'.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Encalm
+        Lounge', Terminal 1, Domestic.
 - slug: encalm-lounge-hyd-international
   name: Encalm Lounge
   operator: Encalm
@@ -140,6 +168,35 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Encalm Lounge - T1 International
+        Departure'.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Encalm
+        Lounge, International Departure, After SHA, Near Gate No. 23, E Floor'.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Encalm
+        Lounge', Terminal 1, International.
 - slug: encalm-prive-hyd-international
   name: Encalm Privé
   operator: Encalm

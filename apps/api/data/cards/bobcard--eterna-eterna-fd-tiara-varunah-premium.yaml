@@ -12,8 +12,8 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-10-04
-  summary: 'Unlimited once unlocked. From 15 Jul 2026 per the BOBCARD notice (trackers say 1 Oct 2026):
-    spend ₹75,000 in the preceding calendar quarter (was ₹40,000).'
+  summary: 'Unlimited once unlocked. From 15 Jul 2026 per the BOBCARD notice: spend ₹75,000 in the preceding
+    calendar quarter (was ₹40,000).'
   rules: []
   unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
     the bank''s own page. Confirm with the bank before relying on it. Condition reported: From 15 Jul
@@ -22,8 +22,9 @@ policies:
   provenance:
     status: unverified
     source: bobcard-eterna-eterna-fd-tiara-varunah-premium-source
-    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
-      against the source yet.
+    notes: 'Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn''t checked it
+      against the source yet. Summary review note moved from the summary: Trackers say the change applies
+      from 1 Oct 2026.'
 - scope: international
   valid_from: 2026-10-04
   summary: Varies.

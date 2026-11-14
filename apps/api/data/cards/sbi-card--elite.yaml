@@ -16,6 +16,8 @@ policies:
   rules:
   - type: program_entitlement
     program: visa-mastercard-lounge-access
+    note: The lounge access program for SBI Card is managed by the respective network partners. Please
+      refer to the respective terms and conditions of Mastercard, RuPay & Visa.
   - type: visit_quota
     count: 2
     period: quarter
@@ -23,14 +25,13 @@ policies:
     note: 'From an undated brochure: ''Two complimentary access every quarter.'''
   - type: entry_method
     method: card_swipe
-  unmodelled_terms: The lounge access program for SBI Card is managed by the respective network partners.
-    Please refer to the respective terms and conditions of Mastercard, RuPay & Visa.
   provenance:
     status: verified
     source: sbi-elite-brochure
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: Brochure is undated; valid_from is the date checked.
+    notes: Brochure is undated; valid_from is the date checked. Remodelled 2026-11-14 with fee/add-on rule
+      types.
 - scope: international
   valid_from: 2026-11-14
   summary: Complimentary Priority Pass membership. The brochure doesn't state how many visits are free.

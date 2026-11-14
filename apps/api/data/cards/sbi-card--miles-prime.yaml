@@ -13,7 +13,7 @@ policies:
 - scope: domestic
   valid_from: 2026-11-14
   summary: 2 / quarter (8 / year) + extra visits on spend. Base visits unconditional; +1 domestic visit
-    per ₹1 lakh spent, capped — verify the current cap.
+    per ₹1 lakh spent, capped.
   rules:
   - type: visit_quota
     count: 2
@@ -26,8 +26,9 @@ policies:
   provenance:
     status: unverified
     source: sbi-card-miles-prime-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The current cap needs
+      checking.'
 - scope: international
   valid_from: 2026-11-14
   summary: 4 / year via Priority Pass.

@@ -61,5 +61,6 @@ Done 2026-11-14. Every policy cites the bank's own page or terms PDF (see the ca
 
 - **Networks:** the banks don't state one for Regalia Gold, SBI's three cards, Atlas or Kotak's three cards, so these show "not stated".
 - **Undated brochures:** SBI's ELITE and PRIME counts come from undated brochures. Those rules are marked ambiguous.
-- **No lounge lists:** HDFC's (JavaScript only), ICICI's and Kotak's lists of lounges for their own programmes aren't linked to lounges yet. For those programmes, the checker finds no lounges.
+- **Lounge lists:** HDFC's, ICICI's and Kotak's lists are linked to lounges at the 7 airports (2026-11-14). The Visa/Mastercard list (Mastercard's page refuses automated access) and the Diners list (only in the Diners app) aren't, so cards relying on them answer "depends".
+- **Possible duplicate:** `travel-club-lounge-cok-t1` and `earth-lounge-cok-t1` may be the same lounge. HDFC's list names it Travel Club and describes it as Earth Lounge.
 - **Atlas:** the bank says its international programme is "under maintenance".

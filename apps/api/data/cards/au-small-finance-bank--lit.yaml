@@ -12,8 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-11-14
-  summary: 1 / quarter as a paid add-on feature. Lounge access is an optional paid feature, not complimentary
-    — verify.
+  summary: 1 / quarter as a paid add-on feature. Lounge access is an optional paid feature, not complimentary.
   rules:
   - type: visit_quota
     count: 1
@@ -26,5 +25,6 @@ policies:
   provenance:
     status: unverified
     source: au-small-finance-bank-ixigo-au-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The tracker flagged this
+      for checking (''verify'').'

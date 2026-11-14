@@ -12,7 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-11-14
-  summary: 2 / quarter. Spend ₹50,000 in the previous quarter — verify.
+  summary: 2 / quarter. Spend ₹50,000 in the previous quarter.
   rules:
   - type: visit_quota
     count: 2
@@ -25,8 +25,9 @@ policies:
   provenance:
     status: unverified
     source: au-small-finance-bank-ixigo-au-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The tracker flagged this
+      spend condition for checking (''verify'').'
 - scope: international
   valid_from: 2026-11-14
   summary: 1 / year via Priority Pass (on request).

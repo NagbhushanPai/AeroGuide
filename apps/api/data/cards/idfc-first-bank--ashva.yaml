@@ -13,7 +13,7 @@ policies:
 - scope: domestic
   valid_from: 2026-11-14
   summary: 4 / quarter. The bank's lounge page lists 4 / quarter; its FAQ applies a ₹20,000 monthly spend
-    to the listed cards — verify whether Ashva is gated.
+    to the listed cards.
   rules:
   - type: visit_quota
     count: 4
@@ -27,8 +27,9 @@ policies:
   provenance:
     status: unverified
     source: idfc-first-bank-mayura-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: Whether Ashva is gated
+      by the ₹20,000 monthly spend needs checking.'
 - scope: international
   valid_from: 2026-11-14
   summary: 2 / quarter.

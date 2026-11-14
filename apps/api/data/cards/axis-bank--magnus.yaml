@@ -16,6 +16,9 @@ policies:
   rules:
   - type: program_entitlement
     program: axis-bank-lounge-set-b
+    note: 'Programme PDF Set B: ''Axis Bank Magnus Credit Card (Unlimited complimentary lounge access)''.
+      Revision T&C: ''Eligible airport lounges at Indian international terminals after immigration are
+      considered international lounges and can be accessed using your Priority Pass.'''
   - type: spend_gate
     amount: 50000
     window: previous_calendar_quarter
@@ -45,22 +48,29 @@ policies:
   - type: entry_method
     method: card_swipe
     note: 'Travel-stay page: ''Swipe your Axis Bank Magnus Credit Card at the eligible domestic airport
-      lounges to avail your free visits''; a Rs 25 authentication transaction is made and reversed. Revision
-      T&C (effective 28-08-2026): ''the Priority Pass card will not be valid for accessing domestic airport
-      lounges in India''; ''present only your MAGNUS Credit Card along with your boarding pass at the
-      lounge reception''.'
-  unmodelled_terms: 'Programme PDF Set B: ''Axis Bank Magnus Credit Card (Unlimited complimentary lounge
-    access)''. Revision T&C: ''Eligible airport lounges at Indian international terminals after immigration
-    are considered international lounges and can be accessed using your Priority Pass.'' Older domestic
-    lounge T&C PDF (2021): ''All Magnus cardholders, primary and add-on, are eligible for unlimited domestic
-    lounges at select airports in India'' via ''Mastercard affiliated lounge'' with a Rs 25 authorisation;
-    that document predates the 1 May 2024 spend criteria. valid_from is the spend-criteria effective date
-    stated on the travel-stay page.'
+      lounges to avail your free visits''. Revision T&C (effective 28-08-2026): ''the Priority Pass card
+      will not be valid for accessing domestic airport lounges in India''; ''present only your MAGNUS Credit
+      Card along with your boarding pass at the lounge reception''.'
+  - type: fee
+    amount: 25
+    currency: INR
+    applies_to: cardholder
+    refundable: true
+    note: 'Travel-stay page: ''A transaction of ₹25/- will be made on the credit card for authentication
+      which will be reversed within 24 working hours.'''
+  - type: add_on_cardholders
+    covered: true
+    ambiguous: true
+    note: 'Older domestic lounge T&C PDF (2021): ''All Magnus cardholders, primary and add-on, are eligible
+      for unlimited domestic lounges''. That document predates the 1 May 2024 spend criteria; the current
+      pages don''t mention add-on cardholders.'
   provenance:
     status: verified
     source: axis-magnus-travel-stay
     verified_at: 2026-11-14
     verified_by: claude-code
+    notes: valid_from is the spend-criteria effective date stated on the travel-stay page. Remodelled 2026-11-14
+      with fee/add-on rule types.
 - scope: international
   valid_from: 2024-04-20
   summary: Unlimited complimentary international lounge visits with the Priority Pass card (no visit quota),
@@ -68,26 +78,25 @@ policies:
   rules:
   - type: program_entitlement
     program: priority-pass
+    note: Eligible lounge list is at www.prioritypass.com. Revision T&C (effective 28-08-2026) says Priority
+      Pass is not valid for domestic lounges in India, but lounges at Indian international terminals after
+      immigration count as international lounges.
   - type: guest_allowance
     count: 4
     period: year
     note: 'Product page: ''4 additional guest visits per card anniversary year''; ''Guest visits have
       been revised to 4 per year w.e.f 20th April''24'' (previously 8). Period is the card anniversary
-      year.'
+      year. Travel-stay page: ''the primary cardholder must be traveling along with the guest''.'
   - type: entry_method
     method: programme_card
     note: 'Travel-stay page: ''Swipe your Priority Pass Card at the eligible lounges to avail complimentary
-      visits''. Revision T&C: ''present your Priority Pass along with your boarding pass at the lounge
-      reception for authentication''.'
-  unmodelled_terms: 'Travel-stay page: ''The Priority Pass Membership Card is linked to the credit card''s
-    status''; unblocking takes at least 24 working hours after the credit card is updated. Eligible lounge
-    list is at www.prioritypass.com. Revision T&C (effective 28-08-2026): Priority Pass is not valid for
-    domestic lounges in India, but ''Eligible airport lounges at Indian international terminals after
-    immigration are considered international lounges and can be accessed using your Priority Pass.'''
+      visits''; ''The Priority Pass Membership Card is linked to the credit card''s status'' (unblocking
+      takes at least 24 working hours after the credit card is updated). Revision T&C: ''present your
+      Priority Pass along with your boarding pass at the lounge reception for authentication''.'
   provenance:
     status: verified
     source: axis-magnus-travel-stay
     verified_at: 2026-11-14
     verified_by: claude-code
     notes: valid_from is the date the bank states the guest allowance was revised to 4 per year; the page
-      gives no other start date for the benefit.
+      gives no other start date for the benefit. Remodelled 2026-11-14 with fee/add-on rule types.

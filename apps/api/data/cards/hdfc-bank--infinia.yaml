@@ -21,14 +21,22 @@ policies:
   - type: entry_method
     method: card_swipe
     note: Primary and Add-on cardholders have to swipe their individual Infinia Credit card.
-  unmodelled_terms: A transaction fee of Rs. 2 will be charged towards complimentary lounge access per
-    visit for Visa cardholders.
+  - type: fee
+    amount: 2
+    currency: INR
+    applies_to: cardholder
+    note: A transaction fee of Rs. 2 will be charged towards complimentary lounge access per visit for
+      Visa cardholders.
+  - type: add_on_cardholders
+    covered: true
+    note: Infinia Primary and Add-on Cardholders can avail unlimited complimentary lounge access.
   provenance:
     status: verified
     source: hdfc-infinia-lounge-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The bank states no start date; valid_from is the date checked.
+    notes: The bank states no start date; valid_from is the date checked. Remodelled 2026-11-14 with fee/add-on
+      rule types.
 - scope: international
   valid_from: 2026-11-14
   summary: Unlimited complimentary lounge access outside India via Priority Pass for primary and add-on
@@ -39,11 +47,19 @@ policies:
   - type: entry_method
     method: programme_card
     note: Presentation of the individual Priority Pass card at the participating airport lounge is mandatory.
-  unmodelled_terms: Any guest visit using Priority pass will be charged at USD 27 + GST per visit per
-    guest. Add-on cardholders can avail complimentary lounge access with their own Priority Pass only.
+  - type: fee
+    amount: 27
+    currency: USD
+    applies_to: guest
+    note: Any guest visit using Priority pass will be charged at USD 27 + GST per visit per guest.
+  - type: add_on_cardholders
+    covered: true
+    note: Add-on cardholders can avail complimentary lounge access with their own Priority Pass only. Otherwise,
+      they will be treated as a guest of the primary cardholder.
   provenance:
     status: verified
     source: hdfc-infinia-lounge-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The bank states no start date; valid_from is the date checked.
+    notes: The bank states no start date; valid_from is the date checked. Remodelled 2026-11-14 with fee/add-on
+      rule types.

@@ -12,7 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-11-14
-  summary: 2 / quarter. Verify the current spend gate (invitation-only; not in the ₹35,000 gate list).
+  summary: 2 / quarter. Invitation-only; not in the ₹35,000 gate list.
   rules:
   - type: visit_quota
     count: 2
@@ -25,8 +25,9 @@ policies:
   provenance:
     status: unverified
     source: rbl-bank-insignia-preferred-banking-world-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The current spend gate
+      needs checking.'
 - scope: international
   valid_from: 2026-11-14
   summary: Varies.

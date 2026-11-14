@@ -57,6 +57,34 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Encalm Lounge', Terminal 1, Domestic.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Encalm
+        Lounge', Terminal 1, Domestic.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Encalm
+        Lounge', Terminal 1, Domestic.
 - slug: encalm-lounge-del-t2-domestic
   name: Encalm Lounge
   terminal: Terminal 2
@@ -107,6 +135,34 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in Axis Bank's Set B participating lounges (programme PDF).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Encalm Lounge', Terminal 2, Domestic.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Encalm
+        Lounge', Terminal 2, Domestic.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Encalm
+        Lounge', Terminal 2, Domestic.
 - slug: encalm-lounge-del-t3-international
   name: Encalm Lounge
   terminal: Terminal 3
@@ -157,6 +213,34 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Encalm Lounge', Terminal 3, International.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Encalm
+        Lounge', Terminal 3, International.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Encalm
+        Lounge', Terminal 3, International.
 - slug: encalm-lounge-del-t3-domestic
   name: Encalm Lounge
   terminal: Terminal 3
@@ -203,6 +287,35 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Encalm Lounge', Terminal 3, Domestic.
+        The list names one Encalm Lounge at T3 domestic; Encalm lists two.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Encalm
+        Lounge', Terminal 3, Domestic. The list names one Encalm Lounge at T3 domestic; Encalm lists two.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Encalm
+        Lounge', Terminal 3, Domestic. The list names one Encalm Lounge at T3 domestic; Encalm lists two.
 - slug: encalm-lounge-del-t3-domestic-food-court
   name: Encalm Lounge
   terminal: Terminal 3
@@ -256,6 +369,35 @@ lounges:
       verified_by: claude-code
       notes: Listed in Axis Bank's Set B participating lounges (programme PDF). The list names one Encalm
         Lounge at T3 domestic; Encalm lists two.
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Encalm Lounge', Terminal 3, Domestic.
+        The list names one Encalm Lounge at T3 domestic; Encalm lists two.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Encalm
+        Lounge', Terminal 3, Domestic. The list names one Encalm Lounge at T3 domestic; Encalm lists two.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Encalm
+        Lounge', Terminal 3, Domestic. The list names one Encalm Lounge at T3 domestic; Encalm lists two.
 - slug: domestic-lounge-new-delhi-t3-del-t3
   name: Domestic Lounge - New Delhi T3
   terminal: Terminal 3
@@ -290,6 +432,7 @@ lounges:
   operator: Encalm Hospitality
   scope: both
   side: landside
+  direction: arrivals
   location_text: Ground Level, Arrivals, Near Gate No.4, Terminal 3, IGI Airport, New Delhi 110037
   nearest_gate: Gate No.4
   opening_hours:
@@ -403,6 +546,7 @@ lounges:
   operator: Encalm Hospitality
   scope: domestic
   side: landside
+  direction: arrivals
   location_text: Terminal 3, IGI Airport, Domestic Arrival Hall, Near Gate No. 1, New Delhi - 110037
   nearest_gate: Gate No. 1
   amenities:
@@ -415,3 +559,6 @@ lounges:
     source: encalm-transit-delhi-page
     verified_at: 2026-11-14
     verified_by: claude-code
+    notes: Encalm's page says both 'Situated at Terminal 3, IGI Airport, International Arrival' and 'Terminal
+      3, IGI Airport, Domestic Arrival Hall, Near Gate No. 1'; scope left as domestic from the address.
+      Rooms for short stays; the page names no lounge access programme.

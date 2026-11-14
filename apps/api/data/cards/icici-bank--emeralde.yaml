@@ -16,19 +16,29 @@ policies:
   rules:
   - type: program_entitlement
     program: icici-bank-lounge-access
+    note: MITC (Nov 6th, 2026) lists ICICI Bank Emeralde Credit Card among cards excluded from the Rs 75,000
+      preceding-calendar-quarter spend criteria.
   - type: entry_method
     method: card_swipe
     note: 'Product page FAQ: "Please swipe the ICICI Bank Emeralde Credit Card to avail the complimentary
       lounge access."'
-  unmodelled_terms: Benefit stated for "the Primary Cardholders"; labelled "Quarterly" on the product
-    page with no further explanation. MITC (Nov 6th, 2026) lists ICICI Bank Emeralde Credit Card among
-    cards excluded from the Rs 75,000 preceding-calendar-quarter spend criteria.
+  - type: fee
+    amount: 1
+    currency: INR
+    applies_to: cardholder
+    note: 'MITC card validation charges, lounges within India: "Re. 1 shall be taken on each eligible
+      card presented at the entrance to the Participating Lounge on AMEX variants."'
+  - type: add_on_cardholders
+    covered: false
+    note: 'Product page: "Get Unlimited complimentary Domestic airport lounge access for the Primary Cardholders."'
   provenance:
     status: verified
     source: icici-emeralde-page
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The product page gives no start date for the benefit, so the verification date is used.
+    notes: The product page gives no start date for the benefit, so the verification date is used. Its
+      "Quarterly" label on the benefit has no further explanation. Remodelled 2026-11-14 with fee/add-on
+      rule types.
 - scope: international
   valid_from: 2026-11-14
   summary: Unlimited complimentary international airport lounge access for the primary cardholder via
@@ -41,12 +51,18 @@ policies:
     note: '"Present your Priority Pass Membership Card at the participating international lounges." The
       Priority Pass T&C page says the membership card is provided in the welcome kit with the eligible
       credit card and that a same-day boarding pass for a departing flight is required.'
-  unmodelled_terms: 'Priority Pass T&C page: guest visits are charged per person per visit (complimentary
-    only for Diamant); "Except ICICI Bank Diamant, Times Black, Emeralde Private Metal, Emeralde, and
-    Emirates Emeralde Credit Cards" other cards pay for visits beyond the complimentary allowance.'
+  - type: add_on_cardholders
+    covered: false
+    note: 'Product page: "Get Unlimited complimentary International airport lounge access for the Primary
+      Cardholders."'
+  - type: guest_allowance
+    count: 0
+    note: 'Priority Pass T&C page: "Guest visits are complimentary for ICICI Bank Diamant Credit Card members"
+      only; guest visits are debited to the credit card per person per visit. No amount is stated.'
   provenance:
     status: verified
     source: icici-emeralde-page
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The product page gives no start date for the benefit, so the verification date is used.
+    notes: The product page gives no start date for the benefit, so the verification date is used. Remodelled
+      2026-11-14 with fee/add-on rule types.

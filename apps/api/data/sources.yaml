@@ -56,13 +56,6 @@ sources:
     source_type: secondary
     retrieved_at: 2026-11-14
 
-  - key: axis-credit-card-listing
-    name: Axis Bank credit cards listing page
-    url: https://www.axis.bank.in/cards/credit-card
-    publisher: Axis Bank
-    source_type: bank
-    retrieved_at: 2026-11-14
-
   - key: axis-horizon-page
     name: Axis Bank HORIZON Credit Card product page
     url: https://www.axis.bank.in/cards/credit-card/axis-horizon-credit-card
@@ -114,13 +107,6 @@ sources:
     source_type: bank
     retrieved_at: 2026-11-14
 
-  - key: hdfc-credit-card-listing
-    name: HDFC Bank credit cards listing page
-    url: https://www.hdfc.bank.in/credit-cards
-    publisher: HDFC Bank
-    source_type: bank
-    retrieved_at: 2026-11-14
-
   - key: hdfc-infinia-page
     name: HDFC Bank INFINIA Metal Edition credit card page
     url: https://www.hdfc.bank.in/credit-cards/infinia-credit-card
@@ -160,6 +146,12 @@ sources:
     name: Domestic Airport Lounge Access Program for Regalia Gold Credit Cards (PDF)
     url: https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/regalia-gold-credit-card/pdfs/lounge-t-and-cs-and-list-Regalia-Gold.pdf
     publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-infinia-lounge-list
+    name: HDFC Bank Infinia participating lounges in India (lms.hoi.in list linked from HDFC's Infinia lounge PDF)
+    url: https://lms.hoi.in/lounge-list/hdfc-infinia
     source_type: bank
     retrieved_at: 2026-11-14
 
@@ -233,13 +225,6 @@ sources:
     source_type: bank
     retrieved_at: 2026-11-14
 
-  - key: priority-pass-blr-index
-    name: Priority Pass lounges at Bengaluru Kempegowda International
-    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international
-    publisher: Priority Pass
-    source_type: network_program
-    retrieved_at: 2026-11-14
-
   - key: priority-pass-blr17
     name: Priority Pass, T1 Lounge (Kerbside), Bengaluru
     url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international/blr17-t1-lounge-kerbside
@@ -310,13 +295,6 @@ sources:
     source_type: lounge_operator
     retrieved_at: 2026-11-14
 
-  - key: icici-credit-card-listing
-    name: ICICI Bank credit card listing page
-    url: https://www.icici.bank.in/personal-banking/cards/credit-card
-    publisher: ICICI Bank
-    source_type: bank
-    retrieved_at: 2026-11-14
-
   - key: icici-emeralde-page
     name: ICICI Bank Emeralde Credit Card page
     url: https://www.icici.bank.in/personal-banking/cards/credit-card/emeralde-credit-card
@@ -352,16 +330,9 @@ sources:
     source_type: bank
     retrieved_at: 2026-11-14
 
-  - key: icici-domestic-lounge-page
-    name: ICICI Bank Domestic Lounge Programme page
-    url: https://www.icici.bank.in/personal-banking/cards/credit-card/exprience/domestic-airport-lounges
-    publisher: ICICI Bank
-    source_type: bank
-    retrieved_at: 2026-11-14
-
-  - key: icici-international-lounge-page
-    name: ICICI Bank International Airport Lounge Access credit card page
-    url: https://www.icici.bank.in/personal-banking/cards/credit-card/international-airport-lounge-access-credit-card
+  - key: icici-domestic-lounge-list-pdf
+    name: ICICI Bank Credit Cards Domestic Airport Lounge List (PDF, last updated November 2026)
+    url: https://www.icici.bank.in/content/dam/icicibank/india/managed-assets/revamp-page-images/docs/pdf/domestic_consolidated_lounge_list-1.pdf
     publisher: ICICI Bank
     source_type: bank
     retrieved_at: 2026-11-14
@@ -370,20 +341,6 @@ sources:
     name: ICICI Bank Priority Pass (International Lounge Access Programme) terms and conditions
     url: https://www.icici.bank.in/personal-banking/cards/credit-card/experience/priority-pass-tnc
     publisher: ICICI Bank
-    source_type: bank
-    retrieved_at: 2026-11-14
-
-  - key: icici-lounge-experience-page
-    name: ICICI Bank Credit Card Experience programme page (domestic and international lounge programmes)
-    url: https://www.icici.bank.in/personal-banking/cards/credit-card/experience/travel-and-stays/dreamfolks
-    publisher: ICICI Bank
-    source_type: bank
-    retrieved_at: 2026-11-14
-
-  - key: kotak-credit-cards-listing
-    name: Kotak Mahindra Bank credit cards listing page
-    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards.html
-    publisher: Kotak Mahindra Bank
     source_type: bank
     retrieved_at: 2026-11-14
 
@@ -436,6 +393,13 @@ sources:
     source_type: bank
     retrieved_at: 2026-11-14
 
+  - key: kotak-domestic-lounge-list-pdf
+    name: Kotak Credit Cards India Lounge Programme, participating lounges by card set (PDF, undated)
+    url: https://images.kotak.bank.in/bank/mailers/2022/files/Kotak%20Domestic%20Lounge%20List.pdf
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
   - key: kotak-lounge-tc-pdf
     name: Kotak Credit Cards Complimentary Airport Lounge Access Program terms and conditions (Lounge MITC,
       PDF)
@@ -456,13 +420,6 @@ sources:
     url: https://jaipur.adaniairports.com/en/airport-services/lounges
     publisher: Adani Airport Holdings (Jaipur)
     source_type: official_airport
-    retrieved_at: 2026-11-14
-
-  - key: pp-bom-listing
-    name: Priority Pass lounge list for Chhatrapati Shivaji International (BOM)
-    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international
-    publisher: Priority Pass
-    source_type: network_program
     retrieved_at: 2026-11-14
 
   - key: pp-bom-bom21-adani-lounge
@@ -528,13 +485,6 @@ sources:
     source_type: network_program
     retrieved_at: 2026-11-14
 
-  - key: pp-jai-listing
-    name: Priority Pass lounge list for Jaipur International (JAI)
-    url: https://www.prioritypass.com/en-GB/lounges/india/jaipur-international
-    publisher: Priority Pass
-    source_type: network_program
-    retrieved_at: 2026-11-14
-
   - key: pp-jai-jai1-adani-lounge
     name: Priority Pass lounge page - Adani Lounge, JAI Terminal 2
     url: https://www.prioritypass.com/en-GB/lounges/india/jaipur-international/jai1-adani-lounge
@@ -545,13 +495,6 @@ sources:
   - key: encalm-lounge-page
     name: Encalm Lounge service page (all Encalm Lounge locations, walk-in prices)
     url: https://encalm.com/services/encalmlounge
-    publisher: Encalm Hospitality
-    source_type: lounge_operator
-    retrieved_at: 2026-11-14
-
-  - key: encalm-delhi-location-page
-    name: Encalm Delhi location page (lounge list with per-lounge amenities)
-    url: https://encalm.com/location/delhi
     publisher: Encalm Hospitality
     source_type: lounge_operator
     retrieved_at: 2026-11-14
@@ -612,13 +555,6 @@ sources:
     source_type: network_program
     retrieved_at: 2026-11-14
 
-  - key: priority-pass-maa-index
-    name: Priority Pass lounge index for Chennai International (MAA)
-    url: https://www.prioritypass.com/en-GB/lounges/india/chennai-international
-    publisher: Priority Pass
-    source_type: network_program
-    retrieved_at: 2026-11-14
-
   - key: priority-pass-maa6
     name: Priority Pass lounge page, Travel Club, Chennai Terminal 1 (opposite Gate 5)
     url: https://www.prioritypass.com/en-GB/lounges/india/chennai-international/maa6-travel-club
@@ -647,13 +583,6 @@ sources:
     source_type: network_program
     retrieved_at: 2026-11-14
 
-  - key: priority-pass-cok-index
-    name: Priority Pass lounge index for Cochin International (COK)
-    url: https://www.prioritypass.com/en-GB/lounges/india/cochin-international
-    publisher: Priority Pass
-    source_type: network_program
-    retrieved_at: 2026-11-14
-
   - key: priority-pass-cok2
     name: Priority Pass lounge page, Earth Lounge, Cochin Terminal 3
     url: https://www.prioritypass.com/en-GB/lounges/india/cochin-international/cok2-earth-lounge
@@ -666,13 +595,6 @@ sources:
     url: https://www.prioritypass.com/en-GB/lounges/india/cochin-international/cok5-travel-club-lounge-cok-domestic
     publisher: Priority Pass
     source_type: network_program
-    retrieved_at: 2026-11-14
-
-  - key: cial-home
-    name: Cochin International Airport Limited home page (links to Airport Lounges and 0484 Aero Lounge)
-    url: https://www.cial.aero/
-    publisher: Cochin International Airport Limited
-    source_type: official_airport
     retrieved_at: 2026-11-14
 
   - key: 0484-aero-lounge-site

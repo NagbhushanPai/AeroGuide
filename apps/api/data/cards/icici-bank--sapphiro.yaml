@@ -34,17 +34,20 @@ policies:
   - type: entry_method
     method: card_swipe
     note: MITC lists a card validation charge taken on each eligible card presented at the entrance to
-      the participating lounge (Re. 1 on Amex variants); the product page itself gives no access method.
-  unmodelled_terms: '"Please note that the airport lounge access benefit is available only for primary
-    Cardholders." Dual-variant cards (Mastercard & Amex | Visa & RuPay) have the entitlement split between
-    the variants.'
+      the participating lounge (Re. 1 on Amex variants; the Visa/Mastercard/RuPay amount is unreadable
+      in the PDF); the product page itself gives no access method.
+  - type: add_on_cardholders
+    covered: false
+    note: '"Please note that the airport lounge access benefit is available only for primary Cardholders."'
+  unmodelled_terms: For dual Credit Card variants (Mastercard & Amex | Visa & RuPay) "the entitlement includes
+    2 domestic lounge visits per quarter for each variant."
   provenance:
     status: verified
     source: icici-sapphiro-page
     verified_at: 2026-11-14
     verified_by: claude-code
     notes: valid_from is the date the bank's MITC and lounge-criteria page give for the Rs 75,000 spend
-      criteria ("Starting Jan 01, 2025").
+      criteria ("Starting Jan 01, 2025"). Remodelled 2026-11-14 with fee/add-on rule types.
 - scope: international
   valid_from: 2026-11-14
   summary: 2 complimentary international airport lounge visits per year for the primary cardholder via
@@ -55,15 +58,23 @@ policies:
   - type: visit_quota
     count: 2
     period: year
+    note: 'Priority Pass T&C page: visits beyond the complimentary allowance are charged per person per
+      visit and debited to the credit card in INR plus GST.'
   - type: entry_method
     method: programme_card
     note: '"Present your Priority Pass Membership Card at the participating international lounges." Priority
       Pass T&C page: a same-day boarding pass for a departing flight is required.'
-  unmodelled_terms: 'Priority Pass T&C page: visits beyond the complimentary allowance and guest visits
-    are charged per person per visit and debited to the credit card in INR plus GST.'
+  - type: add_on_cardholders
+    covered: false
+    note: '"Complimentary benefits are applicable only for the primary cardholder."'
+  - type: guest_allowance
+    count: 0
+    note: 'Priority Pass T&C page: guest visits are charged per person per visit (complimentary only for
+      Diamant). No amount is stated.'
   provenance:
     status: verified
     source: icici-sapphiro-page
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The product page gives no start date for the benefit, so the verification date is used.
+    notes: The product page gives no start date for the benefit, so the verification date is used. Remodelled
+      2026-11-14 with fee/add-on rule types.

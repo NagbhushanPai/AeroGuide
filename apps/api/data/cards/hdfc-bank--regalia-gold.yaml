@@ -16,6 +16,8 @@ policies:
   rules:
   - type: program_entitlement
     program: hdfc-bank-lounge-access
+    note: List of participating lounges may change basis various factors such as closures, change in service
+      provider or at the discretion of bank.
   - type: visit_quota
     count: 3
     period: quarter
@@ -25,8 +27,22 @@ policies:
     note: EMI transactions are not included. Transaction settlement date will only be considered.
   - type: entry_method
     method: card_swipe
-    note: There will be no Lounge Vouchers issue to customers. Rs.2 will be charged to the card account
-      as a transaction for validation.
+    note: There will be no Lounge Vouchers issue to customers. Eligible customers need to swipe their Regalia
+      Gold credit card at listed lounge for access.
+  - type: fee
+    amount: 2
+    currency: INR
+    applies_to: cardholder
+    note: Rs.2 will be charged to the card account as a transaction for validation.
+  - type: add_on_cardholders
+    covered: true
+    note: Primary or add on card holder intending to access the benefit should present their respective
+      cards at the lounge.
+  - type: guest_allowance
+    count: 0
+    note: Access is not allowed to guest member. If guest wants to accompany, the same will be charged
+      by lounge service provide basis customer consent. Guest members added to the visit will always be
+      chargeable.
   unmodelled_terms: Customers with card opened date from 1st to month-end of last month of calendar quarter
     may be exempted from the spend condition for upcoming quarter.
   provenance:
@@ -34,24 +50,29 @@ policies:
     source: hdfc-regalia-gold-lounge-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: Spend condition 'W.e.f - 01-07-2026'.
+    notes: Spend condition 'W.e.f - 01-07-2026'. Remodelled 2026-11-14 with fee/add-on rule types.
 - scope: international
   valid_from: 2026-11-14
-  summary: 6 complimentary lounge visits outside India, through Priority Pass.
+  summary: 6 complimentary lounge visits a calendar year outside India, through Priority Pass.
   rules:
   - type: program_entitlement
     program: priority-pass
   - type: visit_quota
     count: 6
     period: year
-    ambiguous: true
-    note: The product page lists '6 Complimentary ... lounge visits outside India' without saying calendar
-      or membership year.
+    note: The product page lists '6 Complimentary Lounge Access per calendar year outside India using Priority
+      Pass'.
   - type: entry_method
     method: programme_card
+  - type: add_on_cardholders
+    covered: true
+    ambiguous: true
+    note: The product page links to 'apply for Priority Pass for self and add-on members'; it doesn't say
+      whether add-on members share the 6 visits.
   provenance:
     status: verified
     source: hdfc-regalia-gold-page
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The bank states no start date; valid_from is the date checked.
+    notes: The bank states no start date; valid_from is the date checked. Remodelled 2026-11-14 with fee/add-on
+      rule types; the page now says 'per calendar year', so the quota is no longer marked ambiguous.

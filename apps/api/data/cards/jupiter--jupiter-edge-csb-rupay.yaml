@@ -12,8 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-11-14
-  summary: 2 / quarter (vouchers). Spend ₹30,000 in the last 3 months; vouchers valid 3 months. Some sources
-    cite 1 / quarter — verify.
+  summary: 2 / quarter (vouchers). Spend ₹30,000 in the last 3 months; vouchers valid 3 months.
   rules:
   - type: visit_quota
     count: 2
@@ -26,8 +25,9 @@ policies:
   provenance:
     status: unverified
     source: jupiter-jupiter-edge-csb-rupay-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: Some sources cite 1 /
+      quarter; verify.'
 - scope: international
   valid_from: 2026-11-14
   summary: 2 / year.

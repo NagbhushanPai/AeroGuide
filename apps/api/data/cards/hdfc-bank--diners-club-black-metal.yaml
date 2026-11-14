@@ -16,17 +16,26 @@ policies:
   rules:
   - type: program_entitlement
     program: hdfc-bank-lounge-access
+    note: List of participating lounges may change basis various factors such as closures, change in service
+      provider or at the discretion of bank.
   - type: entry_method
     method: card_swipe
     note: Primary or add on card holder ... should present their respective cards at the lounge.
-  unmodelled_terms: Access is not allowed to guest member. If guest wants to accompany, the same will
-    be charged by lounge service provide basis customer consent.
+  - type: add_on_cardholders
+    covered: true
+    note: Lounge access is available to Primary & Add on Card holders. The shared benefit count does not
+      apply when lounge access is unlimited.
+  - type: guest_allowance
+    count: 0
+    note: Access is not allowed to guest member. If guest wants to accompany, the same will be charged
+      by lounge service provide basis customer consent.
   provenance:
     status: verified
     source: hdfc-dcb-lounge-tnc-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The terms are dated 08.12.2025 but state no start date; valid_from is the date checked.
+    notes: The terms are dated 08.12.2025 but state no start date; valid_from is the date checked. Remodelled
+      2026-11-14 with fee/add-on rule types.
 - scope: international
   valid_from: 2026-11-14
   summary: Unlimited lounge access abroad for primary and add-on card members at Diners Club lounges listed
@@ -34,13 +43,20 @@ policies:
   rules:
   - type: program_entitlement
     program: diners-club-lounge-access
+    note: International list of participating lounges is to be referred on Diners Travel Tool App.
   - type: entry_method
     method: card_swipe
-  unmodelled_terms: International list of participating lounges is to be referred on Diners Travel Tool
-    App. Access is not allowed to guest member.
+  - type: add_on_cardholders
+    covered: true
+    note: Lounge access is available to Primary & Add on Card holders.
+  - type: guest_allowance
+    count: 0
+    note: Access is not allowed to guest member. If guest wants to accompany, the same will be charged
+      by lounge service provide basis customer consent.
   provenance:
     status: verified
     source: hdfc-dcb-lounge-tnc-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
-    notes: The bank states no start date; valid_from is the date checked.
+    notes: The bank states no start date; valid_from is the date checked. Remodelled 2026-11-14 with fee/add-on
+      rule types.

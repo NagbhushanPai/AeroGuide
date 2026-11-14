@@ -12,8 +12,7 @@ provenance:
 policies:
 - scope: domestic
   valid_from: 2026-11-14
-  summary: 1 / quarter. Verify the current spend gate — the bank page says only "complimentary lounge
-    visit every quarter".
+  summary: 1 / quarter. The bank page says only "complimentary lounge visit every quarter".
   rules:
   - type: visit_quota
     count: 1
@@ -26,5 +25,6 @@ policies:
   provenance:
     status: unverified
     source: bobcard-premier-source
-    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
-      hasn''t checked it against the source yet.'
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide hasn''t
+      checked it against the source yet. Summary review note moved from the summary: The current spend gate
+      needs checking.'

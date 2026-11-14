@@ -15,11 +15,14 @@ policies:
   rules:
   - type: program_entitlement
     program: kotak-mahindra-bank-lounge-access
+    note: Lounge T&C PDF lists Air + among cards that "can access Domestic airport lounges without any
+      minimum spend requirement".
   - type: visit_quota
     count: 4
     period: year
     note: 'T&C PDF: "4 Complimentary Domestic Lounge Access for Primary Cardholders in a Calendar Year
-      (Capped at 2 Lounge in a Calendar Qtr.)".'
+      (Capped at 2 Lounge in a Calendar Qtr.)". Visits beyond the complimentary quota "will be charged
+      as per the applicable rates" ("Varies from lounge to lounge").'
   - type: visit_quota
     count: 2
     period: quarter
@@ -27,17 +30,27 @@ policies:
       at 2 Lounges per calendar quarter".'
   - type: entry_method
     method: card_swipe
-    note: '"Present your Credit Card at the lounge"; Rs. 2 visit validation charge.'
-  unmodelled_terms: 'Product page: "Complimentary Lounge Access Benefit is only applicable for Primary
-    Cardholder". Lounge T&C PDF lists Air + among cards that "can access Domestic airport lounges without
-    any minimum spend requirement"; visits beyond the complimentary quota "will be charged as per the
-    applicable rates" ("Varies from lounge to lounge"). No start date for the benefit is given, so valid_from
-    is the retrieval date.'
+    note: '"Present your Credit Card at the lounge".'
+  - type: fee
+    amount: 2
+    currency: INR
+    applies_to: cardholder
+    refundable: false
+    note: 'Lounge T&C PDF charges table: "Visit validation charge (Only for complimentary visits) Rs. 2
+      (Non-Reversible)".'
+  - type: add_on_cardholders
+    covered: false
+    note: 'Product page: "Complimentary Lounge Access Benefit is only applicable for Primary Cardholder".'
+  - type: guest_allowance
+    count: 0
+    note: 'Lounge T&C PDF charges table: guest charges "Varies from lounge to lounge".'
   provenance:
     status: verified
     source: kotak-air-plus-tc-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
+    notes: No start date for the benefit is given, so valid_from is the retrieval date. Remodelled 2026-11-14
+      with fee/add-on rule types.
 - scope: international
   valid_from: 2026-11-14
   summary: 2 complimentary international lounge visits per calendar year for the primary cardholder via
@@ -49,18 +62,31 @@ policies:
     count: 2
     period: year
     note: 'T&C PDF: "2 Complimentary International Lounge Access for Primary Cardholders in a Calendar
-      Year (No capping on utilisation)".'
+      Year (No capping on utilisation)". Lounge T&C PDF: visit charge after complimentary visits USD 35.'
   - type: entry_method
     method: card_swipe
-    note: '"Present your Credit Card/Digital QR code available on the Priority Pass app"; USD 1 visit
-      validation charge auto-reversed within 7 working days; international transactions must be activated
-      on the card first. Lounge T&C: cardholders "must inform lounge staff that they are accessing the
-      lounge via Priority Pass Membership".'
-  unmodelled_terms: 'Primary cardholder only. Lounge T&C PDF charges table: visit charge after complimentary
-    visits USD 35, guest charges USD 35. No start date for the benefit is given, so valid_from is the
-    retrieval date.'
+    note: '"Present your Credit Card/Digital QR code available on the Priority Pass app"; international
+      transactions must be activated on the card first. Lounge T&C: cardholders "must inform lounge staff
+      that they are accessing the lounge via Priority Pass Membership".'
+  - type: fee
+    amount: 1
+    currency: USD
+    applies_to: cardholder
+    refundable: true
+    note: 'T&C PDF: "validation charges of $1 will be levied on your credit card account which will be
+      auto reversed within 7 working days".'
+  - type: fee
+    amount: 35
+    currency: USD
+    applies_to: guest
+    note: 'Lounge T&C PDF charges table: guest charges $35.'
+  - type: add_on_cardholders
+    covered: false
+    note: 'Lounge T&C PDF: "Only the Primary cardholder is eligible for lounge access facilities."'
   provenance:
     status: verified
     source: kotak-air-plus-tc-pdf
     verified_at: 2026-11-14
     verified_by: claude-code
+    notes: No start date for the benefit is given, so valid_from is the retrieval date. Remodelled 2026-11-14
+      with fee/add-on rule types.

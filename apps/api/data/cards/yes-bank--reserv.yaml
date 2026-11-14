@@ -30,7 +30,7 @@ policies:
       against the source yet.
 - scope: international
   valid_from: 2026-10-04
-  summary: 6 / year via Priority Pass — verify.
+  summary: 6 / year via Priority Pass.
   rules:
   - type: program_entitlement
     program: priority-pass
@@ -45,5 +45,6 @@ policies:
   provenance:
     status: unverified
     source: yes-bank-marquee-source
-    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
-      against the source yet.
+    notes: 'Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn''t checked it
+      against the source yet. Summary review note moved from the summary: The tracker flagged this for checking
+      (''verify'').'

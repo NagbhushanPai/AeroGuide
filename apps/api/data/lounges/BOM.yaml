@@ -70,6 +70,35 @@ lounges:
       verified_at: '2026-11-14'
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Adani Lounge (erstwhile Oasis Lounge)
+        - T1B Domestic Departure'.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Adani
+        Lounge, Adjacent to MC Donalds, Mezzanine Floor', Terminal 1B.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Adani Lounge',
+        Terminal 1B, Domestic.
 - slug: travel-club-lounge-bom-t1
   name: Travel Club Lounge
   terminal: T1
@@ -119,6 +148,27 @@ lounges:
       verified_by: claude-code
       notes: Listed in Axis Bank's Set B participating lounges (programme PDF). Listed as 'Travel Club
         Lounge, Domestic Departure T1c'.
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Listed in ICICI Bank''s domestic lounge list (last updated November 2026). Listed as ''Travel
+        Club Lounge, Domestic Departure, Terminal T1C, After SHA, 1st floor, Opposite Gate 22'', marked:
+        ''Travel Club lounge, Mumbai will temporarily cease operations till further notice.'''
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Travel
+        Club Lounge', Terminal 1c, Domestic. ICICI's November 2026 list says this lounge will temporarily
+        cease operations.
 - slug: good-times-bar-bom-t1
   name: Good Times Bar
   terminal: T1
@@ -149,6 +199,15 @@ lounges:
       verified_at: 2026-11-14
       verified_by: claude-code
       notes: '''Good Times Bar is a paid lounge and bar''. No price stated.'
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Good
+        Times Bar, Besides William Pen and Parcos Ground Floor', Terminal 1B.
 - slug: adani-lounge-loyalty-bom-t2-domestic-l3
   name: Adani Lounge-Loyalty
   terminal: T2
@@ -169,7 +228,38 @@ lounges:
     source: bom-airport-lounges
     verified_at: 2026-11-14
     verified_by: claude-code
-  accepts: []
+  accepts:
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Adani Lounge - T2 Domestic Departure';
+        matched to the airport page's Adani Lounge-Loyalty (the other Adani lounge there is for airline
+        business class).
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Adani
+        Lounge, Domestic Departure, Level 3, Opposite gate no 44', Terminal 2; matched to the airport
+        page's Adani Lounge-Loyalty (Level 3).
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Adani Lounge',
+        Terminal 2, Domestic; matched to the airport page's Adani Lounge-Loyalty.
 - slug: adani-lounge-business-class-bom-t2-domestic-l3
   name: Adani Lounge-Business Class L3( Airline)
   terminal: T2
@@ -244,6 +334,17 @@ lounges:
       verified_by: claude-code
       notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026). Listed as 'Adani East
         Lounge, International T2'.
+  - program: kotak-mahindra-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: kotak-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in Kotak's India Lounge Programme, Set A (White Signature, Wealth Corporate, White
+        Reserve, Wealth Infinite, Solitaire, Air+, Air+ Prime, Solitaire Business). Listed as 'Loyalty
+        Lounge', Terminal 2, International; matched to the airport page's general Adani Lounge Loyalty
+        (not the first-class/premium-business ones).
 - slug: adani-lounge-loyalty-first-premium-bom-t2-international-l4-west
   name: Adani Lounge Loyalty (1st Class & Premium business)
   terminal: T2
@@ -294,6 +395,7 @@ lounges:
   operator: Aviserv
   scope: both
   side: landside
+  direction: arrivals
   location_text: CSMI Airport, Terminal-2, Arrivals, Nr. Arrival Gate No A, Level-2 West Side
   opening_hours:
     mode: 24h
@@ -324,6 +426,7 @@ lounges:
   operator: Aviserv
   scope: both
   side: landside
+  direction: arrivals
   location_text: CSMI Airport, Terminal-2, Arrivals, Nr. Arrival Gate No C, Level-2 East Side
   opening_hours:
     mode: 24h
@@ -420,6 +523,16 @@ lounges:
       source: pp-bom-bom26-adani-silver
       verified_at: 2026-11-14
       verified_by: claude-code
+  - program: hdfc-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: hdfc-infinia-lounge-list
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed on HDFC Bank's Infinia lounge list (lms.hoi.in, linked from the bank's lounge PDF);
+        the Regalia Gold and Diners Club lists name it too. Listed as 'Adani Silver Lounge - T2 International
+        Departure'.
 - slug: adani-silver-international-lounge-bom-t2
   name: Adani Silver International Lounge
   terminal: T2
@@ -446,6 +559,15 @@ lounges:
       verified_at: 2026-11-14
       verified_by: claude-code
       notes: '''Max stay: 2 hours''; complimentary alcoholic drinks ''4 maximum''.'
+  - program: icici-bank-lounge-access
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: icici-domestic-lounge-list-pdf
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Listed in ICICI Bank's domestic lounge list (last updated November 2026). Listed as 'Adani
+        Silver International Lounge, Post Security Hold Area, Next to Duty free, Terminal 2'.
 - slug: meghavi-air-spa-lounge-bom-t2-domestic
   name: Meghavi Air Spa Lounge
   terminal: T2
