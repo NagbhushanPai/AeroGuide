@@ -38,7 +38,7 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 RADIUS_KM = 6.0
-MAX_ALT_FT = 3000
+MAX_ALT_FT = 3000  # above the airport's elevation
 RETENTION_DAYS = 45
 # If the database is down for a long time, stop buffering new keys rather than grow forever.
 MAX_PENDING = 20_000
@@ -52,6 +52,7 @@ class AirportPoint:
     iata: str
     lat: float
     lon: float
+    elevation_ft: int | None = None  # None = unknown, treated as sea level
 
 
 @dataclass(slots=True)
@@ -72,13 +73,23 @@ def airline_icao(callsign: str | None) -> str | None:
 
 
 def near_airport(a: AircraftState, airports: list[AirportPoint]) -> AirportPoint | None:
-    """The nearest airport within RADIUS_KM, if the aircraft is on the ground or low."""
-    if not a.on_ground and (a.alt_baro_ft is None or a.alt_baro_ft > MAX_ALT_FT):
+    """The nearest airport within RADIUS_KM, if the aircraft is on the ground or low.
+
+    "Low" is height above the airport (barometric altitude minus field elevation), so plateau
+    airports such as Bengaluru (about 3,000 ft) or Leh (about 10,700 ft) aren't missed."""
+    if not a.on_ground and a.alt_baro_ft is None:
         return None
     best: tuple[float, AirportPoint] | None = None
     for ap in airports:
         # Cheap box test first: 0.1° is about 11 km.
         if abs(ap.lat - a.lat) > 0.1 or abs(ap.lon - a.lon) > 0.1:
+            continue
+        too_high = (
+            not a.on_ground
+            and a.alt_baro_ft is not None
+            and a.alt_baro_ft - (ap.elevation_ft or 0) > MAX_ALT_FT
+        )
+        if too_high:
             continue
         d = haversine_km(a.lat, a.lon, ap.lat, ap.lon)
         if d <= RADIUS_KM and (best is None or d < best[0]):
@@ -108,10 +119,18 @@ class SightingRecorder:
             async with self._engine.connect() as conn:
                 rows = (
                     await conn.execute(
-                        select(Airport.id, Airport.iata, func.ST_Y(geom), func.ST_X(geom))
+                        select(
+                            Airport.id,
+                            Airport.iata,
+                            func.ST_Y(geom),
+                            func.ST_X(geom),
+                            Airport.elevation_ft,
+                        )
                     )
                 ).all()
-            self._airports = [AirportPoint(r[0], r[1], float(r[2]), float(r[3])) for r in rows]
+            self._airports = [
+                AirportPoint(r[0], r[1], float(r[2]), float(r[3]), r[4]) for r in rows
+            ]
         return self._airports
 
     def collect(

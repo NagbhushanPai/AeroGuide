@@ -7,9 +7,14 @@
 - The snapshot is written to Redis at most every `warm_write_interval_s` so a restarted
   instance can serve immediately (marked with its real age).
 - Reported routes are looked up a few at a time in the background and cached.
+- Each provider gets at most `provider_timeout_s`, so one that hangs can't hold up the next,
+  and a request with no snapshot at all waits at most `first_wait_s` before it is answered
+  (as unavailable) while the sweep carries on in the background.
+- `status()` reports the last sweep per provider for the health endpoint.
 """
 
 import asyncio
+import contextlib
 import json
 import logging
 import time
@@ -54,6 +59,14 @@ class SourceInfo:
 
 
 @dataclass(slots=True)
+class ProviderStatus:
+    ok: bool
+    at: datetime
+    error: str | None = None
+    aircraft: int | None = None
+
+
+@dataclass(slots=True)
 class Snapshot:
     aircraft: list[AircraftState]
     source: SourceInfo
@@ -74,6 +87,8 @@ class LiveService:
         ttl_s: float = 60.0,
         warm_write_interval_s: float = 60.0,
         route_lookups_per_refresh: int = 10,
+        provider_timeout_s: float = 45.0,
+        first_wait_s: float = 10.0,
         monotonic: Callable[[], float] = time.monotonic,
         on_snapshot: "Callable[[Snapshot, LiveService], Awaitable[None]] | None" = None,
     ) -> None:
@@ -85,7 +100,10 @@ class LiveService:
         self._ttl = ttl_s
         self._warm_interval = warm_write_interval_s
         self._route_budget = route_lookups_per_refresh
+        self._provider_timeout = provider_timeout_s
+        self._first_wait = first_wait_s
         self._monotonic = monotonic
+        self.providers: dict[str, ProviderStatus] = {}
         # Called in the background after each fresh upstream sweep (for example, airport
         # sightings). Its failures are logged and never affect the live snapshot.
         self._on_snapshot = on_snapshot
@@ -113,13 +131,13 @@ class LiveService:
         """
         if not self._is_due():
             return self._snapshot
-        if self._snapshot is None:
-            async with self._lock:
-                if self._is_due():  # another request may have refreshed while we waited
-                    await self._refresh()
-            return self._snapshot
         if self._refresh_task is None or self._refresh_task.done():
             self._refresh_task = asyncio.create_task(self._locked_refresh())
+        if self._snapshot is None:
+            # Nothing to serve yet: wait a little for the first sweep, but never so long that
+            # the hosting proxy times the request out. The sweep continues either way.
+            with contextlib.suppress(TimeoutError):
+                await asyncio.wait_for(asyncio.shield(self._refresh_task), self._first_wait)
         return self._snapshot
 
     async def _locked_refresh(self) -> None:
@@ -138,18 +156,26 @@ class LiveService:
                 errors.append(f"{provider.name}: resting after rate limit")
                 continue
             try:
-                aircraft = await provider.fetch()
+                aircraft = await asyncio.wait_for(provider.fetch(), self._provider_timeout)
             except ProviderRateLimitedError as exc:
                 self._cooldown_until[provider.name] = self._monotonic() + exc.retry_after_s
                 errors.append(f"{provider.name}: rate-limited")
+                self._mark(provider.name, "rate-limited")
                 logger.warning("%s", exc)
+                continue
+            except TimeoutError:
+                errors.append(f"{provider.name}: timed out")
+                self._mark(provider.name, f"timed out after {self._provider_timeout:g}s")
+                logger.warning("position provider %s timed out", provider.name)
                 continue
             except Exception as exc:  # any provider failure → try the next one
                 errors.append(f"{provider.name}: {type(exc).__name__}")
+                self._mark(provider.name, type(exc).__name__)
                 logger.warning(
                     "position provider %s failed: %s: %s", provider.name, type(exc).__name__, exc
                 )
                 continue
+            self._mark(provider.name, None, len(aircraft))
             self._snapshot = Snapshot(
                 aircraft=aircraft,
                 source=SourceInfo(
@@ -163,6 +189,32 @@ class LiveService:
             self._notify(self._snapshot)
             return
         self.last_error = "; ".join(errors)
+
+    def _mark(self, name: str, error: str | None, aircraft: int | None = None) -> None:
+        self.providers[name] = ProviderStatus(
+            ok=error is None, at=datetime.now(UTC), error=error, aircraft=aircraft
+        )
+
+    def status(self) -> dict[str, object]:
+        """What the last sweeps did, for /health. In memory, so per process."""
+        snap = self._snapshot
+        now = self._monotonic()
+        return {
+            "source": snap.source.name if snap else None,
+            "fetched_at": snap.fetched_at if snap else None,
+            "aircraft": len(snap.aircraft) if snap else None,
+            "last_error": self.last_error,
+            "providers": {
+                p.name: {
+                    "ok": st.ok if (st := self.providers.get(p.name)) else None,
+                    "checked_at": st.at if st else None,
+                    "error": st.error if st else None,
+                    "aircraft": st.aircraft if st else None,
+                    "resting_s": max(0, round(self._cooldown_until.get(p.name, 0.0) - now)),
+                }
+                for p in self._providers
+            },
+        }
 
     async def warm_start(self) -> None:
         """Load the last snapshot saved by a previous instance (it keeps its real age)."""
@@ -290,6 +342,10 @@ class LiveService:
             logger.warning("snapshot observer failed: %s: %s", type(exc).__name__, exc)
 
     async def aclose(self) -> None:
-        for task in (self._refresh_task, self._enrich_task, self._observer_task):
-            if task is not None:
-                task.cancel()
+        tasks = [
+            t for t in (self._refresh_task, self._enrich_task, self._observer_task) if t is not None
+        ]
+        for task in tasks:
+            task.cancel()
+        # Let cancelled tasks finish unwinding before the caller closes clients they use.
+        await asyncio.gather(*tasks, return_exceptions=True)

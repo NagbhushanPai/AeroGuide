@@ -16,7 +16,8 @@ router = APIRouter(tags=["health"])
     summary="Service health",
     description=(
         "Liveness plus dependency status. Always returns 200 while the process is up; "
-        "`status` is `degraded` when the database, PostGIS or Redis is unavailable."
+        "`status` is `degraded` when the database, PostGIS or Redis is unavailable. `live` "
+        "reports the last live-position sweep per provider (this process only)."
     ),
 )
 async def health(resources: Annotated[AppResources, Depends(get_resources)]) -> HealthResponse:
@@ -26,4 +27,5 @@ async def health(resources: Annotated[AppResources, Depends(get_resources)]) -> 
         environment=resources.settings.environment,
         version=__version__,
         timeout_s=resources.settings.health_check_timeout_s,
+        live=resources.live.status(),
     )

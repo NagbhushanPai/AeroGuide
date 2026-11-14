@@ -1,4 +1,4 @@
-"""A small per-client rate limit for the public MCP endpoint (ADR-0014).
+"""A small per-client rate limit for the public API and MCP endpoint (ADR-0014).
 
 In memory, so it is per process. That fits one free-tier instance; it isn't a substitute for a
 shared limiter if the API ever runs on several instances.
@@ -16,12 +16,14 @@ MAX_TRACKED_CLIENTS = 10_000
 
 
 def client_key(scope: Scope) -> str:
-    """The caller's address. Behind Render's proxy, the first X-Forwarded-For entry."""
+    """The caller's address. Behind Render's proxy, the LAST X-Forwarded-For entry: the proxy
+    appends the address it saw, while earlier entries come from the client and can be forged."""
     for name, value in scope.get("headers", []):
         if name == b"x-forwarded-for":
-            first: str = bytes(value).decode("latin-1").split(",")[0].strip()
-            if first:
-                return first
+            parts = [p.strip() for p in bytes(value).decode("latin-1").split(",")]
+            last = next((p for p in reversed(parts) if p), "")
+            if last:
+                return last
     client = scope.get("client")
     return str(client[0]) if client else "unknown"
 
@@ -30,11 +32,16 @@ class RateLimit:
     """Allows `per_minute` requests per client in any rolling 60-second window."""
 
     def __init__(
-        self, app: ASGIApp, per_minute: int, clock: Callable[[], float] = time.monotonic
+        self,
+        app: ASGIApp,
+        per_minute: int,
+        clock: Callable[[], float] = time.monotonic,
+        exempt: tuple[str, ...] = (),
     ) -> None:
         self.app = app
         self.per_minute = per_minute
         self.clock = clock
+        self.exempt = exempt  # path prefixes that aren't counted (for example health checks)
         self.hits: dict[str, deque[float]] = {}
 
     def _allow(self, key: str) -> float | None:
@@ -61,7 +68,8 @@ class RateLimit:
             del self.hits[oldest]
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        if scope["type"] != "http":
+        path = str(scope.get("path", ""))
+        if scope["type"] != "http" or (self.exempt and path.startswith(self.exempt)):
             await self.app(scope, receive, send)
             return
         wait = self._allow(client_key(scope))
@@ -82,3 +90,51 @@ class RateLimit:
             }
         )
         await send({"type": "http.response.body", "body": body})
+
+
+class BodyLimit:
+    """Refuses request bodies larger than `max_bytes` (413) before they are parsed."""
+
+    def __init__(self, app: ASGIApp, max_bytes: int) -> None:
+        self.app = app
+        self.max_bytes = max_bytes
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        for name, value in scope.get("headers", []):
+            length = bytes(value)
+            if name == b"content-length" and length.isdigit() and int(length) > self.max_bytes:
+                await _too_large(send)
+                return
+        received = 0
+
+        async def limited() -> dict[str, object]:
+            nonlocal received
+            message = dict(await receive())
+            if message.get("type") == "http.request":
+                received += len(message.get("body", b"") or b"")
+                if received > self.max_bytes:
+                    raise _BodyTooLargeError
+            return message
+
+        try:
+            await self.app(scope, limited, send)
+        except _BodyTooLargeError:
+            await _too_large(send)
+
+
+class _BodyTooLargeError(Exception):
+    pass
+
+
+async def _too_large(send: Send) -> None:
+    await send(
+        {
+            "type": "http.response.start",
+            "status": 413,
+            "headers": [(b"content-type", b"application/json")],
+        }
+    )
+    await send({"type": "http.response.body", "body": b'{"error": "Request body too large."}'})

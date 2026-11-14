@@ -14,7 +14,7 @@ from app.ingestion.live import LiveService
 class AppResources:
     settings: Settings
     engine: AsyncEngine
-    redis: "Redis"
+    redis: "Redis | None"  # None when REDIS_URL isn't set
     live: LiveService
 
 

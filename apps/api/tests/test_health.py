@@ -101,3 +101,28 @@ async def test_health_ok_against_real_services() -> None:
 
     assert result.status == "ok", result.model_dump()
     assert result.checks.postgis.version is not None
+
+
+async def test_redis_is_reported_disabled_not_failing_when_not_configured() -> None:
+    engine = create_engine(UNREACHABLE_DB)
+    try:
+        result = await get_health(
+            engine=engine, redis=None, environment="test", version="0", timeout_s=1.0, live={}
+        )
+    finally:
+        await engine.dispose()
+    assert result.checks.redis.status == "disabled"
+    assert result.live is not None and result.live.providers == {}
+
+
+def test_blank_redis_url_means_no_redis() -> None:
+    assert Settings(redis_url="").redis_url is None  # type: ignore[arg-type]
+
+
+async def test_oversized_request_bodies_are_refused() -> None:
+    app = create_app(
+        Settings(environment="test", database_url=UNREACHABLE_DB, max_request_bytes=100)
+    )
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://t") as c:
+        r = await c.post("/api/v1/eligibility", content=b"x" * 500)
+    assert r.status_code == 413

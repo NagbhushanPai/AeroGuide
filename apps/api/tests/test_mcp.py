@@ -189,9 +189,12 @@ async def test_rate_limit_is_per_client_and_rolls_over() -> None:
         assert (await c.get("/", headers=a)).status_code == 200
 
 
-def test_client_key_prefers_the_first_forwarded_address() -> None:
+def test_client_key_uses_the_address_the_proxy_appended() -> None:
+    # The client controls everything before the last entry; Render appends the real address.
     scope: Scope = {"type": "http", "headers": [(b"x-forwarded-for", b"198.51.100.7, 10.1.1.1")]}
-    assert client_key(scope) == "198.51.100.7"
+    assert client_key(scope) == "10.1.1.1"
+    forged: Scope = {"type": "http", "headers": [(b"x-forwarded-for", b"1.2.3.4, 203.0.113.5")]}
+    assert client_key(forged) == "203.0.113.5"
     assert client_key({"type": "http", "headers": [], "client": ("192.0.2.9", 1234)}) == "192.0.2.9"
 
 

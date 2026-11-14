@@ -71,6 +71,16 @@ def test_only_ground_or_low_aircraft_near_an_airport_match() -> None:
     assert near_airport(aircraft(lat=28.70), airports) is None  # ~16 km away
 
 
+def test_low_means_above_the_airport_not_above_sea_level() -> None:
+    blr = AirportPoint(uuid.uuid4(), "BLR", 13.1986, 77.7066, elevation_ft=3000)
+    final = aircraft(lat=13.21, lon=77.71, on_ground=False, alt_baro_ft=3500)  # ~500 ft up
+    assert near_airport(final, [blr]) == blr
+    assert (
+        near_airport(aircraft(lat=13.21, lon=77.71, on_ground=False, alt_baro_ft=6500), [blr])
+        is None
+    )
+
+
 def test_collect_counts_each_aircraft_once_per_day() -> None:
     rec = SightingRecorder(engine=None)  # type: ignore[arg-type]
     snap = snapshot(

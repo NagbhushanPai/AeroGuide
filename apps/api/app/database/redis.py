@@ -6,7 +6,9 @@ from redis.asyncio import Redis
 
 
 def create_redis(redis_url: str) -> "Redis":
-    return Redis.from_url(redis_url, decode_responses=True, socket_timeout=5)
+    return Redis.from_url(
+        redis_url, decode_responses=True, socket_timeout=5, socket_connect_timeout=2
+    )
 
 
 class RedisKeyValue:

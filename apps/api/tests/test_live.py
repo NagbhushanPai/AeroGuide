@@ -451,3 +451,34 @@ async def test_sweep_with_too_many_missing_regions_fails() -> None:
     async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
         with pytest.raises(RuntimeError, match="3 of 10"):
             await AdsbLolProvider(client, spacing_s=0).fetch()
+
+
+# ---- bounded waits and status -------------------------------------------------------------
+
+
+class HangingProvider(FakeProvider):
+    async def fetch(self) -> list[AircraftState]:
+        self.calls += 1
+        await asyncio.sleep(60)
+        return []
+
+
+async def test_a_hanging_provider_times_out_and_the_next_one_answers() -> None:
+    hang, backup = HangingProvider("hang"), FakeProvider("backup", [state()])
+    live = LiveService([hang, backup], None, None, provider_timeout_s=0.05, first_wait_s=2)
+    snap = await live.snapshot()
+    assert snap is not None and snap.source.name == "backup"
+    status = live.status()
+    providers = status["providers"]
+    assert isinstance(providers, dict)
+    assert providers["hang"]["ok"] is False and "timed out" in providers["hang"]["error"]
+    assert providers["backup"]["ok"] is True and providers["backup"]["aircraft"] == 1
+    await live.aclose()
+
+
+async def test_first_request_waits_only_briefly_when_every_provider_hangs() -> None:
+    live = LiveService([HangingProvider("hang")], None, None, first_wait_s=0.05)
+    started = asyncio.get_running_loop().time()
+    assert await live.snapshot() is None
+    assert asyncio.get_running_loop().time() - started < 1
+    await live.aclose()

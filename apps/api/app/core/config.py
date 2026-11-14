@@ -36,10 +36,14 @@ class Settings(BaseSettings):
         default=PostgresDsn("postgresql+asyncpg://aeroguide:aeroguide@localhost:5432/aeroguide"),
         description="Async SQLAlchemy URL (postgresql+asyncpg://...).",
     )
-    redis_url: RedisDsn = Field(
-        default=RedisDsn("redis://localhost:6379/0"),
-        description="Use rediss:// for TLS (for example Upstash).",
+    redis_url: RedisDsn | None = Field(
+        default=None,
+        description="Optional. Use rediss:// for TLS (for example Upstash). Unset = no Redis: "
+        "the live snapshot and route caches stay in memory.",
     )
+    # Database request limits, so a hung pooler fails fast instead of holding a request.
+    db_connect_timeout_s: float = 5.0
+    db_command_timeout_s: float = 15.0
 
     # Comma-separated in the environment, for example "http://localhost:3000,https://example.org".
     cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:3000"]
@@ -57,6 +61,13 @@ class Settings(BaseSettings):
     snapshot_ttl_s: float = 60.0
     route_lookups_per_refresh: int = 10
     upstream_timeout_s: float = 12.0
+    # Longest one provider's whole sweep may take before the next provider is tried.
+    provider_timeout_s: float = 45.0
+    # Longest a request waits for the very first snapshot (then it gets "unavailable").
+    first_snapshot_wait_s: float = 10.0
+    # Per-client rate limit on the REST API (the MCP endpoint has its own).
+    api_rate_limit_per_minute: int = 120
+    max_request_bytes: int = 16_384
     # Record airline sightings at airports from the live snapshot (needs the database).
     sightings_enabled: bool = True
     sightings_flush_interval_s: float = 300.0
@@ -86,6 +97,11 @@ class Settings(BaseSettings):
         if isinstance(value, str):
             return [host.strip() for host in value.split(",") if host.strip()]
         return value
+
+    @field_validator("redis_url", mode="before")
+    @classmethod
+    def blank_redis_is_none(cls, value: object) -> object:
+        return None if isinstance(value, str) and not value.strip() else value
 
     @field_validator("database_url", mode="before")
     @classmethod

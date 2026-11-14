@@ -18,6 +18,7 @@ from app.database.session import create_engine
 from app.ingestion.live import LiveService
 from app.ingestion.sightings import SightingRecorder
 from app.mcp_server import RateLimit, build_mcp
+from app.mcp_server.ratelimit import BodyLimit
 from app.providers.registry import build_position_providers, build_route_lookup
 
 REPO_URL = "https://github.com/NagbhushanPai/AeroGuide"
@@ -29,8 +30,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        engine = create_engine(str(settings.database_url))
-        redis = create_redis(str(settings.redis_url))
+        engine = create_engine(
+            str(settings.database_url),
+            connect_timeout_s=settings.db_connect_timeout_s,
+            command_timeout_s=settings.db_command_timeout_s,
+        )
+        redis = create_redis(str(settings.redis_url)) if settings.redis_url else None
         http = httpx.AsyncClient(
             timeout=settings.upstream_timeout_s,
             headers={"User-Agent": f"AeroGuide/{__version__} (+{REPO_URL})"},
@@ -51,8 +56,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 else None,
             ),
             build_route_lookup(settings.route_lookups_enabled, http),
-            RedisKeyValue(redis),
+            RedisKeyValue(redis) if redis is not None else None,
             ttl_s=settings.snapshot_ttl_s,
+            provider_timeout_s=settings.provider_timeout_s,
+            first_wait_s=settings.first_snapshot_wait_s,
             route_lookups_per_refresh=settings.route_lookups_per_refresh,
             on_snapshot=recorder,
         )
@@ -71,7 +78,8 @@ def create_app(settings: Settings | None = None) -> FastAPI:
                 except Exception as exc:
                     logging.getLogger(__name__).warning("final sightings flush failed: %s", exc)
             await http.aclose()
-            await redis.aclose()
+            if redis is not None:
+                await redis.aclose()
             await engine.dispose()
 
     app = FastAPI(
@@ -89,6 +97,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(api_router)
+    # Outermost first: refuse oversized bodies, then rate-limit the REST API per client.
+    # /mcp has its own limit below; health checks aren't counted.
+    app.add_middleware(
+        RateLimit,
+        per_minute=settings.api_rate_limit_per_minute,
+        exempt=("/api/v1/health", "/mcp"),
+    )
+    app.add_middleware(BodyLimit, max_bytes=settings.max_request_bytes)
 
     # MCP for AI assistants at /mcp (ADR-0014). Mounted last so the API routes match first.
     mcp = build_mcp(lambda: app.state.resources, settings) if settings.mcp_enabled else None
