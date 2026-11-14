@@ -11,11 +11,13 @@ from app.core.india import today_ist
 from app.schemas.lounges import (
     CardDetail,
     CardList,
+    CardLounges,
     EligibilityRequest,
     EligibilityResponse,
     LoungeDetail,
     LoungeList,
     ProgramList,
+    SearchResults,
 )
 from app.services import lounges as svc
 
@@ -90,6 +92,40 @@ async def card(resources: Resources, response: Response, slug: SlugPath) -> Card
     result = await _run(resources, "card", lambda c: svc.get_card(c, slug, today_ist()))
     response.headers["Cache-Control"] = CACHE_CONTROL
     return _found(result, f"card {slug}")
+
+
+@router.get(
+    "/cards/{slug}/lounges",
+    response_model=CardLounges,
+    summary="Lounges a card's programmes open",
+    description=(
+        "Departure lounges that accept a programme named by the card's benefits in force "
+        "today. Spend, visit and other conditions still apply: use /eligibility for an answer."
+    ),
+    responses=NOT_FOUND,
+)
+async def card_lounges(resources: Resources, response: Response, slug: SlugPath) -> CardLounges:
+    result = await _run(resources, "card lounges", lambda c: svc.card_lounges(c, slug, today_ist()))
+    response.headers["Cache-Control"] = CACHE_CONTROL
+    return _found(result, f"card {slug}")
+
+
+@router.get(
+    "/search",
+    response_model=SearchResults,
+    summary="Search airports, lounges and cards",
+    responses=DB_DOWN,
+)
+async def search(
+    resources: Resources,
+    response: Response,
+    q: Annotated[str, Query(min_length=1, max_length=80)],
+    limit: Annotated[int, Query(ge=1, le=30)] = 12,
+) -> SearchResults:
+    query = " ".join(q.split())
+    items = await _run(resources, "search", lambda c: svc.search(c, query, limit, today_ist()))
+    response.headers["Cache-Control"] = CACHE_CONTROL
+    return SearchResults(q=query, items=items)
 
 
 @router.get(

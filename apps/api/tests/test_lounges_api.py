@@ -120,7 +120,8 @@ async def test_lounges_and_cards_are_served_with_provenance(seeded: httpx.AsyncC
     listing = (await seeded.get("/api/v1/lounges?airport=del")).json()["items"]
     assert {lg["slug"] for lg in listing} == {"test-lounge-del-t9", "test-lounge-del-intl"}
     t9 = next(lg for lg in listing if lg["slug"] == "test-lounge-del-t9")
-    assert t9["programs"] == ["Test Lounge Programme"]
+    assert t9["programs"] == [{"key": "test-programme", "name": "Test Lounge Programme"}]
+    assert t9["direction"] == "departures" and t9["airport_name"]
 
     detail = (await seeded.get("/api/v1/lounges/test-lounge-del-t9")).json()
     assert detail["opening_hours"] == {"mode": "24h", "periods": []}
@@ -128,6 +129,24 @@ async def test_lounges_and_cards_are_served_with_provenance(seeded: httpx.AsyncC
     assert detail["accepts"][0]["provenance"]["status"] == "verified"
     assert detail["provenance"]["source"]["source_type"] == "lounge_operator"
     assert (await seeded.get("/api/v1/lounges/nope")).status_code == 404
+    assert [c["slug"] for c in detail["cards"]] == ["test-bank-voyager"]
+    assert detail["cards"][0]["via"]["key"] == "test-programme"
+
+    opens = (await seeded.get("/api/v1/cards/test-bank-voyager/lounges")).json()
+    assert [lg["slug"] for lg in opens["lounges"]] == ["test-lounge-del-t9"]
+    assert opens["scopes"][0]["lounge_list_known"] is True
+    assert (await seeded.get("/api/v1/cards/nope/lounges")).status_code == 404
+
+    hits = (await seeded.get("/api/v1/search?q=voyager")).json()["items"]
+    assert hits[0] == {
+        "kind": "card",
+        "key": "test-bank-voyager",
+        "title": "Test Voyager",
+        "subtitle": "Test Bank",
+        "href": "/cards/test-bank-voyager",
+    }
+    del_hits = (await seeded.get("/api/v1/search?q=del")).json()["items"]
+    assert del_hits[0]["kind"] == "airport" and del_hits[0]["key"] == "DEL"
 
     filtered = (await seeded.get("/api/v1/lounges?program=test-programme")).json()["items"]
     assert [lg["slug"] for lg in filtered] == ["test-lounge-del-t9"]

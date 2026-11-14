@@ -1,6 +1,6 @@
 # API overview (v1 draft)
 
-Last updated: 2026-11-13. Status: proposed contract. The generated OpenAPI spec at `/api/v1/openapi.json` becomes the source of truth once implemented.
+Last updated: 2026-11-14. Status: proposed contract. The generated OpenAPI spec at `/api/v1/openapi.json` becomes the source of truth once implemented.
 
 ## Conventions
 
@@ -16,7 +16,8 @@ Last updated: 2026-11-13. Status: proposed contract. The generated OpenAPI spec 
   ```
 - Live and flight responses include `meta` (see the [flight data flow](../architecture/flight-data-flow.md)).
 - Errors use RFC 9457 problem details. Upstream failures return `503` with a `Retry-After` header.
-- Public endpoints are rate-limited per IP (in memory). Exceeding the limit returns `429`.
+- Public endpoints are rate-limited per client (in memory, keyed on the address Render's proxy appends to `X-Forwarded-For`): 120 a minute on the REST API, 60 on `/mcp`. Exceeding the limit returns `429` with `Retry-After`. Health checks aren't counted.
+- Request bodies over 16 KB are refused with `413`.
 - On the free tier the API may be asleep. The first request after idle can take about 1 minute.
 
 ## Endpoints
@@ -26,8 +27,7 @@ AI assistants can also use these services through the read-only MCP server at `/
 ### Health
 | | |
 |---|---|
-| `GET /health` | **Implemented (Stage 1).** Always `200` while the process is up. `{ "status": "ok" \| "degraded", "environment", "version", "checks": { "database" \| "postgis" \| "redis": { "status": "ok" \| "error", "version", "detail" } } }` |
-| `GET /health/data` | Snapshot age, active provider, last error |
+| `GET /health` | **Implemented.** Always `200` while the process is up. `{ "status": "ok" \| "degraded", "environment", "version", "checks": { "database" \| "postgis" \| "redis": { "status": "ok" \| "error" \| "disabled", "version", "detail" } }, "live": { "source", "fetched_at", "age_s", "aircraft", "last_error", "providers": { name: { "ok", "checked_at", "error", "aircraft", "resting_s" } } } }`. Redis is optional: `disabled` when `REDIS_URL` isn't set. `live` covers this process only |
 
 ### Positions
 | | |
@@ -54,16 +54,24 @@ AI assistants can also use these services through the read-only MCP server at `/
 ### Lounges
 | | |
 |---|---|
-| `GET /lounges?airport=&program=` | **Implemented.** Lounge summaries with the programmes accepted today |
-| `GET /lounges/{slug}` | **Implemented.** Full record: hours, amenities as stated, acceptance windows (acceptance only, never card benefits), provenance on each |
+| `GET /lounges?airport=&program=` | **Implemented.** Lounge summaries: airport name and city, terminal, scope, side, `direction` (`departures`, `arrivals` or `transit`) and the programmes accepted today (`{ key, name }`) |
+| `GET /lounges/{slug}` | **Implemented.** Full record: hours, amenities as stated, acceptance windows with `in_force` (acceptance only, never card benefits), provenance on each, and `cards`: cards whose benefit in force today names a programme the lounge accepts today (conditions still apply) |
 | `GET /access-programs` | **Implemented.** Lounge programmes |
 
 ### Cards
 | | |
 |---|---|
 | `GET /cards?bank=` | **Implemented.** Cards with the domestic and international summaries in force today, plus every issuer (so issuers without cards still show) |
-| `GET /cards/{slug}` | **Implemented.** Card, every policy version (newest first, `in_force` flag), rules and provenance |
+| `GET /cards/{slug}` | **Implemented.** Card, every policy version (newest first, `in_force` flag), rules and provenance, and `programs` per scope with `lounge_list_known` |
+| `GET /cards/{slug}/lounges` | **Implemented.** Departure lounges accepting a programme the card's benefits in force today name. Conditions still apply: use `/eligibility` for an answer |
 | `GET /cards/compare?slugs=a,b,c` | Side-by-side (P1, later) |
+
+### Search
+| | |
+|---|---|
+| `GET /search?q=&limit=` | **Implemented.** Airports, lounges and cards matching every word of `q` (codes, names, cities, banks), best first: `{ q, items: [{ kind, key, title, subtitle, href }] }`. `href` is the page on the website |
+
+Lounges, cards, policies and acceptances are held in memory for 5 minutes (they change only when the seed runs), so eligibility, search and the two-way lists need no database round trip on a warm cache.
 
 ### Eligibility
 `POST /eligibility` (**implemented**, [ADR-0009](../decisions/0009-deterministic-eligibility-engine.md)). Unknown fields are rejected, so a card number can't be sent by mistake. The response is `Cache-Control: no-store`, and nothing is stored or logged.
@@ -79,4 +87,7 @@ AI assistants can also use these services through the read-only MCP server at `/
 }
 ```
 
-The response has one entry per card, per lounge listed at the airport: `status` (`yes`, `no` or `depends`), the `checks` behind it (rule, status, message), the programmes used, guests covered, how to enter and the policy summary, plus a disclaimer.
+The response has one entry per card, per departure lounge listed at the airport (arrivals and transit lounges are left out): `status` (`yes`, `no` or `depends`), the `checks` behind it (rule, status, message, and `detail` with the bank's quoted wording when there is some), the programmes used, guests covered, how to enter, `notes` (fees, add-on cardholders: informational, never change the answer) and the policy summary, plus a disclaimer.
+
+- A `no` lists only the checks that decided it.
+- Missing data is `depends`, never `no`: no recorded benefit for the scope, a programme whose lounge list we don't have, or guests the terms don't mention. A benefit that ended is `no`.

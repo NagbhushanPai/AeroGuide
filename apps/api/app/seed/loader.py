@@ -192,6 +192,11 @@ async def apply_bundle(conn: AsyncConnection, bundle: Bundle) -> SeedSummary:
     await conn.execute(delete(Airport).where(Airport.id.not_in(list(airport_ids.values()))))
     await conn.execute(delete(Source).where(Source.id.not_in(list(source_ids.values()))))
 
+    # The API keeps lounges and cards in memory for a few minutes; drop them so the next
+    # request in this process sees what was just written.
+    from app.services.lounges import clear_catalogue
+
+    clear_catalogue()
     return SeedSummary(
         sources=len(source_ids),
         airports=len(airport_ids),
