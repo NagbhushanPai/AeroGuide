@@ -1,0 +1,38 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: axis-bank-reserve
+bank: axis-bank
+name: Reserve
+product_url: https://www.axis.bank.in/cards/credit-card/reserve-credit-card/limitless-comfort
+provenance:
+  status: unverified
+  source: axis-bank-reserve-source
+  notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+    against the source yet.
+policies:
+- scope: domestic
+  valid_from: 2026-10-04
+  summary: Unlimited.
+  rules: []
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: None (primary
+    and add-on; 12 guest visits / year). Present the Reserve card with the boarding pass.'
+  provenance:
+    status: unverified
+    source: axis-bank-reserve-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.
+- scope: international
+  valid_from: 2026-10-04
+  summary: Unlimited via Priority Pass + 12 guest visits / year.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+    ambiguous: true
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: axis-bank-reserve-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.

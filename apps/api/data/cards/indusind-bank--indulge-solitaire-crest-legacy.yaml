@@ -1,0 +1,38 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: indusind-bank-indulge-solitaire-crest-legacy
+bank: indusind-bank
+name: Indulge / Solitaire / Crest / Legacy
+product_url: https://www.indusind.bank.in/
+provenance:
+  status: unverified
+  source: indusind-bank-pinnacle-source
+  notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+    hasn''t checked it against the source yet.'
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: '6 / 4 / 2 / 1 per quarter. From Apr 2026: spend ₹5,00,000 (Indulge, Solitaire) or ₹1,50,000
+    (Legacy; Crest reported at both) in the previous quarter — the steepest gates in the market, verify
+    your card.'
+  rules: []
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: From Apr 2026:
+    spend ₹5,00,000 (Indulge, Solitaire) or ₹1,50,000 (Legacy; Crest reported at both) in the previous
+    quarter — the steepest gates in the market, verify your card.'
+  provenance:
+    status: unverified
+    source: indusind-bank-pinnacle-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'
+- scope: international
+  valid_from: 2026-11-14
+  summary: Varies.
+  rules: []
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: indusind-bank-pinnacle-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'

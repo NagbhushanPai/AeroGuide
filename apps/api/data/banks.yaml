@@ -6,3 +6,51 @@ banks:
   - { slug: icici-bank, name: ICICI Bank, url: "https://www.icici.bank.in/" }
   - { slug: axis-bank, name: Axis Bank, url: "https://www.axis.bank.in/" }
   - { slug: kotak-mahindra-bank, name: Kotak Mahindra Bank, url: "https://www.kotak.bank.in/" }
+
+  - slug: american-express
+    name: American Express
+    url: https://www.americanexpress.com/en-in/
+
+  - slug: hsbc
+    name: HSBC India
+    url: https://www.hsbc.co.in/
+
+  - slug: au-small-finance-bank
+    name: AU Small Finance Bank
+    url: https://www.au.bank.in/
+
+  - slug: indusind-bank
+    name: IndusInd Bank
+    url: https://www.indusind.bank.in/
+
+  - slug: yes-bank
+    name: Yes Bank
+    url: https://www.yes.bank.in/
+
+  - slug: rbl-bank
+    name: RBL Bank
+    url: https://www.rbl.bank.in/
+
+  - slug: standard-chartered
+    name: Standard Chartered
+    url: https://www.sc.bank.in/
+
+  - slug: bobcard
+    name: BOBCARD (Bank of Baroda)
+    url: https://www.bobcard.co.in/
+
+  - slug: idfc-first-bank
+    name: IDFC FIRST Bank
+    url: https://www.idfcfirst.bank.in/
+
+  - slug: federal-bank
+    name: Federal Bank
+    url: https://www.federal.bank.in/
+
+  - slug: niyo
+    name: Niyo
+    url: https://goniyo.com/
+
+  - slug: jupiter
+    name: Jupiter (CSB Bank)
+    url: https://jupiter.money/

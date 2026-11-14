@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (cards imported for checking)
+- 61 more cards from 17 issuers, including 12 new ones (American Express, HSBC, AU, IndusInd, Yes Bank, RBL, Standard Chartered, BOBCARD, IDFC FIRST, Federal Bank, Niyo, Jupiter), imported from a third-party lounge tracker. Every one is marked unverified, cites the page the tracker relied on, and says it hasn't been checked by AeroGuide. Their policies carry the tracker's wording as unmodelled terms, so the checker answers "depends" for them, never "yes" (enforced by a test). They join the weekly review queue.
+
+### Changed
+- OpenSky uses an API client (OAuth2 client credentials) when `OPENSKY_CLIENT_ID` and `OPENSKY_CLIENT_SECRET` are set: a registered account's 4,000 daily credits instead of the anonymous per-IP allowance shared with other apps on the host. Tokens are cached and renewed before expiry or on a 401.
+
 ### Added (MCP server for AI assistants)
 - `/mcp` on the API: a read-only Model Context Protocol server (official `mcp` SDK, Streamable HTTP, stateless). 11 tools cover airports, lounges, cards, the lounge access check and live flights, and return the same sourced results as the REST API. Any MCP client can connect, including Claude's free plan as a custom connector, at no cost to the project ([ADR-0014](docs/decisions/0014-mcp-server-for-ai-assistants.md), replacing ADR-0008).
 - Per-client rate limit and Host allow-list on the MCP endpoint; `MCP_ENABLED`, `MCP_RATE_LIMIT_PER_MINUTE` and `MCP_ALLOWED_HOSTS` settings. Setup guide: [docs/api/mcp.md](docs/api/mcp.md).

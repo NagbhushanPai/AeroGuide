@@ -1,0 +1,35 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: idfc-first-bank-debit-cards
+bank: idfc-first-bank
+name: Debit cards
+product_url: https://www.idfcfirst.bank.in/credit-card/benefits/lounge-access
+provenance:
+  status: unverified
+  source: idfc-first-bank-mayura-source
+  notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+    hasn''t checked it against the source yet.'
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: Varies by card. The programme moved to Elite Assist (TFS) — check the IDFC app.
+  rules: []
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: The programme
+    moved to Elite Assist (TFS) — check the IDFC app.'
+  provenance:
+    status: unverified
+    source: idfc-first-bank-mayura-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'
+- scope: international
+  valid_from: 2026-11-14
+  summary: Varies.
+  rules: []
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: idfc-first-bank-mayura-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'

@@ -1,0 +1,47 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: hdfc-bank-diners-club-privilege
+bank: hdfc-bank
+name: Diners Club Privilege
+product_url: https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/diners-privilege-credit-card/pdf/diners-privilege-update-faq-and-tnc.pdf
+provenance:
+  status: unverified
+  source: hdfc-bank-diners-club-privilege-source
+  notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+    against the source yet.
+policies:
+- scope: domestic
+  valid_from: 2026-10-04
+  summary: '2 / quarter (vouchers). From 1 Jul 2026: spend ₹60,000 in the previous calendar quarter; generate
+    the vouchers on SmartBuy, valid to the end of the next quarter.'
+  rules:
+  - type: visit_quota
+    count: 2
+    period: quarter
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: From 1 Jul 2026:
+    spend ₹60,000 in the previous calendar quarter; generate the vouchers on SmartBuy, valid to the end
+    of the next quarter.'
+  provenance:
+    status: unverified
+    source: hdfc-bank-diners-club-privilege-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.
+- scope: international
+  valid_from: 2026-10-04
+  summary: 1 / quarter (voucher, same spend gate).
+  rules:
+  - type: visit_quota
+    count: 1
+    period: quarter
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: hdfc-bank-diners-club-privilege-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.

@@ -53,6 +53,10 @@ Done 2026-11-14. Every policy cites the bank's own page or terms PDF (see the ca
 | Axis Bank | Atlas | Magnus | Horizon | Axis's travel cards on the [listing](https://www.axis.bank.in/cards/credit-card) |
 | Kotak Mahindra Bank | White Reserve | Solitaire | Air+ | The premium unlimited-lounge cards, plus the featured travel card on the [listing](https://www.kotak.bank.in/en/personal-banking/cards/credit-cards.html) |
 
+### Beyond the launch set
+
+61 more cards from 17 issuers were imported on 2026-11-14 from a third-party lounge tracker, all marked unverified (see CONTRIBUTING, "Imported cards waiting for a check"). Checking them against each bank's own page is the next content task.
+
 ### Known gaps
 
 - **Networks:** the banks don't state one for Regalia Gold, SBI's three cards, Atlas or Kotak's three cards, so these show "not stated".

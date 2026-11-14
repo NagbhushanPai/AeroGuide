@@ -1,0 +1,34 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: hsbc-premier
+bank: hsbc
+name: Premier
+product_url: https://www.hsbc.co.in/credit-cards/products/premier/
+provenance:
+  status: unverified
+  source: hsbc-premier-source
+  notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+    against the source yet.
+policies:
+- scope: domestic
+  valid_from: 2026-10-04
+  summary: Unlimited.
+  rules: []
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: None.'
+  provenance:
+    status: unverified
+    source: hsbc-premier-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.
+- scope: international
+  valid_from: 2026-10-04
+  summary: Unlimited + 8 guest visits / year.
+  rules: []
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: hsbc-premier-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.

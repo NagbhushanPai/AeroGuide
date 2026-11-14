@@ -1,0 +1,37 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: bobcard-eterna-eterna-fd-tiara-varunah-premium
+bank: bobcard
+name: Eterna / Eterna FD / Tiara / Varunah Premium
+product_url: https://media.bobcard.co.in/media/0aqczg5p/final-revision-in-charges-benefits-effective-july-202615.pdf
+provenance:
+  status: unverified
+  source: bobcard-eterna-eterna-fd-tiara-varunah-premium-source
+  notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+    against the source yet.
+policies:
+- scope: domestic
+  valid_from: 2026-10-04
+  summary: 'Unlimited once unlocked. From 15 Jul 2026 per the BOBCARD notice (trackers say 1 Oct 2026):
+    spend ₹75,000 in the preceding calendar quarter (was ₹40,000).'
+  rules: []
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: From 15 Jul
+    2026 per the BOBCARD notice (trackers say 1 Oct 2026): spend ₹75,000 in the preceding calendar quarter
+    (was ₹40,000).'
+  provenance:
+    status: unverified
+    source: bobcard-eterna-eterna-fd-tiara-varunah-premium-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.
+- scope: international
+  valid_from: 2026-10-04
+  summary: Varies.
+  rules: []
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: bobcard-eterna-eterna-fd-tiara-varunah-premium-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.

@@ -1,0 +1,40 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: rbl-bank-insignia-preferred-banking-world
+bank: rbl-bank
+name: Insignia Preferred Banking World
+product_url: https://www.rbl.bank.in/
+provenance:
+  status: unverified
+  source: rbl-bank-insignia-preferred-banking-world-source
+  notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+    hasn''t checked it against the source yet.'
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: 2 / quarter. Verify the current spend gate (invitation-only; not in the ₹35,000 gate list).
+  rules:
+  - type: visit_quota
+    count: 2
+    period: quarter
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: Verify the current
+    spend gate (invitation-only; not in the ₹35,000 gate list).'
+  provenance:
+    status: unverified
+    source: rbl-bank-insignia-preferred-banking-world-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'
+- scope: international
+  valid_from: 2026-11-14
+  summary: Varies.
+  rules: []
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: rbl-bank-insignia-preferred-banking-world-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'

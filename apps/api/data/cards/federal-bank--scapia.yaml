@@ -1,0 +1,26 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: federal-bank-scapia
+bank: federal-bank
+name: Scapia
+product_url: https://www.scapia.cards/
+provenance:
+  status: unverified
+  source: federal-bank-scapia-source
+  notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+    against the source yet.
+policies:
+- scope: domestic
+  valid_from: 2026-10-04
+  summary: Unlimited once unlocked. Spend ₹20,000 in the month, combined across the Visa/Mastercard and
+    RuPay Scapia cards (raised from ~₹10,000 in Feb 2026).
+  rules: []
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: Spend ₹20,000
+    in the month, combined across the Visa/Mastercard and RuPay Scapia cards (raised from ~₹10,000 in
+    Feb 2026).'
+  provenance:
+    status: unverified
+    source: federal-bank-scapia-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.

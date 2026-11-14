@@ -681,3 +681,274 @@ sources:
     publisher: Balaji Caterers
     source_type: lounge_operator
     retrieved_at: 2026-11-14
+
+  - key: hdfc-bank-regalia-classic-source
+    name: 'HDFC Regalia (classic): lounge benefit page cited by a tracker (hdfc.bank.in)'
+    url: https://www.hdfc.bank.in/credit-cards/regalia-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hdfc-bank-diners-club-privilege-source
+    name: 'HDFC Diners Club Privilege: lounge benefit page cited by a tracker (hdfc.bank.in)'
+    url: https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/diners-privilege-credit-card/pdf/diners-privilege-update-faq-and-tnc.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hdfc-bank-millennia-source
+    name: 'HDFC Millennia: lounge benefit page cited by a tracker (hdfc.bank.in)'
+    url: https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/millennia-credit-card/pdf/lounge-voucher-on-millennia-credit-card.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hdfc-bank-tata-neu-infinity-source
+    name: 'HDFC Tata Neu Infinity: lounge benefit page cited by a tracker (hdfc.bank.in)'
+    url: https://www.hdfc.bank.in/credit-cards/tata-neu-infinity-hdfc-bank-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hdfc-bank-tata-neu-plus-source
+    name: 'HDFC Tata Neu Plus: lounge benefit page cited by a tracker (hdfc.bank.in)'
+    url: https://www.hdfc.bank.in/credit-cards/tata-neu-plus-hdfc-bank-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hdfc-bank-marriott-bonvoy-source
+    name: 'HDFC Marriott Bonvoy: lounge benefit page cited by a tracker (hdfc.bank.in)'
+    url: https://www.hdfc.bank.in/credit-cards/marriott-bonvoy-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: axis-bank-reserve-source
+    name: 'Axis Reserve: lounge benefit page cited by a tracker (axis.bank.in)'
+    url: https://www.axis.bank.in/cards/credit-card/reserve-credit-card/limitless-comfort
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: axis-bank-select-source
+    name: 'Axis Select: lounge benefit page cited by a tracker (axis.bank.in)'
+    url: https://www.axis.bank.in/retail/cards/credit-card/axis-bank-select-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: icici-bank-emeralde-private-metal-source
+    name: 'ICICI Emeralde Private Metal: lounge benefit page cited by a tracker (icici.bank.in)'
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/emeralde-private-metal-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: icici-bank-times-black-source
+    name: 'ICICI Times Black: lounge benefit page cited by a tracker (icici.bank.in)'
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/times-black-icici-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: icici-bank-coral-source
+    name: 'ICICI Coral: lounge benefit page cited by a tracker (icici.bank.in)'
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/coral-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: icici-bank-adani-one-signature-source
+    name: 'ICICI Adani One Signature: lounge benefit page cited by a tracker (icici.bank.in)'
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/adani-icici-credit-card/signature-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: icici-bank-makemytrip-icici-source
+    name: 'ICICI MakeMyTrip ICICI: lounge benefit page cited by a tracker (icici.bank.in)'
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/makemytrip/makemytrip-icici-bank-credit-card
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: sbi-card-aurum-source
+    name: 'SBI Card Aurum: lounge benefit page cited by a tracker (cardinsider.com)'
+    url: https://cardinsider.com/sbi-card/sbi-credit-cards-for-airport-lounge-access/
+    source_type: secondary
+    retrieved_at: '2026-11-14'
+
+  - key: sbi-card-miles-prime-source
+    name: 'SBI Card Miles Prime: lounge benefit page cited by a tracker (sbicard.com)'
+    url: https://www.sbicard.com/en/blog/detail/miles-blog-1
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: sbi-card-bpcl-octane-source
+    name: 'SBI Card BPCL Octane: lounge benefit page cited by a tracker (sbicard.com)'
+    url: https://www.sbicard.com/sbi-card-en/assets/docs/pdf/loungebenefits.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: american-express-platinum-travel-source
+    name: 'American Express Platinum Travel: lounge benefit page cited by a tracker (americanexpress.com)'
+    url: https://www.americanexpress.com/in/credit-cards/platinum-travel-credit-card/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: american-express-platinum-reserve-source
+    name: 'American Express Platinum Reserve: lounge benefit page cited by a tracker (americanexpress.com)'
+    url: https://www.americanexpress.com/in/credit-cards/platinum-reserve-credit-card/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: american-express-platinum-charge-source
+    name: 'American Express Platinum (charge): lounge benefit page cited by a tracker (americanexpress.com)'
+    url: https://www.americanexpress.com/in/benefits/the-platinum-card/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hsbc-premier-source
+    name: 'HSBC India Premier: lounge benefit page cited by a tracker (hsbc.co.in)'
+    url: https://www.hsbc.co.in/credit-cards/products/premier/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hsbc-travelone-source
+    name: 'HSBC India TravelOne: lounge benefit page cited by a tracker (hsbc.co.in)'
+    url: https://www.hsbc.co.in/credit-cards/products/travelone/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: hsbc-live-plus-source
+    name: 'HSBC India Live+: lounge benefit page cited by a tracker (hsbc.co.in)'
+    url: https://www.hsbc.co.in/credit-cards/products/live-plus/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: kotak-mahindra-bank-white-source
+    name: 'Kotak White: lounge benefit page cited by a tracker (kotak.bank.in)'
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/white-credit-card/lounge-program.html
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: kotak-mahindra-bank-privy-league-signature-source
+    name: 'Kotak Privy League Signature: lounge benefit page cited by a tracker (kotak.bank.in)'
+    url: https://www.kotak.bank.in/content/dam/Kotak/gsfcfiles/credit-cards/lounge-access-tnc.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: kotak-mahindra-bank-royale-signature-source
+    name: 'Kotak Royale Signature: lounge benefit page cited by a tracker (kotak.bank.in)'
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/royale-signature-credit-card.html
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: kotak-mahindra-bank-zen-signature-source
+    name: 'Kotak Zen Signature: lounge benefit page cited by a tracker (kotak.bank.in)'
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/zen-signature-credit-card.html
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: au-small-finance-bank-zenith-plus-source
+    name: 'AU Small Finance Bank Zenith+: lounge benefit page cited by a tracker (au.bank.in)'
+    url: https://www.au.bank.in/content/dam/aubank/in/en/pdf/zenith-plus-credit-card/au-small-finance-bank-cc-airport-lounge-terms-conditions.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: au-small-finance-bank-zenith-source
+    name: 'AU Small Finance Bank Zenith: lounge benefit page cited by a tracker (au.bank.in)'
+    url: https://www.au.bank.in/pdf/zenith-credit-card/revision-of-usage-terms-and-conditions_jan_25-4.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: au-small-finance-bank-ixigo-au-source
+    name: 'AU Small Finance Bank ixigo AU: lounge benefit page cited by a tracker (cardinsider.com)'
+    url: https://cardinsider.com/au-bank/au-bank-credit-cards-for-airport-lounge-access/
+    source_type: secondary
+    retrieved_at: '2026-11-14'
+
+  - key: indusind-bank-tiger-source
+    name: 'IndusInd Bank Tiger: lounge benefit page cited by a tracker (indusind.bank.in)'
+    url: https://www.indusind.bank.in/in/en/personal/cards/credit-card/tiger-credit-card.html
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: indusind-bank-legend-source
+    name: 'IndusInd Bank Legend: lounge benefit page cited by a tracker (indusind.bank.in)'
+    url: https://www.indusind.bank.in/in/en/personal/cards/credit-card/legend-credit-card.html
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: indusind-bank-pinnacle-source
+    name: 'IndusInd Bank Pinnacle: lounge benefit page cited by a tracker (livefromalounge.com)'
+    url: https://livefromalounge.com/indusind-bank-puts-a-price-on-lounge-access-effective-april-1-2026/
+    source_type: secondary
+    retrieved_at: '2026-11-14'
+
+  - key: yes-bank-marquee-source
+    name: 'Yes Bank Marquee: lounge benefit page cited by a tracker (yes.bank.in)'
+    url: https://www.yes.bank.in/sites/web/content/published/api/v1.1/assets/CONT23CDBE6F27E4444AA0A336DDB2885343/native/ybl_yes_bank_domestic_lounge_access.pdf?download=false
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: rbl-bank-world-safari-source
+    name: 'RBL Bank World Safari: lounge benefit page cited by a tracker (webassets.rbl.bank.in)'
+    url: https://webassets.rbl.bank.in/document/pdfs/terms-world-safari-card.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: rbl-bank-icon-source
+    name: 'RBL Bank Icon: lounge benefit page cited by a tracker (webassets.rbl.bank.in)'
+    url: https://webassets.rbl.bank.in/document/pdfs/cc-lounge-faq-july-2025.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: rbl-bank-insignia-preferred-banking-world-source
+    name: 'RBL Bank Insignia Preferred Banking World: lounge benefit page cited by a tracker (cardinsider.com)'
+    url: https://cardinsider.com/rbl-bank/rbl-credit-cards-for-airport-lounge-access/
+    source_type: secondary
+    retrieved_at: '2026-11-14'
+
+  - key: standard-chartered-ultimate-source
+    name: 'Standard Chartered Ultimate: lounge benefit page cited by a tracker (sc.bank.in)'
+    url: https://www.sc.bank.in/credit-cards/ultimate-card/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: standard-chartered-easemytrip-source
+    name: 'Standard Chartered EaseMyTrip: lounge benefit page cited by a tracker (bankbazaar.com)'
+    url: https://www.bankbazaar.com/credit-card/standard-chartered-credit-card-lounge-access.html
+    source_type: secondary
+    retrieved_at: '2026-11-14'
+
+  - key: bobcard-eterna-eterna-fd-tiara-varunah-premium-source
+    name: 'BOBCARD (Bank of Baroda) Eterna / Eterna FD / Tiara / Varunah Premium: lounge benefit page cited
+      by a tracker (media.bobcard.co.in)'
+    url: https://media.bobcard.co.in/media/0aqczg5p/final-revision-in-charges-benefits-effective-july-202615.pdf
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: bobcard-premier-source
+    name: 'BOBCARD (Bank of Baroda) Premier: lounge benefit page cited by a tracker (bobcard.co.in)'
+    url: https://www.bobcard.co.in/credit-card-types/premier
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: idfc-first-bank-mayura-source
+    name: 'IDFC FIRST Bank Mayura: lounge benefit page cited by a tracker (idfcfirst.bank.in)'
+    url: https://www.idfcfirst.bank.in/credit-card/benefits/lounge-access
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: federal-bank-scapia-source
+    name: 'Federal Bank Scapia: lounge benefit page cited by a tracker (scapia.cards)'
+    url: https://www.scapia.cards/
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: federal-bank-celesta-source
+    name: 'Federal Bank Celesta: lounge benefit page cited by a tracker (cardinsider.com)'
+    url: https://cardinsider.com/blog/federal-bank-revises-airport-lounge-access-credit-cards/
+    source_type: secondary
+    retrieved_at: '2026-11-14'
+
+  - key: niyo-niyo-global-debit-credit-source
+    name: 'Niyo Niyo Global (debit / credit): lounge benefit page cited by a tracker (community.goniyo.com)'
+    url: https://community.goniyo.com/t/clarification-on-niyo-lounge-access/17817
+    source_type: bank
+    retrieved_at: '2026-11-14'
+
+  - key: jupiter-jupiter-edge-csb-rupay-source
+    name: 'Jupiter (CSB Bank) Jupiter Edge CSB RuPay: lounge benefit page cited by a tracker (jupiter.money)'
+    url: https://jupiter.money/edge-upi-terms-and-conditions/
+    source_type: bank
+    retrieved_at: '2026-11-14'

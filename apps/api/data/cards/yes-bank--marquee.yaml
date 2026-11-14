@@ -1,0 +1,44 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: yes-bank-marquee
+bank: yes-bank
+name: Marquee
+product_url: https://www.yes.bank.in/sites/web/content/published/api/v1.1/assets/CONT23CDBE6F27E4444AA0A336DDB2885343/native/ybl_yes_bank_domestic_lounge_access.pdf?download=false
+provenance:
+  status: unverified
+  source: yes-bank-marquee-source
+  notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+    against the source yet.
+policies:
+- scope: domestic
+  valid_from: 2026-10-04
+  summary: '6 / quarter. From 1 Apr 2025: spend ₹1,00,000 in the previous calendar quarter (primary and
+    add-on; 2 guest visits / quarter).'
+  rules:
+  - type: visit_quota
+    count: 6
+    period: quarter
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: From 1 Apr 2025:
+    spend ₹1,00,000 in the previous calendar quarter (primary and add-on; 2 guest visits / quarter).'
+  provenance:
+    status: unverified
+    source: yes-bank-marquee-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.
+- scope: international
+  valid_from: 2026-10-04
+  summary: Unlimited via Priority Pass — verify.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+    ambiguous: true
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: yes-bank-marquee-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.

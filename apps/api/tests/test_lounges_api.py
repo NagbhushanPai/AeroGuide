@@ -135,7 +135,7 @@ async def test_lounges_and_cards_are_served_with_provenance(seeded: httpx.AsyncC
     cards = (await seeded.get("/api/v1/cards")).json()
     assert [c["slug"] for c in cards["items"]] == ["test-bank-voyager"]
     assert "2 visits a quarter" in cards["items"][0]["domestic"]
-    assert len(cards["banks"]) == 6
+    assert len(cards["banks"]) == len(read_bundle().banks.banks) + 1  # every issuer + Test Bank
 
     card = (await seeded.get("/api/v1/cards/test-bank-voyager")).json()
     assert [p["in_force"] for p in card["policies"]] == [True, False]  # newest first

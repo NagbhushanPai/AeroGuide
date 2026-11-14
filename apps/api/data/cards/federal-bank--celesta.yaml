@@ -1,0 +1,47 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: federal-bank-celesta
+bank: federal-bank
+name: Celesta
+product_url: https://www.federal.bank.in/
+provenance:
+  status: unverified
+  source: federal-bank-celesta-source
+  notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+    hasn''t checked it against the source yet.'
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: '2 / quarter. From 1 Oct 2025: spend ₹60,000 in the previous quarter; add-on cards no longer
+    eligible (the bank''s lounge page could not be read; rule per the tracker citing the bank notice).'
+  rules:
+  - type: visit_quota
+    count: 2
+    period: quarter
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: From 1 Oct 2025:
+    spend ₹60,000 in the previous quarter; add-on cards no longer eligible (the bank''s lounge page could
+    not be read; rule per the tracker citing the bank notice).'
+  provenance:
+    status: unverified
+    source: federal-bank-celesta-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'
+- scope: international
+  valid_from: 2026-11-14
+  summary: 2 / year.
+  rules:
+  - type: visit_quota
+    count: 2
+    period: year
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: federal-bank-celesta-source
+    notes: 'Imported from a third-party lounge tracker (not re-checked: verify with the bank). AeroGuide
+      hasn''t checked it against the source yet.'

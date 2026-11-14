@@ -1,0 +1,45 @@
+# Unverified: imported from a third-party lounge tracker on 2026-11-14.
+# Check every line against the cited source, then mark it verified.
+slug: hdfc-bank-tata-neu-infinity
+bank: hdfc-bank
+name: Tata Neu Infinity
+product_url: https://www.hdfc.bank.in/credit-cards/tata-neu-infinity-hdfc-bank-credit-card
+provenance:
+  status: unverified
+  source: hdfc-bank-tata-neu-infinity-source
+  notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+    against the source yet.
+policies:
+- scope: domestic
+  valid_from: 2026-10-04
+  summary: 2 / quarter (vouchers). Spend ₹50,000 in the calendar quarter.
+  rules:
+  - type: visit_quota
+    count: 2
+    period: quarter
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: 'Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank''s own page. Confirm with the bank before relying on it. Condition reported: Spend ₹50,000
+    in the calendar quarter.'
+  provenance:
+    status: unverified
+    source: hdfc-bank-tata-neu-infinity-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.
+- scope: international
+  valid_from: 2026-10-04
+  summary: 4 / year (1 / quarter).
+  rules:
+  - type: visit_quota
+    count: 4
+    period: year
+    ambiguous: true
+    note: Count as reported by a third-party tracker.
+  unmodelled_terms: Reported by a third-party lounge tracker and not yet checked by AeroGuide against
+    the bank's own page. Confirm with the bank before relying on it.
+  provenance:
+    status: unverified
+    source: hdfc-bank-tata-neu-infinity-source
+    notes: Imported from a third-party lounge tracker (checked 4 Oct 2026). AeroGuide hasn't checked it
+      against the source yet.

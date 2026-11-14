@@ -21,6 +21,15 @@ def test_repository_seed_files_are_valid() -> None:
     assert all(a.state_code in STATES for a in bundle.airports.airports)
 
 
+def test_unchecked_card_policies_can_never_answer_a_plain_yes() -> None:
+    """A policy not yet checked by AeroGuide must carry unmodelled terms, which makes the
+    eligibility engine answer "depends" at best (ADR-0009)."""
+    for card in read_bundle().cards:
+        for policy in card.policies:
+            if policy.provenance.status.value != "verified":
+                assert policy.unmodelled_terms, f"{card.slug} {policy.scope}"
+
+
 def test_every_state_has_a_known_region() -> None:
     assert {region for _, region in STATES.values()} == set(Region)
 

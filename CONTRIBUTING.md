@@ -131,6 +131,7 @@ Rules:
 - **Conditions no rule type captures:** quote them in `unmodelled_terms`. Every answer for that version becomes "depends".
 - **Benefit changes:** end the old version with `valid_to` (the first day the old version no longer applies) and add a new one. Never rewrite a past version. Versions of the same card and scope can't overlap.
 - **Checking your work:** run `pnpm seed:check` before opening the PR.
+- **Imported cards waiting for a check:** 61 card files start with the comment "Unverified: imported from a third-party lounge tracker". Each cites the page the tracker relied on, usually the bank's own. To verify one, read that page (and the bank's terms PDF), rewrite the rules from what the bank says, remove the tracker's wording from `unmodelled_terms`, and set `status: verified` with your check date. Until then the checker answers "depends" for these cards, never "yes"; a test enforces this.
 
 ## Local development
 
