@@ -21,6 +21,8 @@ Last updated: 2026-11-13. Status: proposed contract. The generated OpenAPI spec 
 
 ## Endpoints
 
+AI assistants can also use these services through the read-only MCP server at `/mcp` ([MCP guide](./mcp.md)).
+
 ### Health
 | | |
 |---|---|

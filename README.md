@@ -97,7 +97,7 @@ A weekly GitHub Actions job checks content staleness, source links and the open 
 
 ## Roadmap
 
-See [docs/planning/roadmap.md](docs/planning/roadmap.md). AI features are deliberately deferred to a later phase ([ADR-0008](docs/decisions/0008-defer-ai-integration.md)).
+See [docs/planning/roadmap.md](docs/planning/roadmap.md). AI assistants can use AeroGuide through its read-only MCP server: see [docs/api/mcp.md](docs/api/mcp.md) and [ADR-0014](docs/decisions/0014-mcp-server-for-ai-assistants.md).
 
 ## Data sources and attribution
 

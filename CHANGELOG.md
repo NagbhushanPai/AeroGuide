@@ -4,6 +4,13 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (MCP server for AI assistants)
+- `/mcp` on the API: a read-only Model Context Protocol server (official `mcp` SDK, Streamable HTTP, stateless). 11 tools cover airports, lounges, cards, the lounge access check and live flights, and return the same sourced results as the REST API. Any MCP client can connect, including Claude's free plan as a custom connector, at no cost to the project ([ADR-0014](docs/decisions/0014-mcp-server-for-ai-assistants.md), replacing ADR-0008).
+- Per-client rate limit and Host allow-list on the MCP endpoint; `MCP_ENABLED`, `MCP_RATE_LIMIT_PER_MINUTE` and `MCP_ALLOWED_HOSTS` settings. Setup guide: [docs/api/mcp.md](docs/api/mcp.md).
+
+### Fixed
+- The lounge checker answered "no" when a bank's own lounge list wasn't recorded at all (HDFC, ICICI and Kotak domestic programmes). It now answers "depends" and says the list is missing.
+
 ### Added (Stage 5c: launch content)
 - 15 cards, the top 3 travel cards of the 5 largest issuers: HDFC Bank (Infinia, Diners Club Black Metal, Regalia Gold), SBI Card (ELITE, PRIME, MILES ELITE), ICICI Bank (Emeralde, Sapphiro, Rubyx), Axis Bank (Atlas, Magnus, Horizon) and Kotak (White Reserve, Solitaire, Air+). Each policy cites the bank's own page or terms document. Unclear wording is marked ambiguous, so the checker answers "depends".
 - 44 lounges at DEL, BOM, BLR, HYD, MAA, COK and JAI, from airport, operator and Priority Pass pages. Bank-run domestic programmes are linked to lounges from the banks' own participating-lounge lists (Axis and SBI Card).

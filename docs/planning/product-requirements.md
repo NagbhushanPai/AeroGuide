@@ -43,7 +43,7 @@ AeroGuide is an aviation and airport intelligence site for India that combines:
 - An architecture that can later expose services as AI tools.
 
 **Non-goals (this phase)**
-- Any AI or LLM feature (chat, RAG, embeddings, agents). See [ADR-0008](../decisions/0008-defer-ai-integration.md).
+- A hosted AI chat or our own model. AI assistants can use AeroGuide's read-only MCP tools instead ([ADR-0014](../decisions/0014-mcp-server-for-ai-assistants.md)).
 - User accounts, saved flights and push alerts (backlog).
 - Booking, payments, affiliate checkout, ads or any other commercial use.
 - Airline schedules, gates, delays, cancellations and punctuality (no open data source exists).

@@ -1,6 +1,6 @@
 # ADR-0008: Defer AI integration; keep services tool-ready
 
-- Status: Proposed
+- Status: Superseded by [ADR-0014](./0014-mcp-server-for-ai-assistants.md)
 - Date: 2026-11-13
 
 ## Context
