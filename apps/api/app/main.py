@@ -2,7 +2,7 @@
 
 import logging
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import AsyncExitStack, asynccontextmanager
 
 import httpx
 from fastapi import FastAPI
@@ -17,6 +17,7 @@ from app.database.redis import RedisKeyValue, create_redis
 from app.database.session import create_engine
 from app.ingestion.live import LiveService
 from app.ingestion.sightings import SightingRecorder
+from app.mcp_server import RateLimit, build_mcp
 from app.providers.registry import build_position_providers, build_route_lookup
 
 REPO_URL = "https://github.com/NagbhushanPai/AeroGuide"
@@ -51,7 +52,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         await live.warm_start()
         app.state.resources = AppResources(settings=settings, engine=engine, redis=redis, live=live)
         try:
-            yield
+            async with AsyncExitStack() as stack:
+                if mcp is not None:
+                    await stack.enter_async_context(mcp.session_manager.run())
+                yield
         finally:
             await live.aclose()
             if recorder is not None:
@@ -78,6 +82,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         allow_headers=["*"],
     )
     app.include_router(api_router)
+
+    # MCP for AI assistants at /mcp (ADR-0014). Mounted last so the API routes match first.
+    mcp = build_mcp(lambda: app.state.resources, settings) if settings.mcp_enabled else None
+    app.state.mcp = mcp
+    if mcp is not None:
+        app.mount("/", RateLimit(mcp.streamable_http_app(), settings.mcp_rate_limit_per_minute))
     return app
 
 

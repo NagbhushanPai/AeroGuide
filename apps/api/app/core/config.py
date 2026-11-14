@@ -57,6 +57,32 @@ class Settings(BaseSettings):
     sightings_enabled: bool = True
     sightings_flush_interval_s: float = 300.0
 
+    # MCP server at /mcp (ADR-0014): read-only tools for AI assistants.
+    mcp_enabled: bool = True
+    # Host headers the MCP endpoint answers to (DNS-rebinding protection). Render sets
+    # RENDER_EXTERNAL_HOSTNAME itself, and it is added automatically (see mcp_hosts).
+    mcp_allowed_hosts: Annotated[list[str], NoDecode] = [
+        "localhost:*",
+        "127.0.0.1:*",
+        "[::1]:*",
+        "test",
+    ]
+    render_external_hostname: str | None = None
+    # Requests per minute per client address. One assistant task makes several tool calls.
+    mcp_rate_limit_per_minute: int = Field(default=60, ge=1)
+
+    @property
+    def mcp_hosts(self) -> list[str]:
+        extra = [self.render_external_hostname] if self.render_external_hostname else []
+        return [*self.mcp_allowed_hosts, *extra]
+
+    @field_validator("mcp_allowed_hosts", mode="before")
+    @classmethod
+    def split_hosts(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [host.strip() for host in value.split(",") if host.strip()]
+        return value
+
     @field_validator("database_url", mode="before")
     @classmethod
     def use_asyncpg(cls, value: object) -> object:
