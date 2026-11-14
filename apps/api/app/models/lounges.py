@@ -175,8 +175,9 @@ class CreditCard(UuidPk, Timestamps, Provenance, Base):
     bank_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("banks.id", ondelete="RESTRICT"), index=True
     )
-    network_code: Mapped[str] = mapped_column(
-        Text, ForeignKey("card_networks.code", ondelete="RESTRICT"), index=True
+    # Null when the bank's own pages don't state the network. Never guessed.
+    network_code: Mapped[str | None] = mapped_column(
+        Text, ForeignKey("card_networks.code", ondelete="RESTRICT"), index=True, nullable=True
     )
     name: Mapped[str] = mapped_column(Text)
     product_url: Mapped[str] = mapped_column(Text)

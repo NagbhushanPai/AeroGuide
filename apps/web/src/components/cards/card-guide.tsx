@@ -93,7 +93,7 @@ function Guide({ card: c }: { card: CardDetail }) {
           <ArrowLeft aria-hidden="true" className="size-4" /> All cards
         </Link>
         <p className="text-sm text-muted-foreground">
-          {c.bank.name} · {c.network}
+          {c.bank.name} · {c.network ?? "Network not stated by the bank"}
         </p>
         <h1 className="font-heading text-3xl font-semibold tracking-tight">{c.name}</h1>
         <div className="flex flex-wrap gap-2">

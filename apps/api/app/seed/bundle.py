@@ -275,7 +275,7 @@ def _validate_lounges_and_cards(
         at = f"cards: {c.slug}"
         if c.bank not in bank_slugs:
             errors.append(f"{at}: unknown bank {c.bank!r}")
-        if c.network not in network_codes:
+        if c.network is not None and c.network not in network_codes:
             errors.append(f"{at}: unknown network {c.network!r}")
         check_provenance(at, c.provenance)
         by_scope: dict[str, list[tuple[date, date | None]]] = {}

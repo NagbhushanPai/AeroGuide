@@ -71,7 +71,7 @@ class CardSummary(BaseModel):
     slug: str
     name: str
     bank: BankRef
-    network: str
+    network: str | None = Field(description="Null when the bank doesn't state the network")
     status: str
     domestic: str | None = Field(description="Summary of the domestic benefit in force today")
     international: str | None

@@ -546,7 +546,7 @@ export interface components {
       name: string;
       bank: components["schemas"]["BankRef"];
       /** Network */
-      network: string;
+      network: string | null;
       /** Status */
       status: string;
       /**
@@ -593,7 +593,7 @@ export interface components {
       name: string;
       bank: components["schemas"]["BankRef"];
       /** Network */
-      network: string;
+      network: string | null;
       /** Status */
       status: string;
       /**

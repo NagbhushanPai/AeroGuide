@@ -90,7 +90,9 @@ export function CardDirectory() {
                           <span className="block text-sm font-medium group-hover:underline">
                             {c.name}
                           </span>
-                          <span className="block text-xs text-muted-foreground">{c.network}</span>
+                          <span className="block text-xs text-muted-foreground">
+                            {c.network ?? "Network not stated"}
+                          </span>
                           <VerificationStatus
                             status={c.status as VerificationState}
                             className="mt-1"

@@ -273,7 +273,8 @@ class PolicyIn(Strict):
 class CardFile(Strict):
     slug: Slug
     bank: Slug
-    network: Annotated[str, StringConstraints(pattern=r"^[a-z]+$")]
+    # None when the bank's pages don't say which network the card runs on.
+    network: Annotated[str, StringConstraints(pattern=r"^[a-z]+$")] | None = None
     name: Text
     product_url: HttpUrl
     provenance: ProvenanceIn

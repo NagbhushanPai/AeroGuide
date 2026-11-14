@@ -23,6 +23,13 @@ def test_fixture_bundle_is_valid(tmp_path: Path) -> None:
     }
 
 
+def test_card_network_may_be_left_unstated(tmp_path: Path) -> None:
+    data = with_test_lounges(tmp_path)
+    card = data / "cards" / "test-bank--voyager.yaml"
+    card.write_text(TEST_CARD.replace("network: visa\n", ""), "utf-8")
+    assert read_bundle(data).cards[0].network is None
+
+
 def test_overlapping_policy_versions_are_rejected(tmp_path: Path) -> None:
     data = with_test_lounges(tmp_path)
     card = data / "cards" / "test-bank--voyager.yaml"

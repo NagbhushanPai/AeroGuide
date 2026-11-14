@@ -230,7 +230,7 @@ def _card_query() -> Any:
     return (
         select(*CARD_COLUMNS)
         .join(Bank, Bank.id == CreditCard.bank_id)
-        .join(CardNetwork, CardNetwork.code == CreditCard.network_code)
+        .outerjoin(CardNetwork, CardNetwork.code == CreditCard.network_code)
     )
 
 
