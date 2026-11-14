@@ -153,7 +153,7 @@ test("directory lists airports and filters by search", async ({ page }) => {
   await page.goto("/airports");
   await expect(page.getByRole("heading", { name: "Airports", level: 1 })).toBeVisible();
   await expect(page.getByText("2 airports")).toBeVisible();
-  await expect(page.getByText("Guide in progress")).toBeVisible();
+  await expect(page.getByText("Guide", { exact: true })).toBeVisible();
 
   await page.getByRole("searchbox", { name: "Search airports" }).fill("other");
   await expect(page.getByText("1 airport", { exact: true })).toBeVisible();
@@ -161,18 +161,41 @@ test("directory lists airports and filters by search", async ({ page }) => {
   await expect(page.getByText("Second Test Airport")).toBeVisible();
 });
 
+test("search box follows the URL when it changes from outside", async ({ page }) => {
+  await mockAirports(page);
+  await page.goto("/airports?q=other");
+  const search = page.getByRole("searchbox", { name: "Search airports" });
+  await expect(search).toHaveValue("other");
+  // A client-side link to the plain directory clears the search.
+  await page
+    .getByRole("navigation", { name: "Footer" })
+    .getByRole("link", { name: "Airports" })
+    .click();
+  await expect(page).toHaveURL(/\/airports$/);
+  await expect(search).toHaveValue("");
+  await expect(page.getByText("2 airports")).toBeVisible();
+});
+
 test("directory explains an outage instead of showing no results", async ({ page }) => {
   await mockAirports(page, { down: true });
+  // Requests are retried for about 75 s (a free-tier cold start) before an error is shown.
+  // Fast-forward the page's clock through the backoff instead of waiting for it.
+  await page.clock.install();
   await page.goto("/airports");
-  // Retries with backoff come first, so allow time for them.
-  await expect(page.getByRole("alert").filter({ hasText: "Couldn't load airports" })).toBeVisible({
-    timeout: 30_000,
-  });
+  await expect(page.getByText("Loading airports…").first()).toBeVisible();
+  const alert = page.getByRole("alert").filter({ hasText: "Couldn't load airports" });
+  for (let i = 0; i < 12 && !(await alert.isVisible()); i++) {
+    await page.clock.fastForward(16_000);
+    await page.waitForTimeout(250);
+  }
+  await expect(alert).toBeVisible();
 });
 
 test("guide without verified terminals says so and links the official site", async ({ page }) => {
   await mockAirports(page);
   await page.goto("/airports/del");
+  // One URL per airport: lowercase codes redirect to the uppercase canonical one.
+  await expect(page).toHaveURL(/\/airports\/DEL$/);
   await expect(page.getByRole("heading", { name: "Test International Airport" })).toBeVisible();
   await expect(page.getByText("Not yet verified").first()).toBeVisible();
   await expect(page.getByText("Terminal information not yet verified")).toBeVisible();
@@ -210,7 +233,11 @@ test("guide shows terminals with their own provenance", async ({ page }) => {
 test("unknown airport code shows a not-found state", async ({ page }) => {
   await mockAirports(page);
   await page.goto("/airports/zzz");
-  await expect(page.getByText("No airport with code ZZZ")).toBeVisible();
+  // With the API reachable from the server the page is a real 404 ("Page not found"); without
+  // it (as in CI) the guide finds out in the browser and says so.
+  await expect(
+    page.getByRole("heading", { level: 1, name: /No airport with code ZZZ|Page not found/ }),
+  ).toBeVisible();
 });
 
 test("map search finds an airport and links to its guide", async ({ page }) => {
@@ -231,6 +258,18 @@ test("map search finds an airport and links to its guide", async ({ page }) => {
     "href",
     "/airports/BLR",
   );
+});
+
+test("the guide's map link opens the map on that airport without a reload", async ({ page }) => {
+  await mockAirports(page);
+  await page.route("**/api/v1/positions", (r) =>
+    r.fulfill({ status: 503, headers: CORS, json: { detail: "down" } }),
+  );
+  await page.route(/tiles\.openfreemap\.org|rainviewer\.com/, (r) => r.abort());
+  await page.goto("/airports/DEL");
+  await page.getByRole("link", { name: "Show on the live map" }).click();
+  await expect(page).toHaveURL(/\/\?airport=DEL$/);
+  await expect(page.getByRole("region", { name: "Airport DEL" })).toBeVisible();
 });
 
 test("an airport link opens the map on that airport", async ({ page }) => {

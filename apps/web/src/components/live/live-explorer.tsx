@@ -2,7 +2,8 @@
 
 import { List, Plane, RadioTower } from "lucide-react";
 import dynamic from "next/dynamic";
-import { useCallback, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +14,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useNow } from "@/hooks/use-now";
 import type { MapAirport } from "@/lib/airports";
 import type { AircraftFeature } from "@/lib/api/client";
 
@@ -20,10 +22,12 @@ import { AirportCard } from "./airport-card";
 import { AirportSearch, useMapAirports } from "./airport-search";
 
 import { AlertsMenu, EventToasts } from "./alerts-menu";
+import { AltitudeLegend } from "./altitude-legend";
 import { FlightList } from "./flight-list";
-import { FlightPanel } from "./flight-panel";
-import { LayerToggles } from "./layer-toggles";
+import { FlightPanel, LostFlightPanel } from "./flight-panel";
+import { LayersMenu, LayerToggles, type WeatherStatus } from "./layer-toggles";
 import type { FlyTarget, LayerVisibility } from "./live-map";
+import { liveState } from "./live-state";
 import { IstClock, LiveStatus } from "./live-status";
 import { useAircraft, usePositions } from "./use-live-data";
 import { useWatchlist } from "./use-watchlist";
@@ -32,15 +36,35 @@ import { useWeatherTiles } from "./use-weather-tiles";
 // MapLibre needs the browser (WebGL), so the map is client-only.
 const LiveMap = dynamic(() => import("./live-map").then((m) => m.LiveMap), {
   ssr: false,
-  loading: () => <div className="absolute inset-0 animate-pulse bg-muted/40" aria-hidden="true" />,
+  loading: () => (
+    <div className="absolute inset-0 bg-muted/40 motion-safe:animate-pulse" aria-hidden="true" />
+  ),
 });
 
 const NO_FEATURES: AircraftFeature[] = [];
+
+/**
+ * Reports the ?airport= code (from an airport guide's "Show on the live map" link). Kept in its
+ * own Suspense boundary so reading the URL doesn't hold back the rest of the map's prerender,
+ * and it follows client-side navigations, which `window.location` read once at mount did not.
+ */
+function AirportFromUrl({ onCode }: { onCode: (code: string | null) => void }) {
+  const code = useSearchParams().get("airport")?.trim().toUpperCase() || null;
+  useEffect(() => onCode(code), [code, onCode]);
+  return null;
+}
 
 export function LiveExplorer() {
   const positions = usePositions();
   const features = positions.data?.features ?? NO_FEATURES;
   const meta = positions.data?.meta;
+  const now = useNow();
+  const status = liveState({
+    meta,
+    now,
+    error: positions.isError,
+    waking: positions.waking,
+  });
 
   const [selected, setSelected] = useState<string | null>(null);
   const [flyTo, setFlyTo] = useState<FlyTarget | null>(null);
@@ -50,14 +74,14 @@ export function LiveExplorer() {
     airports: true,
   });
   const [listOpen, setListOpen] = useState(false);
-  // undefined: the visitor hasn't picked or closed an airport yet, so a "/?airport=DEL" link
-  // (from an airport guide) decides. It's read once; the server render has no URL and shows none.
+  // undefined: the visitor hasn't picked or closed an airport since the URL last named one, so
+  // the ?airport= code decides.
   const [airportChoice, setAirport] = useState<MapAirport | null | undefined>(undefined);
-  const [linkedCode] = useState(() =>
-    typeof window === "undefined"
-      ? null
-      : (new URLSearchParams(window.location.search).get("airport")?.toUpperCase() ?? null),
-  );
+  const [linkedCode, setLinkedCode] = useState<string | null>(null);
+  const onLinkedCode = useCallback((code: string | null) => {
+    setLinkedCode(code);
+    setAirport(undefined);
+  }, []);
   const mapAirports = useMapAirports();
   const linked = useMemo(
     () => (linkedCode ? (mapAirports.data?.find((a) => a.iata === linkedCode) ?? null) : null),
@@ -71,13 +95,23 @@ export function LiveExplorer() {
   const mapFlyTo = flyTo ?? (airportChoice === undefined ? linkedFlyTo : null);
 
   const weather = useWeatherTiles(layers.weather);
-  const detail = useAircraft(selected);
+  const weatherStatus: WeatherStatus = !layers.weather
+    ? { kind: "off" }
+    : weather.isError || weather.data === null
+      ? { kind: "error" }
+      : weather.data
+        ? { kind: "ready", time: weather.data.time }
+        : { kind: "loading" };
+
   const watch = useWatchlist(positions.data?.features, meta?.mode);
 
   const selectedFeature = useMemo(
     () => features.find((f) => f.id === selected),
     [features, selected],
   );
+  // Only poll the details while the aircraft is in the feed; once it's gone the API answers 404.
+  const detail = useAircraft(selectedFeature ? selectedFeature.id : null);
+  const lostSelection = selected !== null && !selectedFeature && positions.data !== undefined;
 
   const focus = useCallback(
     (icao24: string) => {
@@ -118,10 +152,14 @@ export function LiveExplorer() {
   );
 
   const showOverlayMessage = !positions.data || meta?.mode === "unavailable";
+  const showCount = meta !== undefined && meta.mode !== "unavailable";
 
   return (
     <main id="main" className="relative flex h-[calc(100dvh-3.5rem)] overflow-hidden">
       <h1 className="sr-only">Live flight map of India</h1>
+      <Suspense fallback={null}>
+        <AirportFromUrl onCode={onLinkedCode} />
+      </Suspense>
 
       {/* Sidebar (desktop) */}
       <aside
@@ -133,7 +171,7 @@ export function LiveExplorer() {
             <h2 className="flex items-center gap-2 text-sm font-semibold">
               <RadioTower aria-hidden="true" className="size-4 text-primary" /> Live air traffic
             </h2>
-            {meta && meta.mode !== "unavailable" ? (
+            {showCount ? (
               <p className="font-mono text-sm tabular-nums">
                 <span className="text-lg font-semibold text-primary">
                   {meta.count.toLocaleString("en-IN")}
@@ -142,12 +180,7 @@ export function LiveExplorer() {
               </p>
             ) : null}
           </div>
-          <LiveStatus
-            meta={meta}
-            loading={positions.isLoading}
-            waking={positions.waking}
-            error={positions.isError}
-          />
+          <LiveStatus meta={meta} state={status} />
         </div>
         {list}
       </aside>
@@ -166,10 +199,14 @@ export function LiveExplorer() {
           route={detail.data?.reported_route ?? null}
           flyTo={mapFlyTo}
           weatherTilesUrl={weather.data?.url ?? null}
+          dimmed={status.kind === "expired"}
         />
 
-        {/* Top bar over the map */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-wrap items-start justify-between gap-2 p-3">
+        {/*
+         * Top bar over the map. Below sm (phones) it takes two rows: the controls, then the
+         * airport search at full width; the three layer toggles collapse into one menu.
+         */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex flex-wrap items-start gap-2 p-3">
           <div className="pointer-events-auto flex items-center gap-2">
             <Sheet open={listOpen} onOpenChange={setListOpen}>
               <SheetTrigger asChild>
@@ -179,32 +216,41 @@ export function LiveExplorer() {
                   className="bg-background/90 backdrop-blur md:hidden"
                 >
                   <List aria-hidden="true" /> Flights
-                  {meta && meta.mode !== "unavailable" ? (
-                    <span className="font-mono tabular-nums">({meta.count})</span>
+                  {showCount ? (
+                    <span className="font-mono tabular-nums">
+                      ({meta.count.toLocaleString("en-IN")})
+                    </span>
                   ) : null}
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="flex w-[22rem] flex-col p-0">
-                <SheetHeader className="border-b">
+              <SheetContent
+                side="left"
+                className="flex flex-col gap-0 p-0 data-[side=left]:w-[min(22rem,90vw)]"
+              >
+                {/* Right padding keeps the title and status clear of the sheet's close button. */}
+                <SheetHeader className="border-b pr-12">
                   <SheetTitle>Live air traffic</SheetTitle>
                   <SheetDescription asChild>
                     <div>
-                      <LiveStatus
-                        meta={meta}
-                        loading={positions.isLoading}
-                        waking={positions.waking}
-                        error={positions.isError}
-                      />
+                      <LiveStatus meta={meta} state={status} />
                     </div>
                   </SheetDescription>
                 </SheetHeader>
                 {list}
               </SheetContent>
             </Sheet>
-            <LayerToggles value={layers} onChange={setLayers} />
-            <AirportSearch onSelect={focusAirport} className="w-40 sm:w-60" />
+            <div className="hidden sm:block">
+              <LayerToggles value={layers} onChange={setLayers} weather={weatherStatus} />
+            </div>
+            <div className="sm:hidden">
+              <LayersMenu value={layers} onChange={setLayers} weather={weatherStatus} />
+            </div>
           </div>
-          <div className="pointer-events-auto flex items-center gap-2 rounded-full border bg-background/90 py-1 pr-1 pl-3 backdrop-blur">
+          <AirportSearch
+            onSelect={focusAirport}
+            className="pointer-events-auto order-last w-full sm:order-none sm:w-60"
+          />
+          <div className="pointer-events-auto ml-auto flex shrink-0 items-center gap-2 rounded-full border bg-background/90 py-1 pr-1 pl-3 backdrop-blur">
             <IstClock />
             <AlertsMenu
               watched={watch.watched}
@@ -221,15 +267,7 @@ export function LiveExplorer() {
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center p-6">
             <div className="pointer-events-auto max-w-sm rounded-xl border bg-background/95 p-5 text-center shadow-lg">
               <Plane aria-hidden="true" className="mx-auto mb-2 size-6 text-primary" />
-              <LiveStatus
-                meta={meta}
-                loading={positions.isLoading}
-                waking={positions.waking}
-                error={positions.isError}
-              />
-              {meta?.mode === "unavailable" && meta.message ? (
-                <p className="mt-2 text-sm text-muted-foreground">{meta.message}</p>
-              ) : null}
+              <LiveStatus meta={meta} state={status} />
             </div>
           </div>
         ) : null}
@@ -241,6 +279,7 @@ export function LiveExplorer() {
               feature={selectedFeature}
               detail={detail.data}
               loading={detail.isLoading}
+              error={detail.isError}
               watched={watch.isWatched(selectedFeature.id)}
               onToggleWatch={() =>
                 watch.toggle(
@@ -253,16 +292,27 @@ export function LiveExplorer() {
               onClose={() => setSelected(null)}
             />
           </div>
+        ) : lostSelection ? (
+          <div className="absolute inset-x-2 bottom-2 z-20 md:inset-x-auto md:top-16 md:right-3 md:bottom-auto md:w-96">
+            <LostFlightPanel
+              name={
+                watch.watched.find((w) => w.icao24 === selected)?.label ?? selected.toUpperCase()
+              }
+              onClose={() => setSelected(null)}
+            />
+          </div>
         ) : null}
 
         {/* Selected airport (only when no flight is open) */}
-        {airport && !selectedFeature ? (
+        {airport && selected === null ? (
           <div className="absolute inset-x-2 bottom-2 z-20 md:inset-x-auto md:top-16 md:right-3 md:bottom-auto md:w-80">
             <AirportCard airport={airport} onClose={() => setAirport(null)} />
           </div>
         ) : null}
 
         <EventToasts events={watch.events} onDismiss={watch.dismiss} />
+
+        <AltitudeLegend className="absolute bottom-6 left-2 z-10" />
 
         {/* Data credit (the map's own attribution control covers basemap and weather) */}
         {meta?.attribution ? (

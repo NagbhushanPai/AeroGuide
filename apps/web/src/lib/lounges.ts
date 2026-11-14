@@ -60,3 +60,107 @@ export function entryLabel(method: string): string {
 export function formatInr(amount: number): string {
   return `₹${amount.toLocaleString("en-IN")}`;
 }
+
+const DIRECTION_LABEL = {
+  departures: "Departures lounge",
+  arrivals: "Arrivals lounge",
+  transit: "Transit lounge",
+} as const;
+
+export function directionLabel(direction: keyof typeof DIRECTION_LABEL): string {
+  return DIRECTION_LABEL[direction];
+}
+
+export function sideLabel(side: "airside" | "landside"): string {
+  return side === "airside" ? "After security" : "Before security";
+}
+
+/** Lounge filters as kept in the URL. Empty string means "any". */
+export type LoungeFilters = {
+  q: string;
+  airport: string;
+  terminal: string;
+  side: "" | "airside" | "landside";
+  scope: "" | "domestic" | "international";
+  program: string;
+};
+
+export function readLoungeFilters(params: { get(key: string): string | null }): LoungeFilters {
+  const side = params.get("side");
+  const scope = params.get("scope");
+  const airport = (params.get("airport") ?? "").trim().toUpperCase();
+  return {
+    q: (params.get("q") ?? "").trim(),
+    airport: /^[A-Z]{3}$/.test(airport) ? airport : "",
+    terminal: params.get("terminal") ?? "",
+    side: side === "airside" || side === "landside" ? side : "",
+    scope: scope === "domestic" || scope === "international" ? scope : "",
+    program: params.get("program") ?? "",
+  };
+}
+
+type FilterableLounge = {
+  name: string;
+  iata: string;
+  airport_name: string;
+  city: string | null;
+  terminal: string | null;
+  side: "airside" | "landside";
+  scope: "domestic" | "international" | "both";
+  programs: { key: string; name: string }[];
+};
+
+/** Lounges matching every filter. A "both" lounge matches either scope. */
+export function filterLounges<T extends FilterableLounge>(
+  lounges: readonly T[],
+  f: LoungeFilters,
+): T[] {
+  const words = f.q.toLowerCase().split(/\s+/).filter(Boolean);
+  return lounges.filter((l) => {
+    if (f.airport && l.iata !== f.airport) return false;
+    if (f.terminal && l.terminal !== f.terminal) return false;
+    if (f.side && l.side !== f.side) return false;
+    if (f.scope && l.scope !== f.scope && l.scope !== "both") return false;
+    if (f.program && !l.programs.some((p) => p.key === f.program)) return false;
+    if (words.length) {
+      const hay = [
+        l.name,
+        l.iata,
+        l.airport_name,
+        l.city,
+        l.terminal,
+        ...l.programs.map((p) => p.name),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!words.every((w) => hay.includes(w))) return false;
+    }
+    return true;
+  });
+}
+
+export type AirportLoungeGroup<T> = {
+  iata: string;
+  city: string | null;
+  airportName: string;
+  lounges: T[];
+};
+
+/** Groups lounges by airport, airports sorted by city then code. */
+export function groupLoungesByAirport<T extends FilterableLounge>(
+  lounges: readonly T[],
+): AirportLoungeGroup<T>[] {
+  const groups = new Map<string, AirportLoungeGroup<T>>();
+  for (const l of lounges) {
+    const g = groups.get(l.iata);
+    if (g) g.lounges.push(l);
+    else
+      groups.set(l.iata, { iata: l.iata, city: l.city, airportName: l.airport_name, lounges: [l] });
+  }
+  return [...groups.values()].sort(
+    (a, b) =>
+      (a.city ?? a.airportName).localeCompare(b.city ?? b.airportName) ||
+      a.iata.localeCompare(b.iata),
+  );
+}

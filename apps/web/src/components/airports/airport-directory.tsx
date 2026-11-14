@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { EmptyState } from "@/components/data/empty-state";
 import { ErrorState } from "@/components/data/error-state";
+import { WakingMessage } from "@/components/data/waking-message";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { REGIONS, type AirportSummary, type Region } from "@/lib/api/client";
@@ -14,7 +15,8 @@ import { cn } from "@/lib/utils";
 
 import { useAirportSearch } from "./use-airports";
 
-const PAGE = 60;
+/** Every airport in one request: there are about 120, and the API allows up to 200. */
+const LIMIT = 200;
 const DEBOUNCE_MS = 250;
 
 function isRegion(value: string | null): value is Region {
@@ -32,19 +34,31 @@ export function AirportDirectory() {
   const guidesOnly = params.get("guides") === "1";
 
   const [text, setText] = useState(urlQ);
-  const [limit, setLimit] = useState(PAGE);
+  // Follow the URL when it changes from outside (back/forward, a link to /airports), but not
+  // when it's just catching up with what was typed: that would undo keystrokes made since.
+  const [seenQ, setSeenQ] = useState(urlQ);
+  const [pushedQ, setPushedQ] = useState(urlQ);
+  if (urlQ !== seenQ) {
+    setSeenQ(urlQ);
+    if (urlQ !== pushedQ) {
+      setText(urlQ);
+      setPushedQ(urlQ);
+    }
+  }
 
   // The URL holds the filters (so results can be shared); typing reaches it after a pause.
   function update(next: { q?: string; region?: Region | null; guides?: boolean }) {
     const sp = new URLSearchParams(params.toString());
     const set = (key: string, value: string | null) =>
       value ? sp.set(key, value) : sp.delete(key);
-    if ("q" in next) set("q", next.q || null);
+    if ("q" in next) {
+      set("q", next.q || null);
+      setPushedQ(next.q ?? "");
+    }
     if ("region" in next) set("region", next.region ?? null);
     if ("guides" in next) set("guides", next.guides ? "1" : null);
     const qs = sp.toString();
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    setLimit(PAGE);
   }
 
   useEffect(() => {
@@ -56,7 +70,7 @@ export function AirportDirectory() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [text]);
 
-  const search = useAirportSearch({ q: urlQ, region, guidesOnly, limit });
+  const search = useAirportSearch({ q: urlQ, region, guidesOnly, limit: LIMIT });
   const data = search.data;
 
   return (
@@ -103,17 +117,15 @@ export function AirportDirectory() {
           onRetry={() => void search.refetch()}
         />
       ) : !data ? (
-        <div aria-busy="true" aria-live="polite">
-          <p className="mb-3 text-sm text-muted-foreground">
-            {search.waking
-              ? "Waking the data server. On the free tier this can take up to a minute…"
-              : "Loading airports…"}
-          </p>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 9 }, (_, i) => (
-              <Skeleton key={i} className="h-24 rounded-xl" />
-            ))}
-          </div>
+        <div aria-busy="true" className="space-y-3">
+          {search.waking ? (
+            <WakingMessage />
+          ) : (
+            <p role="status" className="text-sm text-muted-foreground">
+              Loading airports…
+            </p>
+          )}
+          <AirportGridSkeleton />
         </div>
       ) : data.items.length === 0 ? (
         <EmptyState
@@ -135,13 +147,10 @@ export function AirportDirectory() {
             ))}
           </ul>
           {data.total > data.items.length ? (
-            <button
-              type="button"
-              onClick={() => setLimit((n) => n + PAGE)}
-              className="w-full rounded-lg border py-2.5 text-sm hover:bg-muted"
-            >
-              Show more ({(data.total - data.items.length).toLocaleString("en-IN")} remaining)
-            </button>
+            <p className="text-sm text-muted-foreground">
+              Showing the first {data.items.length.toLocaleString("en-IN")} of{" "}
+              {data.total.toLocaleString("en-IN")}. Search or pick a region to narrow the list.
+            </p>
           ) : null}
         </div>
       )}
@@ -192,10 +201,42 @@ function AirportCard({ airport: a }: { airport: AirportSummary }) {
         </span>
         {a.has_guide ? (
           <Badge variant="outline" className="mt-2">
-            <BookOpen aria-hidden="true" /> Guide in progress
+            <BookOpen aria-hidden="true" /> Guide
           </Badge>
         ) : null}
       </span>
     </Link>
+  );
+}
+
+/** The card grid placeholder, shared by the loading state and the page's Suspense fallback. */
+export function AirportGridSkeleton() {
+  return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 9 }, (_, i) => (
+        <Skeleton key={i} className="h-24 rounded-xl" />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * Shown while the directory waits for the URL (its filters live there). Same shape as the
+ * directory's own loading state, so the page doesn't flash between two skeletons.
+ */
+export function AirportDirectorySkeleton() {
+  return (
+    <div className="space-y-6" aria-busy="true">
+      <div className="space-y-3">
+        <Skeleton className="h-11 max-w-xl rounded-lg" />
+        <Skeleton className="h-8 max-w-2xl rounded-full" />
+      </div>
+      <div className="space-y-3">
+        <p role="status" className="text-sm text-muted-foreground">
+          Loading airports…
+        </p>
+        <AirportGridSkeleton />
+      </div>
+    </div>
   );
 }

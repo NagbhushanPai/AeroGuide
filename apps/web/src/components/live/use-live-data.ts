@@ -1,13 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 
+import { useWaking } from "@/hooks/use-waking";
 import { fetchAircraft, fetchPositions } from "@/lib/api/client";
+import { contentRetry } from "@/lib/api/retry";
 
 export const POLL_MS = 15_000;
-/** After this long without a first response, assume the free-tier API is cold-starting. */
-const WAKING_AFTER_MS = 4_000;
 
 export function usePositions() {
   const query = useQuery({
@@ -16,21 +15,18 @@ export function usePositions() {
     refetchInterval: POLL_MS,
     refetchIntervalInBackground: false, // pause while the tab is hidden
     staleTime: POLL_MS - 1_000,
-    retry: 3,
-    retryDelay: (n) => Math.min(2_000 * 2 ** n, 15_000),
+    // Keep retrying through a free-tier cold start before showing an error. Later polls
+    // that fail keep the last data on screen, and the status label says it's delayed.
+    ...contentRetry,
   });
-
-  const [slow, setSlow] = useState(false);
-  const waitingForFirst = query.data === undefined && !query.isError;
-  useEffect(() => {
-    if (!waitingForFirst) return;
-    const t = setTimeout(() => setSlow(true), WAKING_AFTER_MS);
-    return () => clearTimeout(t);
-  }, [waitingForFirst]);
-
-  return { ...query, waking: waitingForFirst && slow };
+  const waking = useWaking(query.data === undefined && !query.isError);
+  return { ...query, waking };
 }
 
+/**
+ * Details for one aircraft. Pass null to stop polling (nothing selected, or the aircraft has
+ * left the feed and the API would only answer 404).
+ */
 export function useAircraft(icao24: string | null) {
   return useQuery({
     queryKey: ["aircraft", icao24],

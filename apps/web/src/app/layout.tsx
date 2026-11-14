@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 
 import { Providers } from "@/components/providers";
 import { SiteHeader } from "@/components/layout/site-header";
+import { baseOpenGraph } from "@/lib/seo";
 import { siteConfig } from "@/lib/site";
 
 import "./globals.css";
@@ -11,12 +12,28 @@ const geistSans = Geist({ variable: "--font-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: { default: siteConfig.name, template: `%s · ${siteConfig.name}` },
   description: siteConfig.description,
+  applicationName: siteConfig.name,
+  // Pages that set their own openGraph repeat these (nested fields are replaced, not merged).
+  // The image comes from app/opengraph-image.tsx.
+  openGraph: {
+    siteName: baseOpenGraph.siteName,
+    type: baseOpenGraph.type,
+    locale: baseOpenGraph.locale,
+    title: siteConfig.name,
+    description: siteConfig.description,
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0b1220",
+  // Browser chrome colour per OS theme: the dark and light --background tokens.
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0f1624" },
+    { media: "(prefers-color-scheme: light)", color: "#f8fafc" },
+  ],
   colorScheme: "dark light",
 };
 

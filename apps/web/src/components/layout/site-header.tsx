@@ -1,5 +1,7 @@
 import { Suspense } from "react";
 
+import { SiteSearch } from "@/components/search/site-search";
+
 import { Logo } from "./logo";
 import { MainNav, MainNavLinks } from "./main-nav";
 import { MobileNav, MobileNavMenu } from "./mobile-nav";
@@ -17,6 +19,7 @@ export function SiteHeader() {
               <MainNav />
             </Suspense>
           </div>
+          <SiteSearch />
           <ThemeToggle />
           <Suspense fallback={<MobileNavMenu pathname={null} />}>
             <MobileNav />

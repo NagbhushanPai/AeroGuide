@@ -1,11 +1,12 @@
 "use client";
 
-import { Bell, BellRing, X } from "lucide-react";
+import { Bell, BellRing, Crosshair, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -35,7 +36,7 @@ export function AlertsMenu({
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="bg-background/90 backdrop-blur">
           <Icon aria-hidden="true" />
-          Alerts
+          <span className="max-sm:sr-only">Alerts</span>
           {watched.length ? (
             <span className="font-mono tabular-nums">({watched.length})</span>
           ) : null}
@@ -50,24 +51,22 @@ export function AlertsMenu({
           </p>
         ) : (
           watched.map((f) => (
-            <DropdownMenuItem
-              key={f.icao24}
-              onSelect={() => onFocus(f.icao24)}
-              className="justify-between"
-            >
-              <span className="font-mono">{f.label}</span>
-              <button
-                type="button"
-                aria-label={`Stop watching ${f.label}`}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onUnwatch(f.icao24, f.label);
-                }}
-                className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+            // Two items rather than a button nested in an item: each is reachable with the
+            // arrow keys and announced on its own.
+            <DropdownMenuGroup key={f.icao24} aria-label={f.label}>
+              <DropdownMenuItem onSelect={() => onFocus(f.icao24)}>
+                <Crosshair aria-hidden="true" />
+                <span className="font-mono">{f.label}</span>
+                <span className="ml-auto text-xs text-muted-foreground">Show on map</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={() => onUnwatch(f.icao24, f.label)}
+                className="pl-7 text-xs text-muted-foreground"
               >
-                <X aria-hidden="true" className="size-3.5" />
-              </button>
-            </DropdownMenuItem>
+                <X aria-hidden="true" />
+                Stop watching {f.label}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
           ))
         )}
         <DropdownMenuSeparator />
@@ -100,9 +99,11 @@ export function EventToasts({
   onDismiss: (e: WatchEvent) => void;
 }) {
   return (
+    // Top-left, under the map's top bar: the selected flight or airport card takes the bottom
+    // of the screen on mobile and the right side on desktop, so toasts never cover it.
     <div
       aria-live="polite"
-      className="pointer-events-none absolute bottom-10 left-3 z-20 flex w-72 flex-col gap-2"
+      className="pointer-events-none absolute inset-x-3 top-28 z-20 flex flex-col gap-2 sm:right-auto sm:w-72 xl:top-16"
     >
       {events.slice(0, 3).map((e) => (
         <div

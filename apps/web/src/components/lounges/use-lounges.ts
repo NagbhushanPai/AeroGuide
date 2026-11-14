@@ -3,10 +3,17 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { useWaking } from "@/hooks/use-waking";
-import { fetchCard, fetchCards, fetchLounge, fetchLounges } from "@/lib/api/client";
+import { contentRetry } from "@/lib/api/retry";
+import {
+  fetchCard,
+  fetchCardLounges,
+  fetchCards,
+  fetchLounge,
+  fetchLounges,
+} from "@/lib/api/client";
 
 const STALE_MS = 10 * 60_000;
-const retry = { retry: 3, retryDelay: (n: number) => Math.min(2_000 * 2 ** n, 15_000) };
+const retry = contentRetry;
 
 export function useLounges(airport?: string) {
   const result = useQuery({
@@ -42,6 +49,17 @@ export function useCard(slug: string) {
   const result = useQuery({
     queryKey: ["card", slug],
     queryFn: ({ signal }) => fetchCard(slug, signal),
+    staleTime: STALE_MS,
+    ...retry,
+  });
+  return { ...result, waking: useWaking(result.data === undefined && !result.isError) };
+}
+
+/** Departure lounges a card's programmes open. */
+export function useCardLounges(slug: string) {
+  const result = useQuery({
+    queryKey: ["card-lounges", slug],
+    queryFn: ({ signal }) => fetchCardLounges(slug, signal),
     staleTime: STALE_MS,
     ...retry,
   });

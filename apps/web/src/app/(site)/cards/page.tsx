@@ -20,12 +20,15 @@ export default function CardsPage() {
         title="Cards and lounge access"
         description="Lounge benefits read from each bank's own pages, with the date they apply from, and a checker that explains every answer."
       />
-      {/* The checker reads ?airport= and ?card= from the URL, known only at request time. */}
+      {/* The checker reads ?airport=, ?on=, ?scope= and ?card=; the directory its filters. Both
+          are known only at request time. */}
       <Suspense fallback={<Skeleton className="h-64 rounded-xl" />}>
         <LoungeChecker />
       </Suspense>
       <Section id="cards" title="Cards by issuer" className="mt-6 border-t">
-        <CardDirectory />
+        <Suspense fallback={<Skeleton className="h-64 rounded-xl" />}>
+          <CardDirectory />
+        </Suspense>
       </Section>
     </div>
   );

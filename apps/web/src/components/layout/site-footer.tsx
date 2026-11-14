@@ -29,6 +29,28 @@ export function SiteFooter() {
             checked. Confirm terminals, lounge access and card benefits with the airline, lounge or
             bank before you travel.
           </p>
+          <ul className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
+            <li>
+              <a
+                href={siteConfig.repoUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline-offset-2 hover:text-foreground hover:underline"
+              >
+                Source on GitHub<span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href={siteConfig.contributeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline-offset-2 hover:text-foreground hover:underline"
+              >
+                Contribute data<span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </li>
+          </ul>
         </div>
       </div>
     </footer>

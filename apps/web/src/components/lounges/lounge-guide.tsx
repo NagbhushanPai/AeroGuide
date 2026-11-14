@@ -1,19 +1,29 @@
 "use client";
 
-import { ArrowLeft, Clock, MapPin, SearchX, Sparkles, Ticket } from "lucide-react";
+import { Clock, CreditCard, MapPin, SearchX, Sparkles, Ticket } from "lucide-react";
 import Link from "next/link";
 
 import { EmptyState } from "@/components/data/empty-state";
 import { ErrorState } from "@/components/data/error-state";
 import { Field } from "@/components/data/field";
+import { VerificationStatus } from "@/components/data/verification-status";
+import { WakingMessage } from "@/components/data/waking-message";
 import { ProvenanceLine } from "@/components/airports/provenance-line";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { LoungeDetail } from "@/lib/api/client";
-import { formatIstDate } from "@/lib/freshness";
-import { formatInr, formatOpeningHours, scopeLabel, type OpeningHours } from "@/lib/lounges";
+import type { CardAccess, LoungeDetail } from "@/lib/api/client";
+import { formatIstDate, type VerificationState } from "@/lib/freshness";
+import {
+  directionLabel,
+  formatInr,
+  formatOpeningHours,
+  scopeLabel,
+  sideLabel,
+  type OpeningHours,
+} from "@/lib/lounges";
 
+import { Breadcrumbs } from "./breadcrumbs";
 import { useLounge } from "./use-lounges";
 
 export function LoungeGuide({ slug }: { slug: string }) {
@@ -29,12 +39,14 @@ export function LoungeGuide({ slug }: { slug: string }) {
   }
   if (lounge.data === undefined) {
     return (
-      <div aria-busy="true" aria-live="polite" className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          {lounge.waking
-            ? "Waking the data server. This can take up to a minute…"
-            : "Loading lounge…"}
-        </p>
+      <div aria-busy="true" className="space-y-4">
+        {lounge.waking ? (
+          <WakingMessage />
+        ) : (
+          <p role="status" className="text-sm text-muted-foreground">
+            Loading lounge…
+          </p>
+        )}
         <Skeleton className="h-40 rounded-xl" />
       </div>
     );
@@ -60,12 +72,14 @@ function Guide({ lounge: l }: { lounge: LoungeDetail }) {
   return (
     <article className="space-y-8">
       <header className="space-y-3">
-        <Link
-          href="/lounges"
-          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft aria-hidden="true" className="size-4" /> All lounges
-        </Link>
+        <Breadcrumbs
+          items={[
+            { label: "Airports", href: "/airports" },
+            { label: `${l.city ?? l.airport_name} (${l.iata})`, href: `/airports/${l.iata}` },
+            { label: "Lounges", href: `/lounges?airport=${l.iata}` },
+            { label: l.name },
+          ]}
+        />
         <p className="font-mono text-sm text-primary">
           <Link href={`/airports/${l.iata}`} className="hover:underline">
             {l.iata}
@@ -75,10 +89,13 @@ function Guide({ lounge: l }: { lounge: LoungeDetail }) {
         <h1 className="font-heading text-3xl font-semibold tracking-tight">{l.name}</h1>
         <p className="text-muted-foreground">{l.airport_name}</p>
         <div className="flex flex-wrap gap-1.5">
+          {l.direction !== "departures" ? (
+            <Badge variant="secondary" className="font-semibold">
+              {directionLabel(l.direction)}
+            </Badge>
+          ) : null}
           <Badge variant="outline">{scopeLabel(l.scope)}</Badge>
-          <Badge variant="outline">
-            {l.side === "airside" ? "After security" : "Before security"}
-          </Badge>
+          <Badge variant="outline">{sideLabel(l.side)}</Badge>
         </div>
         <ProvenanceLine provenance={l.provenance} />
       </header>
@@ -129,7 +146,7 @@ function Guide({ lounge: l }: { lounge: LoungeDetail }) {
         ) : (
           <ul className="divide-y rounded-xl border bg-card">
             {l.accepts.map((a) => {
-              const current = !a.valid_to || a.valid_to > new Date().toISOString().slice(0, 10);
+              const current = a.in_force;
               return (
                 <li key={`${a.program.key}-${a.valid_from}`} className="space-y-1 p-4">
                   <p className="font-medium">
@@ -147,7 +164,7 @@ function Guide({ lounge: l }: { lounge: LoungeDetail }) {
                     )}
                     {!current ? (
                       <Badge variant="outline" className="ml-2">
-                        Ended
+                        Not in force
                       </Badge>
                     ) : null}
                   </p>
@@ -165,15 +182,9 @@ function Guide({ lounge: l }: { lounge: LoungeDetail }) {
             })}
           </ul>
         )}
-        <p className="text-sm">
-          <Link
-            href={`/cards?airport=${l.iata}`}
-            className="underline underline-offset-2 hover:text-primary"
-          >
-            Check which of your cards get you in
-          </Link>
-        </p>
       </section>
+
+      <CardsSection lounge={l} />
 
       <section aria-labelledby="amenities-heading" className="space-y-3">
         <h2 id="amenities-heading" className="flex items-center gap-2 text-xl font-semibold">
@@ -196,5 +207,81 @@ function Guide({ lounge: l }: { lounge: LoungeDetail }) {
         </p>
       </section>
     </article>
+  );
+}
+
+function checkHref(l: LoungeDetail): string {
+  const sp = new URLSearchParams({ airport: l.iata });
+  if (l.scope !== "both") sp.set("scope", l.scope);
+  return `/cards?${sp}#check`;
+}
+
+/** Cards whose benefit names a programme this lounge accepts, grouped by bank. */
+function CardsSection({ lounge: l }: { lounge: LoungeDetail }) {
+  const heading = (
+    <h2 id="cards-heading" className="flex items-center gap-2 text-xl font-semibold">
+      <CreditCard aria-hidden="true" className="size-5 text-primary" /> Cards that may get you in
+    </h2>
+  );
+  if (l.direction !== "departures") {
+    return (
+      <section aria-labelledby="cards-heading" className="space-y-3">
+        {heading}
+        <p className="text-sm text-muted-foreground">
+          This is {l.direction === "arrivals" ? "an arrivals" : "a transit"} lounge. Card lounge
+          benefits cover departure lounges, so we don&apos;t match cards to it.
+        </p>
+      </section>
+    );
+  }
+
+  const byBank = new Map<string, CardAccess[]>();
+  for (const c of l.cards) byBank.set(c.bank, [...(byBank.get(c.bank) ?? []), c]);
+  const banks = [...byBank].sort((a, b) => a[0].localeCompare(b[0]));
+
+  return (
+    <section aria-labelledby="cards-heading" className="space-y-3">
+      {heading}
+      {l.cards.length === 0 ? (
+        <p className="text-sm text-muted-foreground">
+          None of the cards we list name a programme this lounge accepts today.
+        </p>
+      ) : (
+        <>
+          <p className="text-sm text-muted-foreground">
+            These cards&apos; benefits name a programme this lounge accepts. Conditions such as
+            spend and visit limits still apply.
+          </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {banks.map(([bank, list]) => (
+              <div key={bank} className="rounded-xl border bg-card p-4">
+                <h3 className="mb-2 text-sm font-semibold">{bank}</h3>
+                <ul className="space-y-1">
+                  {list.map((c) => (
+                    <li key={`${c.slug}-${c.scope}-${c.via.key}`}>
+                      <Link
+                        href={`/cards/${c.slug}`}
+                        className="group -mx-2 flex min-h-11 flex-col justify-center rounded-md px-2 py-1.5 outline-none hover:bg-muted focus-visible:ring-3 focus-visible:ring-ring/50"
+                      >
+                        <span className="text-sm font-medium group-hover:underline">{c.name}</span>
+                        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+                          <span>
+                            <span className="capitalize">{c.scope}</span>, through {c.via.name}
+                          </span>
+                          <VerificationStatus status={c.status as VerificationState} />
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+      <Button asChild>
+        <Link href={checkHref(l)}>Check with my cards</Link>
+      </Button>
+    </section>
   );
 }

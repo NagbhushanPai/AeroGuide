@@ -6,6 +6,7 @@ import Link from "next/link";
 import { EmptyState } from "@/components/data/empty-state";
 import { ErrorState } from "@/components/data/error-state";
 import { Field } from "@/components/data/field";
+import { WakingMessage } from "@/components/data/waking-message";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,6 +36,7 @@ export function AirportGuide({ code }: { code: string }) {
   if (airport.isError && airport.data === undefined) {
     return (
       <ErrorState
+        as="h1"
         title="Couldn't load this airport"
         description="The airport service didn't respond. It may still be starting up."
         onRetry={() => void airport.refetch()}
@@ -43,12 +45,14 @@ export function AirportGuide({ code }: { code: string }) {
   }
   if (airport.data === undefined) {
     return (
-      <div aria-busy="true" aria-live="polite" className="space-y-4">
-        <p className="text-sm text-muted-foreground">
-          {airport.waking
-            ? "Waking the data server. On the free tier this can take up to a minute…"
-            : "Loading airport…"}
-        </p>
+      <div aria-busy="true" className="space-y-4">
+        {airport.waking ? (
+          <WakingMessage />
+        ) : (
+          <p role="status" className="text-sm text-muted-foreground">
+            Loading airport…
+          </p>
+        )}
         <Skeleton className="h-10 w-2/3" />
         <Skeleton className="h-48 rounded-xl" />
       </div>
@@ -57,6 +61,7 @@ export function AirportGuide({ code }: { code: string }) {
   if (airport.data === null) {
     return (
       <EmptyState
+        as="h1"
         icon={SearchX}
         title={`No airport with code ${code}`}
         description="AeroGuide lists Indian airports with scheduled passenger service. Check the code, or search the directory."

@@ -2,45 +2,56 @@
 
 import { useNow } from "@/hooks/use-now";
 import type { PositionsMeta } from "@/lib/api/client";
+import { formatAge } from "@/lib/freshness";
 import { cn } from "@/lib/utils";
 
 import { DemoBadge } from "@/components/data/demo-badge";
 import { RelativeTime } from "@/components/data/relative-time";
+import { WakingMessage } from "@/components/data/waking-message";
 
-type Props = { meta: PositionsMeta | undefined; loading: boolean; waking: boolean; error: boolean };
+import type { LiveState } from "./live-state";
 
-const TONE = {
-  live: { dot: "bg-success animate-pulse", text: "Live" },
-  degraded: { dot: "bg-warning", text: "Delayed" },
-  unavailable: { dot: "bg-muted-foreground", text: "Unavailable" },
-  demo: { dot: "bg-warning", text: "Demo" },
-} as const;
+type Props = { meta: PositionsMeta | undefined; state: LiveState };
 
-/** Live/Delayed/Unavailable/Demo, aircraft count, source and last update. */
-export function LiveStatus({ meta, loading, waking, error }: Props) {
-  if (!meta) {
+function updated(ageS: number | null) {
+  return ageS === null ? null : `updated ${formatAge(ageS)}`;
+}
+
+/** Live / Delayed / No recent data / Unavailable / Demo, with count, source and last update. */
+export function LiveStatus({ meta, state }: Props) {
+  if (state.kind === "waking") return <WakingMessage className="text-xs" />;
+  if (state.kind === "loading" || state.kind === "unreachable") {
     return (
       <p role="status" className="text-xs text-muted-foreground">
-        {error
+        {state.kind === "unreachable"
           ? "Live data service unreachable. Retrying…"
-          : waking
-            ? "Waking up the live data service… this can take up to a minute."
-            : loading
-              ? "Loading live traffic…"
-              : null}
+          : "Loading live traffic…"}
       </p>
     );
   }
-  const tone = TONE[meta.mode];
+  if (!meta) return null;
+
+  const label =
+    state.kind === "live"
+      ? { dot: "bg-success motion-safe:animate-pulse", text: "Live", detail: null }
+      : state.kind === "delayed"
+        ? { dot: "bg-warning", text: "Delayed", detail: updated(state.ageS) }
+        : state.kind === "expired"
+          ? { dot: "bg-muted-foreground", text: "No recent data", detail: updated(state.ageS) }
+          : state.kind === "unavailable"
+            ? { dot: "bg-muted-foreground", text: "Unavailable", detail: null }
+            : null; // demo
+
   return (
     <div role="status" className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-      {meta.mode === "demo" ? (
+      {label === null ? (
         <DemoBadge />
       ) : (
-        <span className="inline-flex items-center gap-1.5 font-medium">
-          <span aria-hidden="true" className={cn("size-2 rounded-full", tone.dot)} />
-          {tone.text}
-          {meta.mode !== "unavailable" ? (
+        <span className="inline-flex flex-wrap items-center gap-x-1.5 font-medium">
+          <span aria-hidden="true" className={cn("size-2 rounded-full", label.dot)} />
+          <span>{label.text}</span>
+          {label.detail ? <span className="font-normal">· {label.detail}</span> : null}
+          {state.kind !== "unavailable" ? (
             <span className="font-mono tabular-nums">
               · {meta.count.toLocaleString("en-IN")} aircraft
             </span>
@@ -60,11 +71,17 @@ export function LiveStatus({ meta, loading, waking, error }: Props) {
             </a>
           ) : (
             meta.source
-          )}{" "}
-          · updated <RelativeTime iso={meta.fetched_at} />
+          )}
+          {/* The delayed/expired label already says how old the data is. */}
+          {state.kind === "live" || state.kind === "demo" ? (
+            <>
+              {" "}
+              · updated <RelativeTime iso={meta.fetched_at} />
+            </>
+          ) : null}
         </span>
       ) : null}
-      {meta.message && meta.mode !== "demo" ? (
+      {meta.message && state.kind !== "demo" ? (
         <span className="text-warning">{meta.message}</span>
       ) : null}
     </div>

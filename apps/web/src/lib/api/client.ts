@@ -25,6 +25,16 @@ export type PolicyOut = components["schemas"]["PolicyOut"];
 export type EligibilityRequest = components["schemas"]["EligibilityRequest"];
 export type EligibilityResponse = components["schemas"]["EligibilityResponse"];
 export type EligibilityStatus = components["schemas"]["LoungeResult"]["status"];
+export type LoungeResult = components["schemas"]["LoungeResult"];
+export type CheckOut = components["schemas"]["CheckOut"];
+export type CardResult = components["schemas"]["CardResult"];
+export type CardAccess = components["schemas"]["CardAccess"];
+export type CardLounges = components["schemas"]["CardLounges"];
+export type ScopePrograms = components["schemas"]["ScopePrograms"];
+export type ProgramBrief = components["schemas"]["ProgramBrief"];
+export type BankRef = components["schemas"]["BankRef"];
+export type SearchHit = components["schemas"]["SearchHit"];
+export type SearchResults = components["schemas"]["SearchResults"];
 export type Region = AirportSummary["region"];
 
 export const REGIONS: readonly Region[] = [
@@ -135,6 +145,19 @@ export function fetchCards(signal?: AbortSignal): Promise<CardList> {
 
 export function fetchCard(slug: string, signal?: AbortSignal): Promise<CardDetail | null> {
   return nullOn404(getJson<CardDetail>(`/api/v1/cards/${encodeURIComponent(slug)}`, signal));
+}
+
+/** Departure lounges the card's programmes open (conditions still apply). Null for an unknown card. */
+export function fetchCardLounges(slug: string, signal?: AbortSignal): Promise<CardLounges | null> {
+  return nullOn404(
+    getJson<CardLounges>(`/api/v1/cards/${encodeURIComponent(slug)}/lounges`, signal),
+  );
+}
+
+/** Airports, lounges and cards matching every word of `q`. */
+export function searchSite(q: string, limit = 12, signal?: AbortSignal): Promise<SearchResults> {
+  const params = new URLSearchParams({ q: q.trim(), limit: String(limit) });
+  return getJson<SearchResults>(`/api/v1/search?${params}`, signal);
 }
 
 /** Nothing in the request is stored by the API. Null for an unknown airport. */

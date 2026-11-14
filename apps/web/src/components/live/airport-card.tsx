@@ -1,13 +1,17 @@
 "use client";
 
-import { BookOpen, X } from "lucide-react";
+import { BookOpen, Sofa, X } from "lucide-react";
 import Link from "next/link";
 
+import { useLounges } from "@/components/lounges/use-lounges";
 import { Button } from "@/components/ui/button";
 import type { MapAirport } from "@/lib/airports";
 
 /** Small card for an airport picked on the map or in the search. */
 export function AirportCard({ airport: a, onClose }: { airport: MapAirport; onClose: () => void }) {
+  // Fetched when the card opens; the button appears only when we list lounges here.
+  const lounges = useLounges(a.iata);
+  const count = lounges.data?.items.length ?? 0;
   return (
     <section
       aria-label={`Airport ${a.iata}`}
@@ -26,11 +30,20 @@ export function AirportCard({ airport: a, onClose }: { airport: MapAirport; onCl
           <X aria-hidden="true" />
         </Button>
       </div>
-      <Button asChild size="sm" className="mt-3 w-full">
-        <Link href={`/airports/${a.iata}`}>
-          <BookOpen aria-hidden="true" /> Airport guide
-        </Link>
-      </Button>
+      <div className="mt-3 flex gap-2">
+        <Button asChild size="sm" className="h-9 flex-1">
+          <Link href={`/airports/${a.iata}`}>
+            <BookOpen aria-hidden="true" /> Airport guide
+          </Link>
+        </Button>
+        {count > 0 ? (
+          <Button asChild size="sm" variant="outline" className="h-9 flex-1">
+            <Link href={`/lounges?airport=${a.iata}`}>
+              <Sofa aria-hidden="true" /> Lounges here ({count})
+            </Link>
+          </Button>
+        ) : null}
+      </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
         Location: OurAirports (public domain)
       </p>

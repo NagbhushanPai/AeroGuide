@@ -6,7 +6,9 @@ import { useMemo, useState } from "react";
 import type { AircraftFeature } from "@/lib/api/client";
 import { cn } from "@/lib/utils";
 
-import { displayName, formatAltitude, typeName } from "./format";
+import { MISSING } from "@/lib/copy";
+
+import { displayName, formatAltitude, hasCallsign, typeName } from "./format";
 
 const PAGE = 100;
 
@@ -64,9 +66,12 @@ export function FlightList({ features, selected, onSelect, isWatched, onToggleWa
       .filter((f) => !from || f.properties.origin_iata === from)
       .filter((f) => !to || f.properties.destination_iata === to)
       .sort((a, b) => {
-        // Watched first, then flights with a callsign, then alphabetical.
+        // Watched first, then flights with a callsign (or flight number), then the rest, which
+        // are shown by registration or hex code; alphabetical within each group.
         const w = Number(isWatched(b.id)) - Number(isWatched(a.id));
         if (w) return w;
+        const c = Number(hasCallsign(b.properties)) - Number(hasCallsign(a.properties));
+        if (c) return c;
         return displayName(a.properties).localeCompare(displayName(b.properties));
       });
   }, [features, query, from, to, isWatched]);
@@ -191,7 +196,9 @@ function FlightRow({
         <div className="flex items-center justify-between gap-2">
           <span className="truncate font-mono text-sm font-semibold">{name}</span>
           <span className="shrink-0 font-mono text-xs text-muted-foreground tabular-nums">
-            {formatAltitude(p.alt_baro_ft, p.on_ground) ?? "—"}
+            {formatAltitude(p.alt_baro_ft, p.on_ground) ?? (
+              <span className="font-sans italic">Altitude: {MISSING.notAvailable}</span>
+            )}
           </span>
         </div>
         <div className="mt-0.5 flex items-center gap-1.5 text-xs text-muted-foreground">
@@ -203,7 +210,9 @@ function FlightRow({
             <span className="italic">Route not reported</span>
           )}
           <span aria-hidden="true">·</span>
-          <span className="truncate">{typeName(p.type_code) ?? "Type unknown"}</span>
+          <span className="truncate">
+            {typeName(p.type_code) ?? <span className="italic">Type: {MISSING.notAvailable}</span>}
+          </span>
         </div>
       </button>
       <button

@@ -189,6 +189,43 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/cards/{slug}/lounges": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Lounges a card's programmes open
+     * @description Departure lounges that accept a programme named by the card's benefits in force today. Spend, visit and other conditions still apply: use /eligibility for an answer.
+     */
+    get: operations["card_lounges_api_v1_cards__slug__lounges_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/search": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /** Search airports, lounges and cards */
+    get: operations["search_api_v1_search_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/v1/access-programs": {
     parameters: {
       query?: never;
@@ -246,6 +283,8 @@ export interface components {
       valid_from: string;
       /** Valid To */
       valid_to: string | null;
+      /** In Force */
+      in_force: boolean;
       provenance: components["schemas"]["Provenance"];
     };
     /** AircraftDetail */
@@ -538,6 +577,29 @@ export interface components {
       /** Url */
       url: string;
     };
+    /**
+     * CardAccess
+     * @description A card that may get into a lounge (through the programme named).
+     */
+    CardAccess: {
+      /** Slug */
+      slug: string;
+      /** Name */
+      name: string;
+      /** Bank */
+      bank: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "verified" | "outdated" | "unverified" | "unavailable";
+      /**
+       * Scope
+       * @enum {string}
+       */
+      scope: "domestic" | "international";
+      via: components["schemas"]["ProgramBrief"];
+    };
     /** CardDetail */
     CardDetail: {
       /** Slug */
@@ -545,10 +607,16 @@ export interface components {
       /** Name */
       name: string;
       bank: components["schemas"]["BankRef"];
-      /** Network */
+      /**
+       * Network
+       * @description Null when the bank doesn't state the network
+       */
       network: string | null;
-      /** Status */
-      status: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "verified" | "outdated" | "unverified" | "unavailable";
       /**
        * Domestic
        * @description Summary of the domestic benefit in force today
@@ -564,6 +632,11 @@ export interface components {
        * @description Every version, newest first
        */
       policies: components["schemas"]["PolicyOut"][];
+      /**
+       * Programs
+       * @description Programmes the benefits in force today name, per scope
+       */
+      programs: components["schemas"]["ScopePrograms"][];
     };
     /** CardFacts */
     CardFacts: {
@@ -579,6 +652,18 @@ export interface components {
       /** Banks */
       banks: components["schemas"]["BankRef"][];
     };
+    /**
+     * CardLounges
+     * @description Lounges accepting the programmes a card's benefits name today. Conditions still apply.
+     */
+    CardLounges: {
+      /** Card */
+      card: string;
+      /** Scopes */
+      scopes: components["schemas"]["ScopePrograms"][];
+      /** Lounges */
+      lounges: components["schemas"]["LoungeSummary"][];
+    };
     /** CardResult */
     CardResult: {
       card: components["schemas"]["CardSummary"];
@@ -592,10 +677,16 @@ export interface components {
       /** Name */
       name: string;
       bank: components["schemas"]["BankRef"];
-      /** Network */
+      /**
+       * Network
+       * @description Null when the bank doesn't state the network
+       */
       network: string | null;
-      /** Status */
-      status: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "verified" | "outdated" | "unverified" | "unavailable";
       /**
        * Domestic
        * @description Summary of the domestic benefit in force today
@@ -615,6 +706,11 @@ export interface components {
       status: "yes" | "no" | "depends";
       /** Message */
       message: string;
+      /**
+       * Detail
+       * @description Quoted bank wording behind the check
+       */
+      detail?: string | null;
     };
     /** ComponentHealth */
     ComponentHealth: {
@@ -682,7 +778,7 @@ export interface components {
       scope: "domestic" | "international";
       /**
        * Lounges Listed
-       * @description Lounges we have records for at this airport
+       * @description Departure lounges we have records for at this airport
        */
       lounges_listed: number;
       /** Results */
@@ -724,6 +820,10 @@ export interface components {
       name: string;
       /** Iata */
       iata: string;
+      /** Airport Name */
+      airport_name: string;
+      /** City */
+      city: string | null;
       /** Terminal */
       terminal: string | null;
       /**
@@ -737,17 +837,21 @@ export interface components {
        */
       side: "airside" | "landside";
       /**
+       * Direction
+       * @enum {string}
+       */
+      direction: "departures" | "arrivals" | "transit";
+      /**
        * Status
        * @description Verification status of the lounge record
+       * @enum {string}
        */
-      status: string;
+      status: "verified" | "outdated" | "unverified" | "unavailable";
       /**
        * Programs
-       * @description Names of programmes accepted today
+       * @description Programmes accepted today
        */
-      programs: string[];
-      /** Airport Name */
-      airport_name: string;
+      programs: components["schemas"]["ProgramBrief"][];
       /** Operator */
       operator: string | null;
       /** Location Text */
@@ -768,6 +872,11 @@ export interface components {
       amenities: components["schemas"]["AmenityRef"][];
       /** Accepts */
       accepts: components["schemas"]["Acceptance"][];
+      /**
+       * Cards
+       * @description Cards whose benefit in force today names a programme this lounge accepts today. Conditions (spend, visits) still apply: use /eligibility for an answer.
+       */
+      cards: components["schemas"]["CardAccess"][];
       provenance: components["schemas"]["Provenance"];
     };
     /** LoungeList */
@@ -791,6 +900,11 @@ export interface components {
       guests_covered: number | null;
       /** Entry */
       entry: string[];
+      /**
+       * Notes
+       * @description Informational: fees, add-on cardholders
+       */
+      notes: string[];
       /** Policy Summary */
       policy_summary: string | null;
     };
@@ -802,6 +916,10 @@ export interface components {
       name: string;
       /** Iata */
       iata: string;
+      /** Airport Name */
+      airport_name: string;
+      /** City */
+      city: string | null;
       /** Terminal */
       terminal: string | null;
       /**
@@ -815,15 +933,21 @@ export interface components {
        */
       side: "airside" | "landside";
       /**
+       * Direction
+       * @enum {string}
+       */
+      direction: "departures" | "arrivals" | "transit";
+      /**
        * Status
        * @description Verification status of the lounge record
+       * @enum {string}
        */
-      status: string;
+      status: "verified" | "outdated" | "unverified" | "unavailable";
       /**
        * Programs
-       * @description Names of programmes accepted today
+       * @description Programmes accepted today
        */
-      programs: string[];
+      programs: components["schemas"]["ProgramBrief"][];
     };
     /** MappedTerminal */
     MappedTerminal: {
@@ -926,6 +1050,13 @@ export interface components {
       features: components["schemas"]["AircraftFeature"][];
       meta: components["schemas"]["PositionsMeta"];
     };
+    /** ProgramBrief */
+    ProgramBrief: {
+      /** Key */
+      key: string;
+      /** Name */
+      name: string;
+    };
     /** ProgramList */
     ProgramList: {
       /** Items */
@@ -1021,6 +1152,50 @@ export interface components {
       estimated_arrival?: string | null;
       /** Minutes Remaining */
       minutes_remaining?: number | null;
+    };
+    /** ScopePrograms */
+    ScopePrograms: {
+      /**
+       * Scope
+       * @enum {string}
+       */
+      scope: "domestic" | "international";
+      /** Programs */
+      programs: components["schemas"]["ProgramBrief"][];
+      /**
+       * Lounge List Known
+       * @description False when we have no lounges recorded for these programmes
+       */
+      lounge_list_known: boolean;
+    };
+    /** SearchHit */
+    SearchHit: {
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: "airport" | "lounge" | "card";
+      /**
+       * Key
+       * @description IATA code or slug
+       */
+      key: string;
+      /** Title */
+      title: string;
+      /** Subtitle */
+      subtitle: string | null;
+      /**
+       * Href
+       * @description Path on the website
+       */
+      href: string;
+    };
+    /** SearchResults */
+    SearchResults: {
+      /** Q */
+      q: string;
+      /** Items */
+      items: components["schemas"]["SearchHit"][];
     };
     /** SourceRef */
     SourceRef: {
@@ -1475,6 +1650,90 @@ export interface operations {
           [name: string]: unknown;
         };
         content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  card_lounges_api_v1_cards__slug__lounges_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        slug: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["CardLounges"];
+        };
+      };
+      /** @description Not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  search_api_v1_search_get: {
+    parameters: {
+      query: {
+        q: string;
+        limit?: number;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SearchResults"];
+        };
       };
       /** @description Validation Error */
       422: {

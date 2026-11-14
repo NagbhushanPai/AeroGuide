@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { AirportDirectory } from "@/components/airports/airport-directory";
+import {
+  AirportDirectory,
+  AirportDirectorySkeleton,
+} from "@/components/airports/airport-directory";
 import { PageHeader } from "@/components/layout/page-header";
-import { Skeleton } from "@/components/ui/skeleton";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Airports",
   description: "Indian airports with scheduled passenger service: codes, locations and guides.",
-};
+  path: "/airports",
+});
 
 export default function AirportsPage() {
   return (
@@ -23,8 +27,11 @@ export default function AirportsPage() {
           </>
         }
       />
-      {/* The directory reads its filters from the URL, which is only known at request time. */}
-      <Suspense fallback={<Skeleton className="h-11 max-w-xl rounded-lg" />}>
+      {/*
+        The directory reads its filters from the URL, which is only known at request time.
+        The fallback has the same shape as the directory's own loading state (one skeleton).
+      */}
+      <Suspense fallback={<AirportDirectorySkeleton />}>
         <AirportDirectory />
       </Suspense>
     </div>

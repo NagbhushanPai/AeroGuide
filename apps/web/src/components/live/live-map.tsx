@@ -18,9 +18,12 @@ import { useEffect, useLayoutEffect, useRef } from "react";
 import type { AircraftFeature, ReportedRoute } from "@/lib/api/client";
 
 import { AIRCRAFT_ICON_ID, createAircraftIcon } from "./aircraft-icon";
+import { ALTITUDE_STOPS, GROUND_COLOR } from "./altitude";
 
 export type LayerVisibility = { traffic: boolean; weather: boolean; airports: boolean };
 export type FlyTarget = { lon: number; lat: number; key: number };
+
+type Theme = "dark" | "light";
 
 type LiveMapProps = {
   features: AircraftFeature[];
@@ -32,9 +35,11 @@ type LiveMapProps = {
   route: ReportedRoute | null;
   flyTo: FlyTarget | null;
   weatherTilesUrl: string | null;
+  /** The data is too old to trust (no update for 5 min): aircraft are drawn faded. */
+  dimmed: boolean;
 };
 
-const STYLES = {
+const STYLES: Record<Theme, string> = {
   dark: "https://tiles.openfreemap.org/styles/dark",
   light: "https://tiles.openfreemap.org/styles/positron",
 };
@@ -43,29 +48,69 @@ setWorkerUrl("/vendor/maplibre-gl-worker.js");
 
 const INDIA_CENTER: [number, number] = [80, 22.5];
 
-// Ground → low → cruise. Colour is never the only signal: altitude is also shown in text.
 const ALTITUDE_COLOR = [
   "case",
   ["get", "on_ground"],
-  "#8b95a7",
+  GROUND_COLOR,
   [
     "interpolate",
     ["linear"],
     ["coalesce", ["get", "alt_baro_ft"], 0],
-    0,
-    "#f59e0b",
-    10000,
-    "#facc15",
-    20000,
-    "#34d399",
-    30000,
-    "#38bdf8",
-    40000,
-    "#a78bfa",
+    ...ALTITUDE_STOPS.flatMap((stop) => [stop.ft, stop.color]),
   ],
 ] as unknown as ExpressionSpecification;
 
+const AIRCRAFT_OPACITY = [
+  "case",
+  ["get", "is_demo"],
+  0.85,
+  1,
+] as unknown as ExpressionSpecification;
+const DIMMED_OPACITY = 0.35;
+
+// Overlay colours per basemap: the dark style needs light text, Positron (light) needs dark.
+const PALETTE: Record<
+  Theme,
+  {
+    dot: string;
+    dotStroke: string;
+    label: string;
+    labelHalo: string;
+    route: string;
+    routeLabel: string;
+    routeHalo: string;
+    aircraftHalo: string;
+  }
+> = {
+  dark: {
+    dot: "#0b1220",
+    dotStroke: "#94a3b8",
+    label: "#94a3b8",
+    labelHalo: "#0b1220",
+    route: "#38bdf8",
+    routeLabel: "#e2e8f0",
+    routeHalo: "#0b1220",
+    aircraftHalo: "rgba(5,10,20,0.85)",
+  },
+  light: {
+    dot: "#ffffff",
+    dotStroke: "#475569",
+    label: "#334155",
+    labelHalo: "#ffffff",
+    route: "#0284c7",
+    routeLabel: "#0f172a",
+    routeHalo: "#ffffff",
+    aircraftHalo: "rgba(15,23,42,0.75)",
+  },
+};
+
 const EMPTY: FeatureCollection = { type: "FeatureCollection", features: [] };
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
 
 function toCollection(features: AircraftFeature[]): FeatureCollection {
   return { type: "FeatureCollection", features: features as unknown as Feature[] };
@@ -106,8 +151,9 @@ function routeCollection(
   };
 }
 
-/** Adds our sources and layers. Safe to call again after a style change. */
-function addOverlays(map: MapLibreMap) {
+/** Adds our sources and layers with the theme's colours. Safe to call again after a style change. */
+function addOverlays(map: MapLibreMap, theme: Theme) {
+  const c = PALETTE[theme];
   if (!map.hasImage(AIRCRAFT_ICON_ID)) {
     const icon = createAircraftIcon();
     if (icon) map.addImage(AIRCRAFT_ICON_ID, icon, { sdf: true, pixelRatio: 2 });
@@ -120,8 +166,8 @@ function addOverlays(map: MapLibreMap) {
       source: "airports",
       paint: {
         "circle-radius": ["match", ["get", "size"], "large", 4, 3],
-        "circle-color": "#0b1220",
-        "circle-stroke-color": "#94a3b8",
+        "circle-color": c.dot,
+        "circle-stroke-color": c.dotStroke,
         "circle-stroke-width": 1.5,
       },
     });
@@ -138,7 +184,7 @@ function addOverlays(map: MapLibreMap) {
         "text-offset": [0, 1.1],
         "text-anchor": "top",
       },
-      paint: { "text-color": "#94a3b8", "text-halo-color": "#0b1220", "text-halo-width": 1.2 },
+      paint: { "text-color": c.label, "text-halo-color": c.labelHalo, "text-halo-width": 1.2 },
     });
   }
   if (!map.getSource("route")) {
@@ -149,7 +195,7 @@ function addOverlays(map: MapLibreMap) {
       source: "route",
       filter: ["==", ["geometry-type"], "LineString"],
       paint: {
-        "line-color": "#38bdf8",
+        "line-color": c.route,
         "line-width": 2,
         "line-opacity": ["match", ["get", "part"], "flown", 0.9, 0.6],
         "line-dasharray": [
@@ -173,7 +219,11 @@ function addOverlays(map: MapLibreMap) {
         "text-offset": [0, -1.2],
         "text-allow-overlap": true,
       },
-      paint: { "text-color": "#e2e8f0", "text-halo-color": "#0b1220", "text-halo-width": 1.5 },
+      paint: {
+        "text-color": c.routeLabel,
+        "text-halo-color": c.routeHalo,
+        "text-halo-width": 1.5,
+      },
     });
   }
   if (!map.getSource("aircraft")) {
@@ -184,9 +234,9 @@ function addOverlays(map: MapLibreMap) {
       source: "aircraft",
       paint: {
         "circle-radius": 16,
-        "circle-color": "#38bdf8",
+        "circle-color": c.route,
         "circle-opacity": ["case", ["boolean", ["feature-state", "selected"], false], 0.25, 0],
-        "circle-stroke-color": "#38bdf8",
+        "circle-stroke-color": c.route,
         "circle-stroke-width": ["case", ["boolean", ["feature-state", "selected"], false], 1.5, 0],
       },
     });
@@ -204,12 +254,39 @@ function addOverlays(map: MapLibreMap) {
       },
       paint: {
         "icon-color": ALTITUDE_COLOR,
-        "icon-halo-color": "rgba(5,10,20,0.85)",
+        "icon-halo-color": c.aircraftHalo,
         "icon-halo-width": 1,
-        "icon-opacity": ["case", ["get", "is_demo"], 0.85, 1],
+        "icon-opacity": AIRCRAFT_OPACITY,
       },
     });
   }
+}
+
+/** Re-colours existing overlays for a theme (layers that don't exist yet are skipped). */
+function applyTheme(map: MapLibreMap, theme: Theme) {
+  const c = PALETTE[theme];
+  const paint = (
+    layer: string,
+    prop: Parameters<MapLibreMap["setPaintProperty"]>[1],
+    value: string,
+  ) => {
+    if (map.getLayer(layer)) map.setPaintProperty(layer, prop, value);
+  };
+  paint("airports-dot", "circle-color", c.dot);
+  paint("airports-dot", "circle-stroke-color", c.dotStroke);
+  paint("airports-label", "text-color", c.label);
+  paint("airports-label", "text-halo-color", c.labelHalo);
+  paint("route-line", "line-color", c.route);
+  paint("route-ends", "text-color", c.routeLabel);
+  paint("route-ends", "text-halo-color", c.routeHalo);
+  paint("aircraft-halo", "circle-color", c.route);
+  paint("aircraft-halo", "circle-stroke-color", c.route);
+  paint("aircraft", "icon-halo-color", c.aircraftHalo);
+}
+
+function applyDimmed(map: MapLibreMap, dimmed: boolean) {
+  if (map.getLayer("aircraft"))
+    map.setPaintProperty("aircraft", "icon-opacity", dimmed ? DIMMED_OPACITY : AIRCRAFT_OPACITY);
 }
 
 function setWeather(map: MapLibreMap, url: string | null, visible: boolean) {
@@ -243,11 +320,14 @@ export function LiveMap({
   route,
   flyTo,
   weatherTilesUrl,
+  dimmed,
 }: LiveMapProps) {
   const container = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const { resolvedTheme } = useTheme();
-  const theme = resolvedTheme === "light" ? "light" : "dark";
+  const theme: Theme = resolvedTheme === "light" ? "light" : "dark";
+  /** The basemap theme the map was created with or last switched to. */
+  const styleTheme = useRef<Theme | null>(null);
 
   // Latest props, read by handlers that outlive a render (style reloads, clicks).
   const latest = useRef({
@@ -258,6 +338,8 @@ export function LiveMap({
     layers,
     route,
     weatherTilesUrl,
+    dimmed,
+    theme,
   });
   useLayoutEffect(() => {
     latest.current = {
@@ -268,6 +350,8 @@ export function LiveMap({
       layers,
       route,
       weatherTilesUrl,
+      dimmed,
+      theme,
     };
   });
   const prevSelected = useRef<string | null>(null);
@@ -275,9 +359,10 @@ export function LiveMap({
   // Create the map once.
   useEffect(() => {
     if (!container.current) return;
+    const initialTheme = latest.current.theme;
     const map = new MapLibreMap({
       container: container.current,
-      style: STYLES[theme],
+      style: STYLES[initialTheme],
       center: INDIA_CENTER,
       zoom: 4.2,
       minZoom: 2.5,
@@ -286,11 +371,14 @@ export function LiveMap({
       renderWorldCopies: false,
     });
     mapRef.current = map;
+    styleTheme.current = initialTheme;
     map.addControl(new NavigationControl({ showCompass: false }), "bottom-right");
 
     const sync = () => {
-      addOverlays(map);
       const l = latest.current;
+      addOverlays(map, l.theme);
+      applyTheme(map, l.theme);
+      applyDimmed(map, l.dimmed);
       (map.getSource("aircraft") as GeoJSONSource | undefined)?.setData(toCollection(l.features));
       const sel = l.features.find((f) => f.id === l.selected);
       (map.getSource("route") as GeoJSONSource | undefined)?.setData(routeCollection(l.route, sel));
@@ -300,6 +388,12 @@ export function LiveMap({
         map.setFeatureState({ source: "aircraft", id: l.selected }, { selected: true });
     };
     map.on("style.load", sync);
+
+    // Some basemap layers name icons their sprite doesn't ship (for example "circle-11").
+    // An empty placeholder keeps MapLibre from warning about them on every tile.
+    map.on("styleimagemissing", (e: { id: string }) => {
+      if (!map.hasImage(e.id)) map.addImage(e.id, { width: 1, height: 1, data: new Uint8Array(4) });
+    });
 
     const onClick = (e: MapLayerMouseEvent) => {
       const id = e.features?.[0]?.properties?.icao24 as string | undefined;
@@ -324,15 +418,25 @@ export function LiveMap({
     return () => {
       map.remove();
       mapRef.current = null;
+      styleTheme.current = null;
     };
-    // The map is created once; theme changes are handled below with setStyle.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Theme → basemap. Overlays are re-added on "style.load".
+  // Theme → basemap. Skipped when the map already shows this theme, so the first mount loads
+  // one style only. A full reload (diff: false) always fires "style.load", which re-adds the
+  // overlays in this theme's colours.
   useEffect(() => {
-    mapRef.current?.setStyle(STYLES[theme]);
+    const map = mapRef.current;
+    if (!map || styleTheme.current === theme) return;
+    styleTheme.current = theme;
+    map.setStyle(STYLES[theme], { diff: false });
   }, [theme]);
+
+  // Old data → faded aircraft.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (map?.isStyleLoaded()) applyDimmed(map, dimmed);
+  }, [dimmed]);
 
   // Aircraft data.
   useEffect(() => {
@@ -370,15 +474,18 @@ export function LiveMap({
     setWeather(map, weatherTilesUrl, layers.weather);
   }, [layers, weatherTilesUrl]);
 
-  // Fly to a flight or airport chosen from a list or search.
+  // Move to a flight or airport chosen from a list or search (no animation if the visitor
+  // asked for reduced motion).
   useEffect(() => {
     if (!flyTo) return;
     const map = mapRef.current;
-    map?.flyTo({
-      center: [flyTo.lon, flyTo.lat],
+    if (!map) return;
+    const target = {
+      center: [flyTo.lon, flyTo.lat] as [number, number],
       zoom: Math.max(map.getZoom(), 6.5),
-      duration: 800,
-    });
+    };
+    if (prefersReducedMotion()) map.jumpTo(target);
+    else map.flyTo({ ...target, duration: 800 });
   }, [flyTo]);
 
   return (

@@ -73,6 +73,51 @@ export function formatIst(iso: string): string {
   return `${date}, ${time} IST`;
 }
 
+const IST_DAY = new Intl.DateTimeFormat("en-CA", {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  timeZone: IST,
+});
+
+/**
+ * Today's date in IST as "YYYY-MM-DD", for comparing with API dates (valid_from/valid_to),
+ * which are Indian calendar dates. `new Date().toISOString().slice(0, 10)` is the UTC date and
+ * is a day behind between 00:00 and 05:30 IST.
+ */
+export function todayIst(now: Date = new Date()): string {
+  return IST_DAY.format(now);
+}
+
+/** "14:10 IST". */
+export function formatIstTime(iso: string): string {
+  const time = new Date(iso).toLocaleTimeString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: IST,
+  });
+  return `${time} IST`;
+}
+
+/**
+ * Time in IST with the day when it isn't today: "01:40 IST", "Tomorrow 01:40 IST",
+ * "Yesterday 23:10 IST" or "16 Nov, 01:40 IST".
+ */
+export function formatIstWithDay(iso: string, now: Date): string {
+  const time = formatIstTime(iso);
+  const day = todayIst(new Date(iso));
+  if (day === todayIst(now)) return time;
+  if (day === todayIst(new Date(now.getTime() + 86_400_000))) return `Tomorrow ${time}`;
+  if (day === todayIst(new Date(now.getTime() - 86_400_000))) return `Yesterday ${time}`;
+  const date = new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    timeZone: IST,
+  });
+  return `${date}, ${time}`;
+}
+
 /** Date only in IST: "13 Nov 2026". */
 export function formatIstDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-GB", {

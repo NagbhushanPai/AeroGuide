@@ -6,7 +6,10 @@ import {
   formatAge,
   formatIst,
   formatIstDate,
+  formatIstTime,
+  formatIstWithDay,
   liveFreshness,
+  todayIst,
 } from "@/lib/freshness";
 
 const NOW = new Date("2026-11-13T12:00:00Z");
@@ -73,5 +76,28 @@ describe("IST formatting", () => {
   it("formats in Asia/Kolkata regardless of the machine time zone", () => {
     expect(formatIst("2026-11-13T13:10:00Z")).toBe("13 Nov 2026, 18:40 IST");
     expect(formatIstDate("2026-11-13T20:00:00Z")).toBe("14 Nov 2026");
+  });
+});
+
+describe("todayIst", () => {
+  it("uses the Indian calendar date, not the UTC one", () => {
+    // 20:00 UTC on 13 Nov is 01:30 IST on 14 Nov.
+    expect(todayIst(new Date("2026-11-13T20:00:00Z"))).toBe("2026-11-14");
+    expect(todayIst(new Date("2026-11-13T12:00:00Z"))).toBe("2026-11-13");
+  });
+});
+
+describe("formatIstWithDay", () => {
+  const now = new Date("2026-11-13T16:00:00Z"); // 21:30 IST
+  it("shows only the time for today", () => {
+    expect(formatIstTime("2026-11-13T17:00:00Z")).toBe("22:30 IST");
+    expect(formatIstWithDay("2026-11-13T17:00:00Z", now)).toBe("22:30 IST");
+  });
+  it("names tomorrow and yesterday", () => {
+    expect(formatIstWithDay("2026-11-13T20:10:00Z", now)).toBe("Tomorrow 01:40 IST");
+    expect(formatIstWithDay("2026-11-12T17:40:00Z", now)).toBe("Yesterday 23:10 IST");
+  });
+  it("gives the date further out", () => {
+    expect(formatIstWithDay("2026-11-15T20:10:00Z", now)).toBe("16 Nov, 01:40 IST");
   });
 });

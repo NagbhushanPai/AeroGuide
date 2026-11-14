@@ -51,9 +51,9 @@
 }
 
 /*
- * AeroGuide tokens. Dark navy is primary (the <html> element carries `.dark`).
+ * AeroGuide tokens. Dark navy is the default theme (the <html> element carries `.dark`);
+ * :root holds the light theme, chosen with the header's theme toggle.
  * One cyan accent, amber for warnings and stale data, red only for errors.
- * Light values exist so a light theme can be added in Stage 2.
  */
 :root {
   --background: oklch(0.985 0.003 250);
@@ -137,5 +137,20 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/*
+ * Reduced motion: no pulsing, spinning, sliding or smooth scrolling for visitors who asked for
+ * less movement. Animations end at their final frame; state changes still happen, instantly.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

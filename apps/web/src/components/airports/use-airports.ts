@@ -3,6 +3,7 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { useWaking } from "@/hooks/use-waking";
+import { contentRetry } from "@/lib/api/retry";
 import {
   fetchAirlinesSeen,
   fetchAirport,
@@ -12,7 +13,7 @@ import {
 
 // Airport content only changes when the seed runs, so long client caching is fine.
 const STALE_MS = 10 * 60_000;
-const retry = { retry: 3, retryDelay: (n: number) => Math.min(2_000 * 2 ** n, 15_000) };
+const retry = contentRetry;
 
 export function useAirportSearch(query: AirportQuery) {
   const result = useQuery({

@@ -73,12 +73,36 @@ export function formatMinutes(min: number | null | undefined): string | null {
   return h > 0 ? `${h} h ${m.toString().padStart(2, "0")} min` : `${m} min`;
 }
 
-/** Best label for an aircraft: flight number, then callsign, then registration, then hex. */
-export function displayName(p: {
+/**
+ * A broadcast identifier worth showing, or null. Transponders sometimes send padding or junk
+ * ("@@@@@@@@", "????", blanks): anything that isn't letters, digits, spaces or hyphens, or has
+ * no letter or digit at all, is treated as not sent.
+ */
+export function cleanIdent(value: string | null | undefined): string | null {
+  const v = value?.trim();
+  if (!v) return null;
+  if (!/^[A-Za-z0-9][A-Za-z0-9 -]*$/.test(v)) return null;
+  return v.toUpperCase();
+}
+
+type Identity = {
   flight_number?: string | null;
   callsign: string | null;
   registration: string | null;
   icao24: string;
-}): string {
-  return p.flight_number ?? p.callsign ?? p.registration ?? p.icao24.toUpperCase();
+};
+
+/** Best label for an aircraft: flight number, then callsign, then registration, then hex. */
+export function displayName(p: Identity): string {
+  return (
+    cleanIdent(p.flight_number) ??
+    cleanIdent(p.callsign) ??
+    cleanIdent(p.registration) ??
+    p.icao24.toUpperCase()
+  );
+}
+
+/** True when the aircraft broadcasts a usable flight number or callsign. */
+export function hasCallsign(p: Identity): boolean {
+  return cleanIdent(p.flight_number) !== null || cleanIdent(p.callsign) !== null;
 }

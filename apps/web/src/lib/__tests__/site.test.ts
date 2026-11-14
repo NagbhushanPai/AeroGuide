@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isActive, mainNav } from "@/lib/site";
+import { absoluteUrl, isActive, mainNav, SITE_URL } from "@/lib/site";
 
 const byHref = (href: string) => mainNav.find((item) => item.href === href)!;
 
@@ -13,6 +13,24 @@ describe("mainNav", () => {
       "Cards",
       "About",
     ]);
+  });
+
+  it("has a short label for the mobile tab bar", () => {
+    expect(mainNav.map((item) => item.shortLabel)).toEqual([
+      "Map",
+      "Airports",
+      "Lounges",
+      "Cards",
+      "About",
+    ]);
+  });
+});
+
+describe("absoluteUrl", () => {
+  it("joins the site URL and a path without doubling slashes", () => {
+    expect(SITE_URL.endsWith("/")).toBe(false);
+    expect(absoluteUrl("/airports/DEL")).toBe(`${SITE_URL}/airports/DEL`);
+    expect(absoluteUrl("about")).toBe(`${SITE_URL}/about`);
   });
 });
 
