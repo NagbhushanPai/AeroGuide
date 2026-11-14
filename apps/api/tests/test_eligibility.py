@@ -223,6 +223,15 @@ def test_rule_table(policies, lounge, trip, facts, expected, deciding) -> None: 
         assert any(c.status is expected for c in d.checks)
 
 
+def test_programme_without_a_known_lounge_list_is_depends_not_no() -> None:
+    other = [policy(rules=(ProgramEntitlement(program="other"),))]
+    unknown = evaluate(other, LOUNGE, TRIP, mapped_programs=frozenset({"test-programme"}))
+    assert unknown.status is Status.DEPENDS
+    assert "list of lounges" in unknown.checks[0].message
+    known = evaluate(other, LOUNGE, TRIP, mapped_programs=frozenset({"test-programme", "other"}))
+    assert known.status is Status.NO
+
+
 def test_decision_reports_programme_guests_and_entry() -> None:
     d = evaluate([policy(GuestAllowance(count=1), EntryMethod(method="card_swipe"))], LOUNGE, TRIP)
     assert d.status is Status.YES

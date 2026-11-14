@@ -391,6 +391,15 @@ async def check_eligibility(
             .where(LoungeAccessMethod.lounge_id.in_([r.id for r in lounge_rows]))
         )
     ).all()
+    mapped_programs = frozenset(
+        (
+            await conn.execute(
+                select(AccessProgram.key)
+                .join(LoungeAccessMethod, LoungeAccessMethod.access_program_id == AccessProgram.id)
+                .distinct()
+            )
+        ).scalars()
+    )
     accepted_today = await _accepted_programs(conn, [r.id for r in lounge_rows], on)
     lounges = [
         (
@@ -450,7 +459,7 @@ async def check_eligibility(
         )
         lounge_results = []
         for summary, lounge in lounges:
-            d = engine.evaluate(policies, lounge, trip, facts)
+            d = engine.evaluate(policies, lounge, trip, facts, mapped_programs)
             lounge_results.append(
                 LoungeResult(
                     lounge=summary,

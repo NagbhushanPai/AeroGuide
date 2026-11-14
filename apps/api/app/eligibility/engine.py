@@ -120,8 +120,15 @@ def _rupees(amount: int) -> str:
 
 
 def evaluate(
-    policies: Sequence[Policy], lounge: Lounge, trip: Trip, facts: Facts | None = None
+    policies: Sequence[Policy],
+    lounge: Lounge,
+    trip: Trip,
+    facts: Facts | None = None,
+    mapped_programs: frozenset[str] | None = None,
 ) -> Decision:
+    """`mapped_programs`: programmes some lounge records accepting. A programme outside this
+    set has no known lounge list, so "not accepted here" becomes "depends", not "no".
+    None means every programme's lounges are known."""
     facts = facts or Facts()
 
     if lounge.scope != "both" and lounge.scope != trip.scope:
@@ -156,6 +163,15 @@ def evaluate(
                 "programme",
                 Status.DEPENDS,
                 "The bank doesn't name a lounge programme, so we can't match it to this lounge.",
+            )
+        )
+    elif not via and mapped_programs is not None and not set(programs) <= mapped_programs:
+        checks.append(
+            Check(
+                "program_entitlement",
+                Status.DEPENDS,
+                "We don't have the list of lounges for this card's programme yet, so we can't "
+                "tell whether this lounge is on it. Check the bank's lounge list.",
             )
         )
     elif not via:
