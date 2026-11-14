@@ -1,0 +1,149 @@
+iata: MAA
+lounges:
+- slug: travel-club-maa-t1-gate-1
+  name: Travel Club
+  terminal: Terminal 1
+  scope: domestic
+  side: airside
+  location_text: Airside - Domestic Departures. After Security Checks, turn right towards Gate 1. The
+    lounge is located on the 3rd Floor.
+  nearest_gate: Gate 1
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - accessible
+  - flight_info
+  provenance:
+    status: verified
+    source: priority-pass-maa10
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-maa10
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Maximum 3 hour stay - Children under 4 years are admitted free - Separate smoking area outside
+        the lounge.
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF). Listed as 'Travel Club
+        Lounge A/B, Domestic Departure T1'.
+- slug: travel-club-maa-t1-gate-5
+  name: Travel Club
+  terminal: Terminal 1
+  scope: domestic
+  side: airside
+  location_text: Departures. After security checks. Opposite Gate 5. 3rd Floor, via lift. Inside the Security
+    Hold Area.
+  nearest_gate: Gate 5
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - accessible
+  - flight_info
+  provenance:
+    status: verified
+    source: priority-pass-maa6
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-maa6
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Max stay: 3 hours. Children under 4 years admitted free. No smoking (including vaping).'
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF). Listed as 'Travel Club
+        Lounge A/B, Domestic Departure T1'.
+- slug: travel-club-maa-t2
+  name: Travel Club
+  terminal: Terminal 2
+  scope: international
+  side: airside
+  location_text: Airside - International Departures, post Immigration and Security Checks, 3rd Floor.
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - accessible
+  provenance:
+    status: verified
+    source: priority-pass-maa11
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-maa11
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Ambiguous on the source. Page states both ''Maximum 3 hour stay'' (conditions text) and
+        ''Max stay: 2 hours'' (summary line). Children under 3 years admitted free. Smart casual dress.
+        Standard alcoholic drinks complimentary, premium-brand extra payment.'
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: travel-club-maa-t4
+  name: Travel Club
+  terminal: Terminal 4
+  scope: domestic
+  side: airside
+  location_text: Airside - Domestic Departures. After Security Checks, inside the Security Hold Area.
+    The lounge is located opposite Gate 17.
+  nearest_gate: Gate 17
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - accessible
+  - flight_info
+  provenance:
+    status: verified
+    source: priority-pass-maa12
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-maa12
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Max stay: 2 hours. Children are not admitted. Unlimited guests per cardholder. No smoking
+        (including vaping).'
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF).

@@ -1,0 +1,66 @@
+slug: kotak-mahindra-bank-air-plus
+bank: kotak-mahindra-bank
+name: Air+
+product_url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/kotak-air-plus-credit-card.html
+provenance:
+  status: verified
+  source: kotak-air-plus-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: 4 complimentary domestic lounge visits per calendar year for the primary cardholder, capped
+    at 2 per calendar quarter, with no minimum spend requirement; a Rs. 2 visit validation charge applies.
+  rules:
+  - type: program_entitlement
+    program: kotak-mahindra-bank-lounge-access
+  - type: visit_quota
+    count: 4
+    period: year
+    note: 'T&C PDF: "4 Complimentary Domestic Lounge Access for Primary Cardholders in a Calendar Year
+      (Capped at 2 Lounge in a Calendar Qtr.)".'
+  - type: visit_quota
+    count: 2
+    period: quarter
+    note: 'Quarterly cap within the 4-per-year quota; product page: "Domestic lounge access will capped
+      at 2 Lounges per calendar quarter".'
+  - type: entry_method
+    method: card_swipe
+    note: '"Present your Credit Card at the lounge"; Rs. 2 visit validation charge.'
+  unmodelled_terms: 'Product page: "Complimentary Lounge Access Benefit is only applicable for Primary
+    Cardholder". Lounge T&C PDF lists Air + among cards that "can access Domestic airport lounges without
+    any minimum spend requirement"; visits beyond the complimentary quota "will be charged as per the
+    applicable rates" ("Varies from lounge to lounge"). No start date for the benefit is given, so valid_from
+    is the retrieval date.'
+  provenance:
+    status: verified
+    source: kotak-air-plus-tc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+- scope: international
+  valid_from: 2026-11-14
+  summary: 2 complimentary international lounge visits per calendar year for the primary cardholder via
+    Priority Pass, with no minimum spend requirement and no quarterly cap.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: visit_quota
+    count: 2
+    period: year
+    note: 'T&C PDF: "2 Complimentary International Lounge Access for Primary Cardholders in a Calendar
+      Year (No capping on utilisation)".'
+  - type: entry_method
+    method: card_swipe
+    note: '"Present your Credit Card/Digital QR code available on the Priority Pass app"; USD 1 visit
+      validation charge auto-reversed within 7 working days; international transactions must be activated
+      on the card first. Lounge T&C: cardholders "must inform lounge staff that they are accessing the
+      lounge via Priority Pass Membership".'
+  unmodelled_terms: 'Primary cardholder only. Lounge T&C PDF charges table: visit charge after complimentary
+    visits USD 35, guest charges USD 35. No start date for the benefit is given, so valid_from is the
+    retrieval date.'
+  provenance:
+    status: verified
+    source: kotak-air-plus-tc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code

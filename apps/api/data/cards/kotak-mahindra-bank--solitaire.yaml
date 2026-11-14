@@ -1,0 +1,65 @@
+slug: kotak-mahindra-bank-solitaire
+bank: kotak-mahindra-bank
+name: Solitaire
+product_url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/kotak-solitaire-credit-card.html
+provenance:
+  status: verified
+  source: kotak-solitaire-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: Unlimited complimentary domestic lounge access for primary and add-on cardholders with no minimum
+    spend requirement, plus 2 complimentary domestic guest visits per year for the primary cardholder;
+    a Rs. 2 visit validation charge applies.
+  rules:
+  - type: program_entitlement
+    program: kotak-mahindra-bank-lounge-access
+  - type: guest_allowance
+    count: 2
+    period: year
+    note: 'T&C PDF: "4 Free lounge access for guest with Primary Cardholders: 2 Domestic lounge access
+      in a year, 2 International lounge access in a year". Lounge programme page: guest access must be
+      added in the same transaction as the primary cardholder''s visit.'
+  - type: entry_method
+    method: card_swipe
+    note: '"Present your Credit Card at the lounge"; Rs. 2 visit validation charge debited at the lounge.'
+  unmodelled_terms: 'Lounge programme page: "Unlimited Domestic lounge access for primary and add-on card
+    holders". Lounge T&C PDF lists Solitaire among cards that "can access Domestic airport lounges without
+    any minimum spend requirement" and exempts it from the primary-cardholder-only restriction. FAQ: card
+    must be presented "along with a valid boarding pass & govt. ID proof". No start date for the benefit
+    is given, so valid_from is the retrieval date.'
+  provenance:
+    status: verified
+    source: kotak-solitaire-lounge-program
+    verified_at: 2026-11-14
+    verified_by: claude-code
+- scope: international
+  valid_from: 2026-11-14
+  summary: Unlimited complimentary international lounge access for primary and add-on cardholders via
+    Priority Pass with no minimum spend requirement, plus 2 complimentary international guest visits per
+    year for the primary cardholder.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: guest_allowance
+    count: 2
+    period: year
+    note: 'T&C PDF: "2 International lounge access in a year" for guests of the primary cardholder; beyond
+      that the Lounge T&C charges table gives guest charges of USD 35.'
+  - type: entry_method
+    method: card_swipe
+    note: '"Present your Credit Card/Digital QR code available on the Priority Pass app"; USD 1 visit
+      validation charge debited and auto-reversed within 7 working days; international transactions must
+      be activated on the card first. Lounge T&C: cardholders "must inform lounge staff that they are
+      accessing the lounge via Priority Pass Membership".'
+  unmodelled_terms: 'Lounge programme page: "Unlimited International lounge access for primary and add-on
+    card holders". Lounge T&C PDF lists Solitaire among cards that "can access Global (International)
+    airport lounges without any minimum spend requirement". No start date for the benefit is given, so
+    valid_from is the retrieval date.'
+  provenance:
+    status: verified
+    source: kotak-solitaire-lounge-program
+    verified_at: 2026-11-14
+    verified_by: claude-code

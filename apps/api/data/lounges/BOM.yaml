@@ -1,0 +1,503 @@
+iata: BOM
+lounges:
+- slug: adani-lounge-bom-t1b
+  name: Adani Lounge T1B
+  terminal: T1
+  operator: Adani
+  scope: domestic
+  side: airside
+  location_text: Domestic Departures, Terminal 1B, CSMI Airport, Mumbai
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - flight_info
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom21-adani-lounge
+      verified_at: 2026-11-14
+      verified_by: claude-code
+  - program: dreamfolks
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: bom-airport-lounges
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Named on the airport page only: ''accept all Major Credit Cards registered under Lounge
+        Access Program issued through Dreamfolks, Priority Pass, Dragon Pass''. The DreamFolks site publishes
+        no public lounge list to confirm against.'
+  - program: dragonpass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: bom-airport-lounges
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Named on the airport page only (see dreamfolks note); not confirmed on the programme's own
+        site.
+  - program: walk-in-paid
+    valid_from: 2026-11-14
+    paid_duration_min: 180
+    provenance:
+      status: verified
+      source: bom-airport-lounges
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: '''Lounge is Open for all Walk-In Guests'', ''Walk In Charges (as per plans applicable)'',
+        ''Duration of Lounge Access is limited to 3 Hrs. Maximum''. No price stated.'
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF).
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: travel-club-lounge-bom-t1
+  name: Travel Club Lounge
+  terminal: T1
+  scope: domestic
+  side: airside
+  location_text: 1C Opposite Gate 22
+  nearest_gate: Gate 22
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - wifi
+  - business
+  - flight_info
+  - charging
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom13-travel-club
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Priority Pass lists 'Travel Club', Terminal 1, 'Airside - Domestic Departures. The lounge
+        is located on the 3rd Floor opposite gate 44', max stay 3 hours. Gate differs from the airport
+        page (Gate 22).
+  - program: walk-in-paid
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: bom-airport-lounges
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: '''Travel Club Lounge is a paid lounge''. No price stated.'
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF). Listed as 'Travel Club
+        Lounge, Domestic Departure T1c'.
+- slug: good-times-bar-bom-t1
+  name: Good Times Bar
+  terminal: T1
+  scope: domestic
+  side: airside
+  location_text: 1B Near Gate 10
+  nearest_gate: Gate 10
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - wifi
+  - business
+  - flight_info
+  - charging
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: walk-in-paid
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: bom-airport-lounges
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: '''Good Times Bar is a paid lounge and bar''. No price stated.'
+- slug: adani-lounge-loyalty-bom-t2-domestic-l3
+  name: Adani Lounge-Loyalty
+  terminal: T2
+  operator: Adani
+  scope: domestic
+  side: airside
+  location_text: CSMI Airport, Terminal-2, Domestic Departure, Level-3
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - spa
+  - wifi
+  - business
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts: []
+- slug: adani-lounge-business-class-bom-t2-domestic-l3
+  name: Adani Lounge-Business Class L3( Airline)
+  terminal: T2
+  operator: Adani
+  scope: domestic
+  side: airside
+  location_text: CSMI Airport, Terminal-2, Domestic Departure, Level-3
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - spa
+  - wifi
+  - business
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts: []
+- slug: amex-lounge-bom-t2-domestic-l3
+  name: AMEX
+  terminal: T2
+  scope: domestic
+  side: airside
+  location_text: Terminal 2 Domestic, Level 3, Near Gate 65, Opposite Burger King.
+  nearest_gate: Gate 65
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - wifi
+  - business
+  - flight_info
+  - charging
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts: []
+- slug: adani-lounge-loyalty-bom-t2-international-l4-east
+  name: Adani Lounge Loyalty
+  terminal: T2
+  operator: Adani
+  scope: international
+  side: airside
+  location_text: CSMI Airport, Terminal-2, International Departure, Level-4
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - spa
+  - showers
+  - wifi
+  - business
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026). Listed as 'Adani East
+        Lounge, International T2'.
+- slug: adani-lounge-loyalty-first-premium-bom-t2-international-l4-west
+  name: Adani Lounge Loyalty (1st Class & Premium business)
+  terminal: T2
+  operator: Adani
+  scope: international
+  side: airside
+  location_text: CSMI Airport, Terminal-2, International Departure, Level-4
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - spa
+  - showers
+  - wifi
+  - business
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts: []
+- slug: adani-lounge-loyalty-first-premium-bom-t2-international-l3-west
+  name: Adani Lounge Loyalty (1st Class & Premium business)
+  terminal: T2
+  operator: Adani
+  scope: international
+  side: airside
+  location_text: CSMI Airport, Terminal-2, International Departure, Level-4
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - spa
+  - showers
+  - wifi
+  - business
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts: []
+- slug: aviserv-lounge-west-bom-t2
+  name: Aviserv Lounge West
+  terminal: T2
+  operator: Aviserv
+  scope: both
+  side: landside
+  location_text: CSMI Airport, Terminal-2, Arrivals, Nr. Arrival Gate No A, Level-2 West Side
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - wifi
+  - sleeping
+  - business
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom27-aviserv-west
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Priority Pass ''Aviserv Lounge - West'', Terminal 2, ''Before security checks'', ''Level
+        2'', ''Near Gate A'', hours 00:00 - 23:59 daily, ''Max stay: 2 hours'', labelled ''International,
+        Domestic''.'
+- slug: aviserv-lounge-east-bom-t2
+  name: Aviserv Lounge East
+  terminal: T2
+  operator: Aviserv
+  scope: both
+  side: landside
+  location_text: CSMI Airport, Terminal-2, Arrivals, Nr. Arrival Gate No C, Level-2 East Side
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - wifi
+  - business
+  provenance:
+    status: verified
+    source: bom-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom16-aviserv-east
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Priority Pass ''Aviserv Lounge (East)'', Terminal 2, ''Landside - Level 2 (Arrivals Level)'',
+        hours 12:00 - 00:00 daily (airport page says Open 24 Hours), ''Maximum 3 hour stay'' and ''Max
+        stay: 2 hours'' both appear, labelled ''International, Domestic''.'
+- slug: travel-club-bom-t2
+  name: Travel Club
+  terminal: T2
+  scope: domestic
+  side: airside
+  location_text: Airside - Domestic transit and Domestic departures only. The lounge is located opposite
+    Gate 44.
+  nearest_gate: Gate 44
+  opening_hours:
+    mode: 24h
+  amenities:
+  - flight_info
+  - accessible
+  provenance:
+    status: verified
+    source: pp-bom-bom10-travel-club-t2
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom10-travel-club-t2
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: '''Max stay: 3 hours''. The official airport page lists no Travel Club in Terminal 2.'
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: adani-silver-lounge-bom-t2
+  name: Adani Silver Lounge
+  terminal: T2
+  operator: Adani
+  scope: international
+  side: airside
+  location_text: Departures, After security checks, After passport control, Level 4, after the Duty Free,
+    next to the Superdry store
+  opening_hours:
+    mode: weekly
+    periods:
+    - days:
+      - mon
+      - tue
+      - wed
+      - thu
+      - fri
+      - sat
+      - sun
+      open: '12:00'
+      close: '23:59'
+  amenities:
+  - food
+  - alcohol
+  provenance:
+    status: verified
+    source: pp-bom-bom26-adani-silver
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom26-adani-silver
+      verified_at: 2026-11-14
+      verified_by: claude-code
+- slug: adani-silver-international-lounge-bom-t2
+  name: Adani Silver International Lounge
+  terminal: T2
+  operator: Adani
+  scope: international
+  side: airside
+  location_text: Departures, After security checks, After passport control, Level 4, Near the Duty Free
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - flight_info
+  provenance:
+    status: verified
+    source: pp-bom-bom20-adani-silver-international
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom20-adani-silver-international
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: '''Max stay: 2 hours''; complimentary alcoholic drinks ''4 maximum''.'
+- slug: meghavi-air-spa-lounge-bom-t2-domestic
+  name: Meghavi Air Spa Lounge
+  terminal: T2
+  scope: domestic
+  side: airside
+  location_text: Departures, After security checks, After passport control, 3rd Floor, Near Gate 85
+  nearest_gate: Gate 85
+  opening_hours:
+    mode: 24h
+  amenities:
+  - spa
+  - accessible
+  provenance:
+    status: verified
+    source: pp-bom-bom24s-meghavi-domestic
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom24s-meghavi-domestic
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Spa, not a seating lounge: a lounge visit is redeemed for a 30-minute massage ''worth INR
+        2,700''; ''Children are not admitted''; ''usage is subject to availability''.'
+- slug: meghavi-air-spa-lounge-intl-bom-t2
+  name: Meghavi Air Spa Lounge - Intl
+  terminal: T2
+  scope: international
+  side: airside
+  location_text: Departures, After security checks, After passport control, 4th Floor, between gates 46
+    and 53
+  opening_hours:
+    mode: 24h
+  amenities:
+  - spa
+  - accessible
+  provenance:
+    status: verified
+    source: pp-bom-bom25s-meghavi-intl
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-bom-bom25s-meghavi-intl
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Spa, not a seating lounge: a lounge visit is redeemed for a 30-minute massage valued at
+        INR 3,200; ''Children are not admitted''; subject to availability. Read from the es-LA locale
+        page (en-GB page returned no content).'

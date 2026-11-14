@@ -1,0 +1,59 @@
+iata: JAI
+lounges:
+- slug: adani-lounge-jai-t2
+  name: Adani Lounge
+  terminal: T2
+  operator: Adani
+  scope: domestic
+  side: airside
+  location_text: Domestic Departure, Post SHA on first floor, Terminal 2
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - wifi
+  - flight_info
+  provenance:
+    status: verified
+    source: jai-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: pp-jai-jai1-adani-lounge
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Priority Pass ''Adani Lounge'', Jaipur International, Terminal 2, ''Domestic'', ''After
+        security checks'', ''1st Floor'', ''Opposite Gate M1 next to Pranam Lounge'', hours 00:00 - 23:59
+        daily, ''Max stay: 2 hours'', ''Children under 5 years admitted free''.'
+  - program: walk-in-paid
+    valid_from: 2026-11-14
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: jai-airport-lounges
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Airport page: lounge ''for business class, Corporate, Card Holders and Walkin customers'';
+        ''2 hours of Lounge Access prior to scheduled departure''. No price stated.'
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF). Listed as 'The Lounge,
+        Domestic Departure T2'; the rules section calls it the Jaipur Adani lounge.
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026). Listed as 'The Lounge,
+        Terminal 2'.

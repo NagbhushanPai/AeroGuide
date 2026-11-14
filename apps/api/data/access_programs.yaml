@@ -4,4 +4,59 @@
 #     name: Example Lounge Programme
 #     kind: membership        # membership | network | bank | airline | paid
 #     url: https://example.org/
-programs: []
+programs:
+  - key: priority-pass
+    name: Priority Pass
+    kind: membership
+    url: https://www.prioritypass.com/
+
+  - key: hdfc-bank-lounge-access
+    name: HDFC Bank credit card domestic lounge programme
+    kind: bank
+    url: https://www.hdfc.bank.in/credit-cards
+
+  - key: diners-club-lounge-access
+    name: Diners Club airport lounge programme
+    kind: network
+
+  - key: sbi-card-lounge-set-b
+    name: SBI Card domestic lounge programme (Set B cards)
+    kind: bank
+    url: https://www.sbicard.com/en/personal/benefits/airport-lounge-access.page
+
+  - key: visa-mastercard-lounge-access
+    name: Visa / Mastercard domestic lounge programme
+    kind: network
+
+  - key: axis-bank-lounge-set-b
+    name: Axis Bank domestic lounge programme (Set B cards)
+    kind: bank
+    url: https://www.axis.bank.in/docs/default-source/default-document-library/axis-bank-airport-lounge-access-program.pdf
+
+  - key: icici-bank-lounge-access
+    name: ICICI Bank Domestic Lounge Programme
+    kind: bank
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/exprience/domestic-airport-lounges
+
+  - key: kotak-mahindra-bank-lounge-access
+    name: Kotak Mahindra Bank domestic lounge access (card swipe)
+    kind: bank
+    url: https://images.kotak.bank.in/bank/mailers/2023/files/Lounge%20MITC%2012-5%20Revised.pdf
+
+  - key: dreamfolks
+    name: DreamFolks
+    kind: membership
+    url: https://www.dreamfolks.in/
+
+  - key: dragonpass
+    name: DragonPass
+    kind: membership
+
+  - key: walk-in-paid
+    name: Paid walk-in entry at the lounge
+    kind: paid
+
+  - key: encalm-paid
+    name: Encalm Lounge (paid walk-in entry)
+    kind: paid
+    url: https://encalm.com/services/encalmlounge

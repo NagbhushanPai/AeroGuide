@@ -1,0 +1,49 @@
+slug: hdfc-bank-infinia
+bank: hdfc-bank
+network: visa
+name: Infinia Metal Edition
+product_url: https://www.hdfc.bank.in/credit-cards/infinia-credit-card
+provenance:
+  status: verified
+  source: hdfc-infinia-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+  notes: Network from the lounge PDF's Rs 2 Visa validation fee.
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: Unlimited complimentary domestic lounge access in India for primary and add-on cardholders,
+    by swiping the Infinia card. No visit limit or spend condition is stated.
+  rules:
+  - type: program_entitlement
+    program: hdfc-bank-lounge-access
+    note: Eligible lounge list is linked from the product page.
+  - type: entry_method
+    method: card_swipe
+    note: Primary and Add-on cardholders have to swipe their individual Infinia Credit card.
+  unmodelled_terms: A transaction fee of Rs. 2 will be charged towards complimentary lounge access per
+    visit for Visa cardholders.
+  provenance:
+    status: verified
+    source: hdfc-infinia-lounge-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The bank states no start date; valid_from is the date checked.
+- scope: international
+  valid_from: 2026-11-14
+  summary: Unlimited complimentary lounge access outside India via Priority Pass for primary and add-on
+    cardholders, each with their own Priority Pass.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: entry_method
+    method: programme_card
+    note: Presentation of the individual Priority Pass card at the participating airport lounge is mandatory.
+  unmodelled_terms: Any guest visit using Priority pass will be charged at USD 27 + GST per visit per
+    guest. Add-on cardholders can avail complimentary lounge access with their own Priority Pass only.
+  provenance:
+    status: verified
+    source: hdfc-infinia-lounge-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The bank states no start date; valid_from is the date checked.

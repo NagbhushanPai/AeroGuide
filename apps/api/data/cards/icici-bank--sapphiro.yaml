@@ -1,0 +1,69 @@
+slug: icici-bank-sapphiro
+bank: icici-bank
+network: mastercard
+name: Sapphiro
+product_url: https://www.icici.bank.in/personal-banking/cards/credit-card/sapphiro-card
+provenance:
+  status: verified
+  source: icici-sapphiro-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+policies:
+- scope: domestic
+  valid_from: 2025-01-01
+  summary: Complimentary domestic airport lounge visits each quarter for the primary cardholder, unlocked
+    by spending Rs 75,000 or more in the preceding calendar quarter.
+  rules:
+  - type: program_entitlement
+    program: icici-bank-lounge-access
+  - type: visit_quota
+    count: 4
+    period: quarter
+    ambiguous: true
+    note: Product page benefits section states 4 domestic visits per quarter for the primary cardholder;
+      its FAQ says a holder of both Mastercard and Amex variants gets 2 domestic visits per quarter per
+      variant.
+  - type: spend_gate
+    amount: 75000
+    window: previous_calendar_quarter
+    ambiguous: true
+    note: 'MITC: "Spends made in the preceding calendar quarter will unlock access for the subsequent
+      calendar quarter", but its illustration uses spend windows such as Sept 26 to Dec 25 for Jan 1 to
+      March 31 access. Spends exclude rent, government, education, fees, EMI and similar transactions
+      per the lounge-criteria page.'
+  - type: entry_method
+    method: card_swipe
+    note: MITC lists a card validation charge taken on each eligible card presented at the entrance to
+      the participating lounge (Re. 1 on Amex variants); the product page itself gives no access method.
+  unmodelled_terms: '"Please note that the airport lounge access benefit is available only for primary
+    Cardholders." Dual-variant cards (Mastercard & Amex | Visa & RuPay) have the entitlement split between
+    the variants.'
+  provenance:
+    status: verified
+    source: icici-sapphiro-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: valid_from is the date the bank's MITC and lounge-criteria page give for the Rs 75,000 spend
+      criteria ("Starting Jan 01, 2025").
+- scope: international
+  valid_from: 2026-11-14
+  summary: 2 complimentary international airport lounge visits per year for the primary cardholder via
+    Priority Pass.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: visit_quota
+    count: 2
+    period: year
+  - type: entry_method
+    method: programme_card
+    note: '"Present your Priority Pass Membership Card at the participating international lounges." Priority
+      Pass T&C page: a same-day boarding pass for a departing flight is required.'
+  unmodelled_terms: 'Priority Pass T&C page: visits beyond the complimentary allowance and guest visits
+    are charged per person per visit and debited to the credit card in INR plus GST.'
+  provenance:
+    status: verified
+    source: icici-sapphiro-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The product page gives no start date for the benefit, so the verification date is used.

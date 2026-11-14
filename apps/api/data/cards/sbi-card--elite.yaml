@@ -1,0 +1,49 @@
+slug: sbi-card-elite
+bank: sbi-card
+name: SBI Card ELITE
+product_url: https://www.sbicard.com/en/personal/credit-cards/lifestyle/sbi-card-elite.page
+provenance:
+  status: verified
+  source: sbi-elite-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+  notes: The brochure names both Visa and Mastercard, so the network is left unstated.
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: 2 complimentary domestic lounge visits a quarter in India through the Visa or Mastercard lounge
+    programme.
+  rules:
+  - type: program_entitlement
+    program: visa-mastercard-lounge-access
+  - type: visit_quota
+    count: 2
+    period: quarter
+    ambiguous: true
+    note: 'From an undated brochure: ''Two complimentary access every quarter.'''
+  - type: entry_method
+    method: card_swipe
+  unmodelled_terms: The lounge access program for SBI Card is managed by the respective network partners.
+    Please refer to the respective terms and conditions of Mastercard, RuPay & Visa.
+  provenance:
+    status: verified
+    source: sbi-elite-brochure
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: Brochure is undated; valid_from is the date checked.
+- scope: international
+  valid_from: 2026-11-14
+  summary: Complimentary Priority Pass membership. The brochure doesn't state how many visits are free.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: entry_method
+    method: programme_card
+  unmodelled_terms: Complimentary membership to Priority Pass Program to get access at over 850 Airport
+    Lounges worldwide. No visit count is stated.
+  provenance:
+    status: verified
+    source: sbi-elite-brochure
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: Brochure is undated; valid_from is the date checked.

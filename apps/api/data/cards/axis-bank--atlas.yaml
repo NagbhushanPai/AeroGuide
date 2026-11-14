@@ -1,0 +1,54 @@
+slug: axis-bank-atlas
+bank: axis-bank
+name: Atlas
+product_url: https://www.axis.bank.in/cards/credit-card/axis-bank-atlas-credit-card
+provenance:
+  status: verified
+  source: axis-atlas-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+  notes: The bank's pages don't state the network.
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: 8 domestic lounge visits at the Silver tier (12 at Gold, 18 at Platinum), shared between the
+    cardholder and guests. Swipe the card at the lounge. No spend condition.
+  rules:
+  - type: program_entitlement
+    program: axis-bank-lounge-set-b
+  - type: visit_quota
+    count: 8
+    period: year
+    ambiguous: true
+    note: Silver tier. The terms give counts per tier but no period; the product page shows them as yearly
+      values.
+  - type: entry_method
+    method: card_swipe
+    note: For domestic lounge access, cardholders can swipe their card at the lounge for access.
+  unmodelled_terms: 'Tiers: Silver 8, Gold 12, Platinum 18 domestic visits. The above number of visits
+    include visits for primary cardholder and guests as well. The spend based criteria is waived for ...
+    ATLAS Credit Card.'
+  provenance:
+    status: verified
+    source: axis-atlas-tnc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The terms state no start date; valid_from is the date checked.
+- scope: international
+  valid_from: 2026-11-14
+  summary: 4 international lounge visits at the Silver tier (6 at Gold, 12 at Platinum). The bank says
+    the international programme is currently under maintenance.
+  rules:
+  - type: visit_quota
+    count: 4
+    period: year
+    ambiguous: true
+    note: Silver tier; no period stated in the terms.
+  unmodelled_terms: 'The international lounge program on your Axis Bank Atlas Credit Card is under maintenance.
+    Tiers: Silver 4, Gold 6, Platinum 12 international visits, including guests.'
+  provenance:
+    status: verified
+    source: axis-atlas-tnc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The terms state no start date; valid_from is the date checked.

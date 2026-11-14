@@ -1,0 +1,47 @@
+slug: icici-bank-rubyx
+bank: icici-bank
+network: mastercard
+name: Rubyx
+product_url: https://www.icici.bank.in/personal-banking/cards/credit-card/rubyx-credit-card
+provenance:
+  status: verified
+  source: icici-rubyx-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+policies:
+- scope: domestic
+  valid_from: 2025-01-01
+  summary: 2 complimentary domestic airport lounge visits per quarter for the primary cardholder, unlocked
+    by spending Rs 75,000 or more in the preceding calendar quarter.
+  rules:
+  - type: program_entitlement
+    program: icici-bank-lounge-access
+  - type: visit_quota
+    count: 2
+    period: quarter
+    ambiguous: true
+    note: 'Product page: "Get 2 Domestic Airport Lounge access for primary cardholders on eligible spends
+      of Rs 75,000 or more in the preceding spends quarter"; the quarterly period is taken from the FAQ
+      wording "in the following calendar quarter" and the dual-variant sentence "1 domestic lounge visits
+      per quarter for each variant".'
+  - type: spend_gate
+    amount: 75000
+    window: previous_calendar_quarter
+    ambiguous: true
+    note: 'MITC: "Spends made in the preceding calendar quarter will unlock access for the subsequent
+      calendar quarter", but its illustration uses spend windows such as Sept 26 to Dec 25 for Jan 1 to
+      March 31 access.'
+  - type: entry_method
+    method: card_swipe
+    note: MITC lists a card validation charge taken on each eligible card presented at the entrance to
+      the participating lounge; the product page itself gives no access method.
+  unmodelled_terms: '"The benefit is exclusively applicable to the primary Cardholder." For dual Credit
+    Card variants (Mastercard & Amex | Visa & RuPay) "the entitlement includes 1 domestic lounge visits
+    per quarter for each variant."'
+  provenance:
+    status: verified
+    source: icici-rubyx-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: valid_from is the date the bank's MITC and lounge-criteria page give for the Rs 75,000 spend
+      criteria ("Starting Jan 01, 2025").

@@ -1,0 +1,185 @@
+iata: BLR
+lounges:
+- slug: t1-lounge-kerbside-blr-t1
+  name: T1 Lounge (Kerbside)
+  terminal: Terminal 1
+  scope: both
+  side: landside
+  location_text: Landside - the lounge is located outside Terminal 1 Arrivals, near Arrivals Gate 13
+  opening_hours:
+    mode: 24h
+  amenities:
+  - business
+  - accessible
+  - flight_info
+  provenance:
+    status: verified
+    source: priority-pass-blr17
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: Before security checks. Operator not named.
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-blr17
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Max stay: 2 hours. Children under 5 years admitted free.'
+- slug: 080-domestic-lounge-blr-t1-gate-34
+  name: 080 Domestic Lounge
+  terminal: Terminal 1
+  scope: domestic
+  side: airside
+  location_text: Departures, After security checks, Level 1, Opposite Gate 34, Next to Starbucks
+  nearest_gate: Gate 34
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - business
+  - accessible
+  provenance:
+    status: verified
+    source: priority-pass-blr11
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-blr11
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Access is permitted 3 hours prior to scheduled flight departure.
+- slug: 080-domestic-lounge-blr-t1-level-2
+  name: 080 Domestic Lounge
+  terminal: Terminal 1
+  scope: domestic
+  side: airside
+  location_text: Departures, After security checks, Level 2, Above Swarovski, opposite Fossil
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  provenance:
+    status: verified
+    source: priority-pass-blr8
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-blr8
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Access is permitted 3 hours prior to scheduled flight departure.
+- slug: 080-lounge-blr-t2-domestic
+  name: 080 Lounge (Domestic T2)
+  terminal: Terminal 2
+  scope: domestic
+  side: airside
+  location_text: Departures, After security checks, Level 4
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - accessible
+  provenance:
+    status: verified
+    source: priority-pass-blr9
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-blr9
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Access is permitted 2 hours prior to scheduled flight departure.
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF). Listed as '080 Domestic
+        Lounge, Domestic Departure T2'.
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026). Listed as '080 Domestic
+        Lounge, Domestic T2'.
+- slug: 080-international-lounge-blr-t2
+  name: 080 International Lounge
+  terminal: Terminal 2
+  scope: international
+  side: airside
+  location_text: Departures, After security checks, After passport control, Level 3
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - accessible
+  - flight_info
+  provenance:
+    status: verified
+    source: priority-pass-blr10
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-blr10
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Max stay: 3 hours.'
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: 080-arrival-lounge-blr-t2
+  name: 080 Arrival Lounge
+  terminal: Terminal 2
+  scope: both
+  side: landside
+  location_text: Ground Level, Arrivals Hall, Level 0. Follow signs to the lounge
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - accessible
+  - flight_info
+  provenance:
+    status: verified
+    source: priority-pass-blr12
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: Arrivals lounge, after passport control. Recorded as landside because it is in the arrivals
+      hall.
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-blr12
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Max stay: 2 hours.'

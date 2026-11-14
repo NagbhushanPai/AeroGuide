@@ -1,0 +1,178 @@
+iata: HYD
+lounges:
+- slug: encalm-lounge-hyd-domestic
+  name: Encalm Lounge
+  operator: Encalm
+  scope: domestic
+  side: airside
+  location_text: Level E, Opposite to domestic transfers, domestic departures RGI Airport, Shamshabad
+    501218 Telangana
+  opening_hours:
+    mode: 24h
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - showers
+  - spa
+  - charging
+  - flight_info
+  - accessible
+  - smoking
+  - kids
+  provenance:
+    status: verified
+    source: hyd-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: 'Official airport page: ''Domestic Departure – Encalm Lounge'', ''Location: Level E, Airside''.
+      Opening hours 00:00-23:59 every day per the Priority Pass page (priority-pass-hyd8); the airport
+      and operator pages give no hours. Amenities: airport page lists premium seating, hot meals and beverages,
+      shower facilities, free Wi-Fi and charging stations, head & shoulder massage and foot reflexology
+      (shared text for both Encalm lounges); operator page lists Bar, F&B, Flight Information, Wi-Fi;
+      Priority Pass page lists disabled access, flight information, separate smoking room, separate children''s
+      play area. Terminal not named by any source (Priority Pass says ''Main Terminal'').'
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-hyd8
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Priority Pass page: ''Maximum 2 hour stay'', ''Children under 6 years are admitted free'',
+        ''Max Unlimited guests per cardholder''.'
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 2550
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Ambiguous on the source. Operator page gives category pricing, not a per-lounge price: ''Domestic
+        departure lounges: INR 2550 including tax for access up to 2 hours'' (children 6-11: INR 1800).
+        The page lists the Hyderabad domestic lounge under that category. Walk-in: ''payment can be conveniently
+        made at the entrance of the respective lounge''. ''Terms & Conditions Apply''.'
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF).
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: encalm-lounge-hyd-international
+  name: Encalm Lounge
+  operator: Encalm
+  scope: international
+  side: airside
+  location_text: Level E beside gate no. 23 SHA international departures RGI Airport, Shamshad 501218
+    Telangana
+  nearest_gate: Gate 23
+  opening_hours:
+    mode: 24h
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - showers
+  - spa
+  - charging
+  - flight_info
+  - accessible
+  - smoking
+  - kids
+  - business
+  - sleeping
+  provenance:
+    status: verified
+    source: hyd-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: 'Official airport page: ''International Departure – Encalm Lounge & Prive'', ''Encalm Lounge
+      Location: Level E, Airside''. Operator lounge page gives an alternative location text ''Unit No.
+      E-SA-001 Level E, Opposite the International Transfer Security Hold Area, International Departures''.
+      Priority Pass page: ''Airside - International Departures, Level E, near Gate 23'', hours 00:00-23:59
+      daily, ''Workstations'', ''Day beds'', ''Separate children''s play area'', ''Separate smoking room'',
+      ''Newspapers / magazines'', ''Disabled access'', ''Flight information''. Shower/spa/charging from
+      the airport page''s shared amenity list; bar/F&B/Wi-Fi from the operator page. Terminal not named
+      by any source.'
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-hyd4
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Ambiguous on the source. Priority Pass page states both ''Maximum 2 hour stay'' (conditions
+        text) and ''Max stay: 3 hours'' (summary field). ''Children under 6 years are admitted free'',
+        ''Max Unlimited guests per cardholder''.'
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 4150
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Ambiguous on the source. Operator page gives category pricing, not a per-lounge price: ''International
+        departure lounges: INR 4150 including tax for access up to 2 hours'' (children 6-11: INR 2900).
+        The page lists the Hyderabad international lounge under that category. ''Terms & Conditions Apply''.'
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: encalm-prive-hyd-international
+  name: Encalm Privé
+  operator: Encalm
+  scope: international
+  side: airside
+  location_text: Mezzanine Level, International Departures, Rajiv Gandhi International Airport, Hyderabad
+    – 500409
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - showers
+  - flight_info
+  provenance:
+    status: verified
+    source: hyd-airport-lounges
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: 'Official airport page: ''Prive Location: Mezzanine Floor, Airside'' under ''International
+      Departure – Encalm Lounge & Prive''. Operator page: ''Designed exclusively for business class travelers'';
+      services Bar, F&B, Live Cooking, Grab N Go, Flight Information, Newspaper and Magazine, Wi-Fi, Shower
+      Facilities. No opening hours stated on any page read. Not listed on the Priority Pass Hyderabad
+      page.'
+  accepts:
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 5150
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-prive-hyd
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Operator page, under the heading ''GUEST CHARGES FOR T1'': Adults ₹5,150 including tax for
+        up to 2 hours; children 6-11 ₹3,600; under 6 complimentary.'

@@ -1,0 +1,58 @@
+slug: sbi-card-miles-elite
+bank: sbi-card
+name: SBI Card MILES ELITE
+product_url: https://www.sbicard.com/en/personal/credit-cards/sbi-card-miles-elite.html
+provenance:
+  status: verified
+  source: sbi-miles-elite-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+  notes: The terms mention both Visa and Mastercard, so the network is left unstated.
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: Up to 15 complimentary Priority Pass lounge visits in India, one voucher for every ₹1 lakh
+    spent. Vouchers are generated on the Priority Pass website.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: visit_quota
+    count: 15
+    period: year
+    ambiguous: true
+    note: 'Terms: ''8, 12 and 15 complimentary visits basis spends of every INR 1 lac on SBI Card Miles,
+      SBI Card MILES PRIME and SBI Card MILES ELITE, respectively''. The period isn''t stated.'
+  - type: entry_method
+    method: voucher
+  unmodelled_terms: Complimentary visits for lounges within India are spend based and complimentary lounge
+    voucher needs to be generated on Priority Pass website using the unique 12 digit code, that customer
+    will get on his registered SMS and e-mail on spend of every Rs. 1 lac.
+  provenance:
+    status: verified
+    source: sbi-miles-elite-tnc
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The terms state no start date; valid_from is the date checked.
+- scope: international
+  valid_from: 2026-11-14
+  summary: 6 complimentary visits to Priority Pass lounges outside India for the primary cardholder.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: visit_quota
+    count: 6
+    period: year
+    ambiguous: true
+    note: 'Terms: ''6 for SBI Card MILES ELITE'' with no period; membership is ''valid for 24 months''.'
+  - type: entry_method
+    method: programme_card
+    note: Lounge access is conditional upon presentation of a valid Priority Pass card or generated QR
+      code only.
+  unmodelled_terms: Complimentary visits using the Priority Pass Card plastic are applicable for Primary
+    Cardholders only. Guest Charges USD 27+ Applicable Taxes per visit.
+  provenance:
+    status: verified
+    source: sbi-miles-elite-tnc
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The terms state no start date; valid_from is the date checked.

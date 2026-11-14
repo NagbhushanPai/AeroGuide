@@ -1,0 +1,52 @@
+slug: icici-bank-emeralde
+bank: icici-bank
+network: amex
+name: Emeralde
+product_url: https://www.icici.bank.in/personal-banking/cards/credit-card/emeralde-credit-card
+provenance:
+  status: verified
+  source: icici-emeralde-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: Unlimited complimentary domestic airport lounge access for the primary cardholder; no spend
+    condition is stated and the card is excluded from the bank's spend-based domestic lounge criteria.
+  rules:
+  - type: program_entitlement
+    program: icici-bank-lounge-access
+  - type: entry_method
+    method: card_swipe
+    note: 'Product page FAQ: "Please swipe the ICICI Bank Emeralde Credit Card to avail the complimentary
+      lounge access."'
+  unmodelled_terms: Benefit stated for "the Primary Cardholders"; labelled "Quarterly" on the product
+    page with no further explanation. MITC (Nov 6th, 2026) lists ICICI Bank Emeralde Credit Card among
+    cards excluded from the Rs 75,000 preceding-calendar-quarter spend criteria.
+  provenance:
+    status: verified
+    source: icici-emeralde-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The product page gives no start date for the benefit, so the verification date is used.
+- scope: international
+  valid_from: 2026-11-14
+  summary: Unlimited complimentary international airport lounge access for the primary cardholder via
+    a complimentary Priority Pass membership.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: entry_method
+    method: programme_card
+    note: '"Present your Priority Pass Membership Card at the participating international lounges." The
+      Priority Pass T&C page says the membership card is provided in the welcome kit with the eligible
+      credit card and that a same-day boarding pass for a departing flight is required.'
+  unmodelled_terms: 'Priority Pass T&C page: guest visits are charged per person per visit (complimentary
+    only for Diamant); "Except ICICI Bank Diamant, Times Black, Emeralde Private Metal, Emeralde, and
+    Emirates Emeralde Credit Cards" other cards pay for visits beyond the complimentary allowance.'
+  provenance:
+    status: verified
+    source: icici-emeralde-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The product page gives no start date for the benefit, so the verification date is used.

@@ -125,7 +125,10 @@ policies:
 
 
 def with_test_lounges(tmp_path: Path) -> Path:
+    """Real reference data, but only the fictional lounges and card (no real ones)."""
     data = copy_data(tmp_path)
+    for path in [*(data / "lounges").glob("*.yaml"), *(data / "cards").glob("*.yaml")]:
+        path.unlink()
     sources = data / "sources.yaml"
     sources.write_text(sources.read_text(encoding="utf-8") + TEST_SOURCES_EXTRA, encoding="utf-8")
     (data / "access_programs.yaml").write_text(TEST_PROGRAMME, encoding="utf-8")

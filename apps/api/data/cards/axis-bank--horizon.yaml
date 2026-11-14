@@ -1,0 +1,91 @@
+slug: axis-bank-horizon
+bank: axis-bank
+network: visa
+name: HORIZON
+product_url: https://www.axis.bank.in/cards/credit-card/axis-horizon-credit-card
+provenance:
+  status: verified
+  source: axis-horizon-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: 8 complimentary domestic airport lounge visits per calendar quarter on the Visa variant (6
+    on the Mastercard variant), with no spend criteria.
+  rules:
+  - type: program_entitlement
+    program: axis-bank-lounge-set-b
+  - type: visit_quota
+    count: 8
+    period: quarter
+    note: 'Visa Signature variant. Card T&C: ''8 complimentary visits per calendar quarter for Visa Signature
+      Cardmembers''; Mastercard World variant gets 6.'
+  - type: airport_restriction
+    only:
+    - AMD
+    - BLR
+    - BBI
+    - MAA
+    - CJB
+    - DED
+    - GOX
+    - HYD
+    - JAI
+    - COK
+    - CCU
+    - BOM
+    - DEL
+    - BDQ
+    note: Set B participating lounges in the programme PDF (dated 16 April 2026), domestic departure lounges
+      only. Horizon is not eligible for the BLR Domestic Lounge at Bengaluru T1 and uses the 080 Domestic
+      Lounge there instead.
+  - type: entry_method
+    method: card_swipe
+    note: 'Card T&C: ''A Transaction of INR 2 on Visa and of INR 25 on Mastercard will be made to Axis
+      Bank Horizon credit card for accessing the airport lounge. The same will be reversed by Visa/Mastercard
+      on the Cardmember''s Credit Card.'''
+  unmodelled_terms: 'Card T&C section 8: ''This offer is applicable to the primary Cardholder having Axis
+    Bank Horizon Credit Card.'' ''Domestic Lounge Access: a. 6 complimentary visits per calendar quarter
+    for Mastercard World Cardmembers. b. 8 complimentary visits per calendar quarter for Visa Signature
+    Cardmembers.'' Programme PDF: ''The spend based criteria is waived for Burgundy Private Credit Card,
+    RESERVE Credit Card, Olympus Credit Card, Primus Credit Card, Horizon Credit Card, and ATLAS Credit
+    Card.'' ''The list of eligible lounges maybe updated without prior intimation to the Cardmembers.'''
+  provenance:
+    status: verified
+    source: axis-horizon-tnc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The bank gives no start date for this benefit; valid_from is the date the pages were read.
+- scope: international
+  valid_from: 2026-11-14
+  summary: 2 complimentary international airport lounge accesses per calendar quarter for the primary
+    cardholder, accessed by making a USD 1 transaction on the card which is reversed on successful authorisation.
+  rules:
+  - type: visit_quota
+    count: 2
+    period: quarter
+    note: 'Card T&C: ''2 complimentary lounge access per calendar quarter will be available on the Credit
+      Card''.'
+  - type: program_entitlement
+    program: priority-pass
+    ambiguous: true
+    note: The T&C text does not name a programme; its 'updated list of lounge access' and 'conditions
+      of usage' links point to prioritypass.com/airport-lounges and prioritypass.com/conditions-of-use.
+      Access is by a USD 1 card transaction, not a membership card.
+  - type: entry_method
+    method: card_swipe
+    note: 'Card T&C: ''A Transaction of USD 1 will have to be made by the Cardholder using Axis Bank Horizon
+      Credit Card for accessing the airport lounge. The same will be reversed on the Cardmember''s Credit
+      Card upon successful authorization.'''
+  unmodelled_terms: 'Card T&C section 8: ''This offer is applicable to the primary Cardholder having Axis
+    Bank Horizon Credit Card.'' ''The lounge access is provided to Axis Bank Horizon credit Cardmembers
+    to select domestic and international lounges.'' ''The list of eligible lounges maybe updated without
+    prior intimation to the Cardmembers.'' Product page: ''2 International airport lounge access per calendar
+    quarter''. No guest allowance is stated.'
+  provenance:
+    status: verified
+    source: axis-horizon-tnc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The bank gives no start date for this benefit; valid_from is the date the pages were read.

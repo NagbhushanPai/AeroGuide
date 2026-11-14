@@ -1,0 +1,46 @@
+slug: hdfc-bank-diners-club-black-metal
+bank: hdfc-bank
+network: diners
+name: Diners Club Black Metal Edition
+product_url: https://www.hdfc.bank.in/credit-cards/diners-club-black-metal-edition-credit-card
+provenance:
+  status: verified
+  source: hdfc-dcb-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+policies:
+- scope: domestic
+  valid_from: 2026-11-14
+  summary: Unlimited lounge access in India for primary and add-on card members at the participating lounges
+    listed on the product page. No guests.
+  rules:
+  - type: program_entitlement
+    program: hdfc-bank-lounge-access
+  - type: entry_method
+    method: card_swipe
+    note: Primary or add on card holder ... should present their respective cards at the lounge.
+  unmodelled_terms: Access is not allowed to guest member. If guest wants to accompany, the same will
+    be charged by lounge service provide basis customer consent.
+  provenance:
+    status: verified
+    source: hdfc-dcb-lounge-tnc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The terms are dated 08.12.2025 but state no start date; valid_from is the date checked.
+- scope: international
+  valid_from: 2026-11-14
+  summary: Unlimited lounge access abroad for primary and add-on card members at Diners Club lounges listed
+    in the Diners Travel Tool app. No guests.
+  rules:
+  - type: program_entitlement
+    program: diners-club-lounge-access
+  - type: entry_method
+    method: card_swipe
+  unmodelled_terms: International list of participating lounges is to be referred on Diners Travel Tool
+    App. Access is not allowed to guest member.
+  provenance:
+    status: verified
+    source: hdfc-dcb-lounge-tnc-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The bank states no start date; valid_from is the date checked.

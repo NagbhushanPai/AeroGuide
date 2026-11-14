@@ -1,0 +1,133 @@
+iata: COK
+lounges:
+- slug: travel-club-lounge-cok-t1
+  name: Travel Club Lounge
+  terminal: Terminal 1
+  scope: domestic
+  side: airside
+  location_text: Departures. After security checks. 2nd Floor, via lift. The lounge is located next to
+    KFC.
+  opening_hours:
+    mode: weekly
+    periods:
+    - days:
+      - mon
+      - wed
+      - thu
+      - fri
+      - sat
+      - sun
+      open: 00:00
+      close: '23:59'
+    - days:
+      - tue
+      open: 00:01
+      close: '13:30'
+    - days:
+      - tue
+      open: '16:00'
+      close: '23:59'
+  amenities:
+  - food
+  - flight_info
+  provenance:
+    status: verified
+    source: priority-pass-cok5
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-cok5
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Max stay: 2 hours. Children under 5 years admitted free. Unlimited guests per cardholder.
+        Hot and cold buffet complimentary.'
+- slug: earth-lounge-cok-t3
+  name: Earth Lounge
+  terminal: Terminal 3
+  scope: international
+  side: airside
+  location_text: International Departures, after security and passport control. Take the escalator on
+    the right to the 3rd floor; the lounge is on the left side of the food court area.
+  opening_hours:
+    mode: 24h
+  amenities:
+  - food
+  - alcohol
+  - accessible
+  provenance:
+    status: verified
+    source: priority-pass-cok2
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-cok2
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Children under 7 admitted free. Complimentary alcohol limited to two 30ml spirits or one
+        650ml beer per adult; other alcoholic drinks paid. A la carte menu extra payment. Smart-casual
+        dress. No maximum stay listed.
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: earth-lounge-cok-t1
+  name: Earth Lounge
+  terminal: Terminal 1
+  scope: domestic
+  side: airside
+  provenance:
+    status: unverified
+    notes: Named in web-search snippets of a Priority Pass detail page (cok3) and in bank lounge-list
+      PDFs, but the Priority Pass cok3 page rendered only a JS shell on three attempts and the lounge
+      is absent from the Priority Pass Cochin index page fetched on 2026-11-14. No location, hours, amenities
+      or programme acceptance recorded.
+  accepts:
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF).
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: 0484-aero-lounge-cok-t2
+  name: 0484 Aero Lounge
+  terminal: T2
+  operator: Balaji Caterers
+  scope: both
+  side: landside
+  location_text: Adjacent to this is the 0484 Aero Lounge, located at T2. ... ideally positioned between
+    terminals T1 and T3 ... outside the Security Hold Area
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - sleeping
+  - spa
+  - business
+  provenance:
+    status: verified
+    source: 0484-aero-lounge-site
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts: []

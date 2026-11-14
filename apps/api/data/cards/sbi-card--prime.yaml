@@ -1,0 +1,59 @@
+slug: sbi-card-prime
+bank: sbi-card
+name: SBI Card PRIME
+product_url: https://www.sbicard.com/en/personal/credit-cards/rewards/sbi-card-prime.page
+provenance:
+  status: verified
+  source: sbi-prime-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+  notes: The brochure names both Visa Signature and Mastercard World, so the network is left unstated.
+policies:
+- scope: domestic
+  valid_from: 2026-01-10
+  summary: 2 complimentary domestic lounge visits a quarter in India. Present the card at a participating
+    lounge; it's authorised on the lounge's terminal.
+  rules:
+  - type: program_entitlement
+    program: sbi-card-lounge-set-b
+    note: SBI Card PRIME is a Set B card on the bank's lounge page (participating lounges w.e.f. 10 Jan'26).
+  - type: visit_quota
+    count: 2
+    period: quarter
+    ambiguous: true
+    note: 'Count from the bank''s PRIME brochure: ''2 complimentary Domestic Airport Lounge access per
+      quarter in India''. The brochure is older than the current lounge list.'
+  - type: entry_method
+    method: card_swipe
+    note: Access to the lounge would be provided only upon successful authorization of their SBI Credit
+      Card on the lounge's POS terminal.
+  provenance:
+    status: verified
+    source: sbi-lounge-benefits-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+- scope: international
+  valid_from: 2026-11-14
+  summary: 4 complimentary visits a year to Priority Pass lounges outside India, at most 2 a quarter.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: visit_quota
+    count: 4
+    period: year
+    note: 4 complimentary visits per year to International Lounges outside India.
+  - type: visit_quota
+    count: 2
+    period: quarter
+    note: (max. 2 visits per quarter)
+  - type: entry_method
+    method: programme_card
+  unmodelled_terms: The standard membership of the Priority Pass Program is complimentary for the first
+    two years. Usage fee of upto $27+ Applicable Taxes will be charged on your SBI Card PRIME after the
+    complimentary visit.
+  provenance:
+    status: verified
+    source: sbi-prime-brochure
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: Brochure is undated; valid_from is the date checked.

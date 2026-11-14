@@ -55,3 +55,629 @@ sources:
     publisher: OpenStreetMap contributors
     source_type: secondary
     retrieved_at: 2026-11-14
+
+  - key: axis-credit-card-listing
+    name: Axis Bank credit cards listing page
+    url: https://www.axis.bank.in/cards/credit-card
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-horizon-page
+    name: Axis Bank HORIZON Credit Card product page
+    url: https://www.axis.bank.in/cards/credit-card/axis-horizon-credit-card
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-horizon-tnc-pdf
+    name: Axis Bank HORIZON Credit Card Terms and Conditions (PDF, section 8 Complimentary Lounge access)
+    url: https://www.axis.bank.in/docs/default-source/default-document-library/credit-cards/terms-and-conditions-for-horizon-credit-card.pdf
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-magnus-page
+    name: Axis Bank Magnus Credit Card product page
+    url: https://www.axis.bank.in/cards/credit-card/axis-bank-magnus-credit-card
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-magnus-travel-stay
+    name: Axis Bank Magnus Credit Card travel and stay benefits page (lounge access section)
+    url: https://www.axis.bank.in/cards/credit-card/axis-bank-magnus-credit-card/travel-stay
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-magnus-tnc-revision-pdf
+    name: Revision of MAGNUS Credit Card Terms and Conditions (PDF, effective 28-08-2026, lounge access
+      guidelines)
+    url: https://campaign.axis.bank.in/generic/terms-and-conditions-magnus.pdf
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-magnus-domestic-lounge-tnc-pdf
+    name: Terms and Conditions for Unlimited Domestic lounge access on Axis Bank Magnus Credit Card (PDF,
+      2021)
+    url: https://www.axis.bank.in/docs/default-source/magnus-card/magnus_domestic_lounge_tnc.pdf
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-lounge-program-pdf
+    name: Axis Bank Credit Cards Domestic Airport Lounge Access Program (PDF, dated 16 April 2026)
+    url: https://www.axis.bank.in/docs/default-source/default-document-library/axis-bank-airport-lounge-access-program.pdf
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-credit-card-listing
+    name: HDFC Bank credit cards listing page
+    url: https://www.hdfc.bank.in/credit-cards
+    publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-infinia-page
+    name: HDFC Bank INFINIA Metal Edition credit card page
+    url: https://www.hdfc.bank.in/credit-cards/infinia-credit-card
+    publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-infinia-lounge-pdf
+    name: HDFC Bank Infinia Airport Lounge Access Program (PDF)
+    url: https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/infinia-credit-card/airport-lounge-access-program-30sep2025.pdf
+    publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-dcb-page
+    name: HDFC Bank Diners Club Black Metal Edition credit card page
+    url: https://www.hdfc.bank.in/credit-cards/diners-club-black-metal-edition-credit-card
+    publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-dcb-lounge-tnc-pdf
+    name: HDFC Bank Diners Club complimentary lounge access terms (PDF, dated 08.12.2025)
+    url: https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/diners-club-black-credit-card/pdfs/lounge-tnc.pdf
+    publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-regalia-gold-page
+    name: HDFC Bank Regalia Gold credit card page
+    url: https://www.hdfc.bank.in/credit-cards/regalia-gold-credit-card
+    publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: hdfc-regalia-gold-lounge-pdf
+    name: Domestic Airport Lounge Access Program for Regalia Gold Credit Cards (PDF)
+    url: https://www.hdfc.bank.in/content/dam/hdfcbankpws/in/en/personal-banking/discover-products/cards/credit-cards/regalia-gold-credit-card/pdfs/lounge-t-and-cs-and-list-Regalia-Gold.pdf
+    publisher: HDFC Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-lounge-benefits-page
+    name: SBI Card airport lounge access page (participating lounges w.e.f. 10 Jan 2026)
+    url: https://www.sbicard.com/en/personal/benefits/airport-lounge-access.page
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-lounge-revision-pdf
+    name: SBI Card Domestic Airport Lounge Access Program, revision w.e.f. 10 Jan 2026 (PDF)
+    url: https://www.sbicard.com/sbi-card-en/assets/docs/pdf/lounge-benefits.pdf
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-elite-page
+    name: SBI Card ELITE product page
+    url: https://www.sbicard.com/en/personal/credit-cards/lifestyle/sbi-card-elite.page
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-elite-brochure
+    name: SBI Card ELITE e-brochure (PDF)
+    url: https://www.sbicard.com/sbi-card-en/assets/docs/pdf/personal/credit-cards/lifestyle/sbi-card-elite/E-Brochure_FINAL.pdf
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-prime-page
+    name: SBI Card PRIME product page
+    url: https://www.sbicard.com/en/personal/credit-cards/rewards/sbi-card-prime.page
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-prime-brochure
+    name: SBI Card PRIME web brochure (PDF)
+    url: https://www.sbicard.com/sbi-card-en/assets/docs/pdf/personal/credit-cards/rewards/sbi-card-prime/prime-web-brochure.pdf
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-miles-elite-page
+    name: SBI Card MILES ELITE product page
+    url: https://www.sbicard.com/en/personal/credit-cards/sbi-card-miles-elite.html
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: sbi-miles-elite-tnc
+    name: SBI Card MILES ELITE terms and conditions (PDF, section 14 Priority Pass)
+    url: https://www.sbicard.com/sbi-card-en/assets/docs/pdf/tnc/sbi-card-miles-elite-tnc.pdf
+    publisher: SBI Card
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-atlas-page
+    name: Axis Bank Atlas credit card page
+    url: https://www.axis.bank.in/cards/credit-card/axis-bank-atlas-credit-card
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: axis-atlas-tnc-pdf
+    name: Terms and conditions of features of Axis Bank Atlas credit card (PDF)
+    url: https://www.axis.bank.in/docs/default-source/default-document-library/credit-cards/terms-and-conditions-of-features-of-axis-bank-atlas-credit-card.pdf
+    publisher: Axis Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-blr-index
+    name: Priority Pass lounges at Bengaluru Kempegowda International
+    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-blr17
+    name: Priority Pass, T1 Lounge (Kerbside), Bengaluru
+    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international/blr17-t1-lounge-kerbside
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-blr11
+    name: Priority Pass, 080 Domestic Lounge (T1, opposite gate 34), Bengaluru
+    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international/blr11-080-domestic-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-blr8
+    name: Priority Pass, 080 Domestic Lounge (T1, level 2), Bengaluru
+    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international/blr8-080-domestic-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-blr10
+    name: Priority Pass, 080 International Lounge (T2), Bengaluru
+    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international/blr10-080-international-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-blr12
+    name: Priority Pass, 080 Arrival Lounge (T2), Bengaluru
+    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international/blr12-080-arrival-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-blr9
+    name: Priority Pass, 080 Lounge (Domestic T2), Bengaluru
+    url: https://www.prioritypass.com/en-GB/lounges/india/kempegowda-international/blr9-080-lounge-domestic-t2
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: hyd-airport-lounges
+    name: Rajiv Gandhi International Airport lounges page
+    url: https://www.hyderabad.aero/rgia/airport-facilities/lounges
+    publisher: GMR Hyderabad International Airport
+    source_type: official_airport
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-hyd8
+    name: Priority Pass, Encalm Lounge (domestic), Hyderabad
+    url: https://www.prioritypass.com/en-GB/lounges/india/rajiv-gandhi-international/hyd8-encalm-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-hyd4
+    name: Priority Pass, Encalm Lounge (international), Hyderabad
+    url: https://www.prioritypass.com/en-GB/lounges/india/rajiv-gandhi-international/hyd4-encalm-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: encalm-prive-hyd
+    name: Encalm Privé Hyderabad page
+    url: https://encalm.com/services/encalmprivehyd
+    publisher: Encalm
+    source_type: lounge_operator
+    retrieved_at: 2026-11-14
+
+  - key: icici-credit-card-listing
+    name: ICICI Bank credit card listing page
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-emeralde-page
+    name: ICICI Bank Emeralde Credit Card page
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/emeralde-credit-card
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-sapphiro-page
+    name: ICICI Bank Sapphiro Credit Card page
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/sapphiro-card
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-rubyx-page
+    name: ICICI Bank Rubyx Credit Card page
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/rubyx-credit-card
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-mitc-pdf
+    name: ICICI Bank Credit Card Most Important Terms and Conditions (MITC), last updated Nov 6th, 2026
+    url: https://www.icici.bank.in/content/dam/icicibank/india/managed-assets/revamp-page-images/docs/pdf/mitc_cc.pdf
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-lounge-criteria-page
+    name: ICICI Bank "Changes to Credit Card Features and Charges" page (domestic lounge spend criteria)
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/upcoming-changes-features-and-charges
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-domestic-lounge-page
+    name: ICICI Bank Domestic Lounge Programme page
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/exprience/domestic-airport-lounges
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-international-lounge-page
+    name: ICICI Bank International Airport Lounge Access credit card page
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/international-airport-lounge-access-credit-card
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-priority-pass-tnc
+    name: ICICI Bank Priority Pass (International Lounge Access Programme) terms and conditions
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/experience/priority-pass-tnc
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: icici-lounge-experience-page
+    name: ICICI Bank Credit Card Experience programme page (domestic and international lounge programmes)
+    url: https://www.icici.bank.in/personal-banking/cards/credit-card/experience/travel-and-stays/dreamfolks
+    publisher: ICICI Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-credit-cards-listing
+    name: Kotak Mahindra Bank credit cards listing page
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards.html
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-white-reserve-page
+    name: Kotak White Reserve Credit Card page
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/white-reserve-credit-card.html
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-white-reserve-lounge-program
+    name: Kotak White Reserve Credit Card lounge programme page
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/white-reserve-credit-card/lounge-program.html
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-solitaire-page
+    name: Kotak Solitaire Credit Card page
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/kotak-solitaire-credit-card.html
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-solitaire-lounge-program
+    name: Kotak Solitaire Credit Card lounge programme page
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/kotak-solitaire-credit-card/lounge-program.html
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-solitaire-tc-pdf
+    name: Kotak Solitaire Credit Card detailed terms and conditions (PDF)
+    url: https://images.kotak.bank.in/bank/mailers/2026/files/detailed-tc-kotak-solitaire-cc_07_04_2026_Final.pdf
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-air-plus-page
+    name: Kotak Air+ Credit Card page
+    url: https://www.kotak.bank.in/en/personal-banking/cards/credit-cards/kotak-air-plus-credit-card.html
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-air-plus-tc-pdf
+    name: Kotak Air+ Credit Card terms and conditions (PDF)
+    url: https://images.kotak.bank.in/bank/mailers/2025/files/DetailedT&CKotakAir+CreditCard.pdf
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: kotak-lounge-tc-pdf
+    name: Kotak Credit Cards Complimentary Airport Lounge Access Program terms and conditions (Lounge MITC,
+      PDF)
+    url: https://images.kotak.bank.in/bank/mailers/2023/files/Lounge%20MITC%2012-5%20Revised.pdf
+    publisher: Kotak Mahindra Bank
+    source_type: bank
+    retrieved_at: 2026-11-14
+
+  - key: bom-airport-lounges
+    name: CSMIA Mumbai airport official Lounges page
+    url: https://csmia-mumbai.adaniairports.com/en/airport-services/lounges
+    publisher: Adani Airport Holdings (CSMIA)
+    source_type: official_airport
+    retrieved_at: 2026-11-14
+
+  - key: jai-airport-lounges
+    name: Jaipur International Airport official Lounges page
+    url: https://jaipur.adaniairports.com/en/airport-services/lounges
+    publisher: Adani Airport Holdings (Jaipur)
+    source_type: official_airport
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-listing
+    name: Priority Pass lounge list for Chhatrapati Shivaji International (BOM)
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom21-adani-lounge
+    name: Priority Pass lounge page - Adani Lounge, BOM Terminal 1B
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international/bom21-adani-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom13-travel-club
+    name: Priority Pass lounge page - Travel Club, BOM Terminal 1
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international/bom13-travel-club
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom10-travel-club-t2
+    name: Priority Pass lounge page - Travel Club, BOM Terminal 2
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international/bom10-travel-club
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom16-aviserv-east
+    name: Priority Pass lounge page - Aviserv Lounge (East), BOM Terminal 2
+    url: https://www.prioritypass.com/en-GB/lounges/india/mumbai-chattrapathi-shivaji/bom16-aviserv-lounge-east
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom27-aviserv-west
+    name: Priority Pass lounge page - Aviserv Lounge - West, BOM Terminal 2
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international/bom27-aviserv-lounge-west
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom26-adani-silver
+    name: Priority Pass lounge page - Adani Silver Lounge, BOM Terminal 2
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international/bom26-adani-silver-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom20-adani-silver-international
+    name: Priority Pass lounge page - Adani Silver International Lounge, BOM Terminal 2
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international/bom20-adani-lounge-east
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom24s-meghavi-domestic
+    name: Priority Pass lounge page - Meghavi Air Spa Lounge (domestic), BOM Terminal 2
+    url: https://www.prioritypass.com/en-GB/lounges/india/chhatrapati-shivaji-international/bom24s-meghavi-air-spa-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-bom-bom25s-meghavi-intl
+    name: Priority Pass lounge page - Meghavi Air Spa Lounge - Intl, BOM Terminal 2 (es-LA locale)
+    url: https://www.prioritypass.com/es-LA/lounges/india/chhatrapati-shivaji-international/bom25s-meghavi-air-spa-lounge-intl
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-jai-listing
+    name: Priority Pass lounge list for Jaipur International (JAI)
+    url: https://www.prioritypass.com/en-GB/lounges/india/jaipur-international
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: pp-jai-jai1-adani-lounge
+    name: Priority Pass lounge page - Adani Lounge, JAI Terminal 2
+    url: https://www.prioritypass.com/en-GB/lounges/india/jaipur-international/jai1-adani-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: encalm-lounge-page
+    name: Encalm Lounge service page (all Encalm Lounge locations, walk-in prices)
+    url: https://encalm.com/services/encalmlounge
+    publisher: Encalm Hospitality
+    source_type: lounge_operator
+    retrieved_at: 2026-11-14
+
+  - key: encalm-delhi-location-page
+    name: Encalm Delhi location page (lounge list with per-lounge amenities)
+    url: https://encalm.com/location/delhi
+    publisher: Encalm Hospitality
+    source_type: lounge_operator
+    retrieved_at: 2026-11-14
+
+  - key: encalm-prive-page
+    name: Encalm Prive Delhi page
+    url: https://encalm.com/services/encalmprive
+    publisher: Encalm Hospitality
+    source_type: lounge_operator
+    retrieved_at: 2026-11-14
+
+  - key: encalm-transit-delhi-page
+    name: Transit by Encalm (Nap & Shower Rooms) Delhi page
+    url: https://encalm.com/services/transit-lounge-delhi
+    publisher: Encalm Hospitality
+    source_type: lounge_operator
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-del12
+    name: Priority Pass lounge page DEL12 Encalm Lounge, Terminal 1D
+    url: https://www.prioritypass.com/lounges/india/new-delhi-indira-gandhi-intl/del12-encalm-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-del14
+    name: Priority Pass lounge page DEL14 Domestic Lounge - New Delhi T3
+    url: https://www.prioritypass.com/en-GB/lounges/india/indira-gandhi-international/del14-domestic-lounge-new-delhi-t3
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-del15
+    name: Priority Pass lounge page DEL15 Encalm Lounge, Terminal 3 International
+    url: https://prioritypass.com/lounges/india/new-delhi-indira-gandhi-intl/del15-international-lounge---t3
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-del18
+    name: Priority Pass lounge page DEL18 Encalm Lounge - Delhi Domestic T2
+    url: https://www.prioritypass.com/lounges/india/new-delhi-indira-gandhi-intl/del18-encalm-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-del19
+    name: Priority Pass lounge page DEL19 Encalm Lounge - Delhi Domestic T3
+    url: https://www.prioritypass.com/en-GB/lounges/india/indira-gandhi-international/del19-encalm-lounge-delhi-domestic-t3
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-del20
+    name: Priority Pass lounge page DEL20 Encalm Lounge - DEL Arrivals, Terminal 3
+    url: https://www.prioritypass.com/en-GB/lounges/india/indira-gandhi-international/del20-encalm-lounge-del-arrivals
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-maa-index
+    name: Priority Pass lounge index for Chennai International (MAA)
+    url: https://www.prioritypass.com/en-GB/lounges/india/chennai-international
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-maa6
+    name: Priority Pass lounge page, Travel Club, Chennai Terminal 1 (opposite Gate 5)
+    url: https://www.prioritypass.com/en-GB/lounges/india/chennai-international/maa6-travel-club
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-maa10
+    name: Priority Pass lounge page, Travel Club, Chennai Terminal 1 (towards Gate 1)
+    url: https://www.prioritypass.com/en-GB/lounges/india/chennai-international/maa10-travel-club
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-maa11
+    name: Priority Pass lounge page, Travel Club, Chennai Terminal 2 (international)
+    url: https://www.prioritypass.com/en-GB/lounges/india/chennai-international/maa11-travel-club
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-maa12
+    name: Priority Pass lounge page, Travel Club, Chennai Terminal 4
+    url: https://www.prioritypass.com/en-GB/lounges/india/chennai-international/maa12-travel-club
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-cok-index
+    name: Priority Pass lounge index for Cochin International (COK)
+    url: https://www.prioritypass.com/en-GB/lounges/india/cochin-international
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-cok2
+    name: Priority Pass lounge page, Earth Lounge, Cochin Terminal 3
+    url: https://www.prioritypass.com/en-GB/lounges/india/cochin-international/cok2-earth-lounge
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: priority-pass-cok5
+    name: Priority Pass lounge page, Travel Club Lounge, Cochin Terminal 1
+    url: https://www.prioritypass.com/en-GB/lounges/india/cochin-international/cok5-travel-club-lounge-cok-domestic
+    publisher: Priority Pass
+    source_type: network_program
+    retrieved_at: 2026-11-14
+
+  - key: cial-home
+    name: Cochin International Airport Limited home page (links to Airport Lounges and 0484 Aero Lounge)
+    url: https://www.cial.aero/
+    publisher: Cochin International Airport Limited
+    source_type: official_airport
+    retrieved_at: 2026-11-14
+
+  - key: 0484-aero-lounge-site
+    name: 0484 Aero Lounge website (linked from the CIAL home page)
+    url: https://0484aerolounge.com/
+    publisher: Balaji Caterers
+    source_type: lounge_operator
+    retrieved_at: 2026-11-14

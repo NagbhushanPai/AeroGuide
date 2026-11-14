@@ -1,0 +1,417 @@
+iata: DEL
+lounges:
+- slug: encalm-lounge-del-t1-domestic
+  name: Encalm Lounge
+  terminal: Terminal 1
+  operator: Encalm Hospitality
+  scope: domestic
+  side: airside
+  location_text: Mezzanine Level 5, Domestic Departures, Near Food Court Area, Terminal-1 IGI Airport
+    (New Delhi)
+  opening_hours:
+    mode: 24h
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - flight_info
+  - accessible
+  provenance:
+    status: verified
+    source: encalm-lounge-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-del12
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Priority Pass lists it as Terminal 1D, Domestic; max stay 2 hours; children under 6 free.
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 2550
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Adult price incl. tax; child (6-11) INR 1,800; walk-in guests pay at the lounge entrance.
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF).
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: encalm-lounge-del-t2-domestic
+  name: Encalm Lounge
+  terminal: Terminal 2
+  operator: Encalm Hospitality
+  scope: domestic
+  side: airside
+  location_text: 2nd Floor, SHA Area, Domestic Departures, Near Food Court Area, Terminal-2, IGI Airport
+    New Delhi- 110037
+  opening_hours:
+    mode: 24h
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - flight_info
+  - accessible
+  provenance:
+    status: verified
+    source: encalm-lounge-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-del18
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Priority Pass name: Encalm Lounge - Delhi Domestic T2; max stay 2 hours; children under
+        6 free.'
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 2550
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Adult price incl. tax; child (6-11) INR 1,800; walk-in guests pay at the lounge entrance.
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF).
+- slug: encalm-lounge-del-t3-international
+  name: Encalm Lounge
+  terminal: Terminal 3
+  operator: Encalm Hospitality
+  scope: international
+  side: airside
+  location_text: Mezzanine Level, T3 International Departures, IGI Airport, New Delhi- 110037
+  opening_hours:
+    mode: 24h
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - flight_info
+  - accessible
+  - business
+  provenance:
+    status: verified
+    source: encalm-lounge-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-del15
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Priority Pass location: Airside - International Departures, Security Hold Area, Food Court
+        Level, next to the Encalm Spa; max stay 2 hours; children under 6 free.'
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 4150
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Adult price incl. tax; child (6-11) INR 2,900; walk-in guests pay at the lounge entrance.
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: encalm-lounge-del-t3-domestic
+  name: Encalm Lounge
+  terminal: Terminal 3
+  operator: Encalm Hospitality
+  scope: domestic
+  side: airside
+  location_text: Mezzanine Level, Domestic Departures, Terminal 3, IGI Airport, New Delhi 110037
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - flight_info
+  provenance:
+    status: verified
+    source: encalm-lounge-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 2550
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Adult price incl. tax; child (6-11) INR 1,800; walk-in guests pay at the lounge entrance.
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF). The list names one Encalm
+        Lounge at T3 domestic; Encalm lists two.
+  - program: sbi-card-lounge-set-b
+    valid_from: '2026-01-10'
+    provenance:
+      status: verified
+      source: sbi-lounge-benefits-page
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in SBI Card's Set B participating lounges (w.e.f. 10 Jan 2026).
+- slug: encalm-lounge-del-t3-domestic-food-court
+  name: Encalm Lounge
+  terminal: Terminal 3
+  operator: Encalm Hospitality
+  scope: domestic
+  side: airside
+  location_text: Mezzanine Floor, Near Food Court Area, Domestic Departure, Terminal 3, IGI Airport, New
+    Delhi – 110037
+  opening_hours:
+    mode: 24h
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - flight_info
+  - accessible
+  provenance:
+    status: verified
+    source: encalm-lounge-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-del19
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Ambiguous on the source. Priority Pass name: Encalm Lounge - Delhi Domestic T3, ''Airside
+        - Domestic Departures, Security Hold Area, Food Court Level''. Encalm lists two domestic T3 lounges
+        on the mezzanine; matched to this one by the ''Food Court'' wording. Max stay stated as 2 hours
+        in one place and 3 hours in another on the PP page; children under 6 free.'
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 2550
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Adult price incl. tax; child (6-11) INR 1,800; walk-in guests pay at the lounge entrance.
+  - program: axis-bank-lounge-set-b
+    valid_from: '2023-06-01'
+    provenance:
+      status: verified
+      source: axis-lounge-program-pdf
+      verified_at: '2026-11-14'
+      verified_by: claude-code
+      notes: Listed in Axis Bank's Set B participating lounges (programme PDF). The list names one Encalm
+        Lounge at T3 domestic; Encalm lists two.
+- slug: domestic-lounge-new-delhi-t3-del-t3
+  name: Domestic Lounge - New Delhi T3
+  terminal: Terminal 3
+  scope: domestic
+  side: airside
+  location_text: Security Hold Zone, Food Court Level, Mezzanine Floor
+  opening_hours:
+    mode: 24h
+  amenities:
+  - alcohol
+  - flight_info
+  - accessible
+  provenance:
+    status: verified
+    source: priority-pass-del14
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-del14
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Operator not stated by Priority Pass. Alcoholic drinks marked 'Extra Payment Required'; max
+        stay 2 hours; children under 6 free. May be the same premises as one of Encalm's two domestic
+        T3 lounges; could not confirm.
+- slug: encalm-lounge-del-t3-arrivals
+  name: Encalm Lounge
+  terminal: Terminal 3
+  operator: Encalm Hospitality
+  scope: both
+  side: landside
+  location_text: Ground Level, Arrivals, Near Gate No.4, Terminal 3, IGI Airport, New Delhi 110037
+  nearest_gate: Gate No.4
+  opening_hours:
+    mode: 24h
+  amenities:
+  - wifi
+  - food
+  - flight_info
+  - accessible
+  provenance:
+    status: verified
+    source: encalm-lounge-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: priority-pass
+    valid_from: 2026-11-14
+    provenance:
+      status: verified
+      source: priority-pass-del20
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: 'Priority Pass name: Encalm Lounge - DEL Arrivals; ''Landside - located prior to the exit
+        gates, near the Food Court''; tagged International, Domestic; max 2 hour stay; boarding pass with
+        confirmed same-day travel required; luggage storage listed; children under 6 free.'
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 2550
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-lounge-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Arrival lounge adult price incl. tax; child (6-11) INR 1,800; walk-in guests pay at the lounge
+        entrance.
+- slug: encalm-prive-del-t3-international
+  name: Encalm Privé
+  terminal: Terminal 3
+  operator: Encalm Hospitality
+  scope: international
+  side: airside
+  location_text: Level 3, International Departures, Terminal 3, IGI Airport, New Delhi – 110037
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - showers
+  - spa
+  - sleeping
+  - business
+  - kids
+  - flight_info
+  - smoking
+  provenance:
+    status: verified
+    source: encalm-prive-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 5150
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-prive-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Adult price incl. tax; child (6-11) INR 3,600; under 6 free; walk-in, pay at the lounge entrance.
+- slug: encalm-prive-del-t1-domestic
+  name: Encalm Privé
+  terminal: Terminal 1
+  operator: Encalm Hospitality
+  scope: domestic
+  side: airside
+  location_text: Mezzanine Level 5, Domestic Departures, Terminal 1, IGI Airport, New Delhi – 110037
+  amenities:
+  - wifi
+  - food
+  - alcohol
+  - showers
+  - spa
+  - sleeping
+  - business
+  - kids
+  - flight_info
+  - smoking
+  provenance:
+    status: verified
+    source: encalm-prive-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+  accepts:
+  - program: encalm-paid
+    valid_from: 2026-11-14
+    paid_price: 4000
+    currency: INR
+    paid_duration_min: 120
+    provenance:
+      status: verified
+      source: encalm-prive-page
+      verified_at: 2026-11-14
+      verified_by: claude-code
+      notes: Adult price incl. tax; child (6-11) INR 2,800; under 6 free; walk-in, pay at the lounge entrance.
+- slug: transit-by-encalm-del-t3-arrivals
+  name: Transit by Encalm
+  terminal: Terminal 3
+  operator: Encalm Hospitality
+  scope: domestic
+  side: landside
+  location_text: Terminal 3, IGI Airport, Domestic Arrival Hall, Near Gate No. 1, New Delhi - 110037
+  nearest_gate: Gate No. 1
+  amenities:
+  - wifi
+  - food
+  - sleeping
+  - showers
+  provenance:
+    status: verified
+    source: encalm-transit-delhi-page
+    verified_at: 2026-11-14
+    verified_by: claude-code

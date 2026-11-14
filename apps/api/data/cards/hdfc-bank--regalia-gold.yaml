@@ -1,0 +1,57 @@
+slug: hdfc-bank-regalia-gold
+bank: hdfc-bank
+name: Regalia Gold
+product_url: https://www.hdfc.bank.in/credit-cards/regalia-gold-credit-card
+provenance:
+  status: verified
+  source: hdfc-regalia-gold-page
+  verified_at: 2026-11-14
+  verified_by: claude-code
+  notes: The bank's pages don't state the network.
+policies:
+- scope: domestic
+  valid_from: 2026-07-01
+  summary: 3 lounge visits in India per calendar quarter after spending ₹60,000 or more in the previous
+    calendar quarter. Swipe the card at a listed lounge.
+  rules:
+  - type: program_entitlement
+    program: hdfc-bank-lounge-access
+  - type: visit_quota
+    count: 3
+    period: quarter
+  - type: spend_gate
+    amount: 60000
+    window: previous_calendar_quarter
+    note: EMI transactions are not included. Transaction settlement date will only be considered.
+  - type: entry_method
+    method: card_swipe
+    note: There will be no Lounge Vouchers issue to customers. Rs.2 will be charged to the card account
+      as a transaction for validation.
+  unmodelled_terms: Customers with card opened date from 1st to month-end of last month of calendar quarter
+    may be exempted from the spend condition for upcoming quarter.
+  provenance:
+    status: verified
+    source: hdfc-regalia-gold-lounge-pdf
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: Spend condition 'W.e.f - 01-07-2026'.
+- scope: international
+  valid_from: 2026-11-14
+  summary: 6 complimentary lounge visits outside India, through Priority Pass.
+  rules:
+  - type: program_entitlement
+    program: priority-pass
+  - type: visit_quota
+    count: 6
+    period: year
+    ambiguous: true
+    note: The product page lists '6 Complimentary ... lounge visits outside India' without saying calendar
+      or membership year.
+  - type: entry_method
+    method: programme_card
+  provenance:
+    status: verified
+    source: hdfc-regalia-gold-page
+    verified_at: 2026-11-14
+    verified_by: claude-code
+    notes: The bank states no start date; valid_from is the date checked.
