@@ -51,7 +51,7 @@ Check constraint: `verification_status <> 'verified' OR (verified_at IS NOT NULL
 | `flight_positions` | partitioned by range on `position_time` (daily); index (`icao24`, `position_time desc`); GiST on `position` |
 | `lounges` | unique `slug`; index `airport_id`, `terminal_id`; GiST on `location` |
 | `lounge_access_methods` | exclusion: no overlapping `daterange(valid_from, valid_to)` per (`lounge_id`, `access_program_id`) |
-| `credit_cards` | unique `slug`; index `bank_id`, `network_code` |
+| `credit_cards` | unique `slug`; index `bank_id`, `network_code` (nullable since migration 0005: not every bank states the network) |
 | `lounge_policies` | exclusion: no overlapping `daterange(valid_from, valid_to)` per (`card_variant_id`, `scope`) |
 | `policy_rules` | check: `rule_type` in the known set; `rule` is validated by Pydantic before insert |
 | `record_sources` | PK (`source_id`, `record_table`, `record_id`) |

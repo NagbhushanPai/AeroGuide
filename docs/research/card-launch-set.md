@@ -43,10 +43,19 @@ Each card's programme needs lounges that accept it. Start with the 7 guide airpo
 
 ## Progress
 
-| Issuer | Card 1 | Card 2 | Card 3 |
-|---|---|---|---|
-| HDFC Bank | | | |
-| SBI Card | | | |
-| ICICI Bank | | | |
-| Axis Bank | | | |
-| Kotak Mahindra Bank | | | |
+Done 2026-11-14. Every policy cites the bank's own page or terms PDF (see the card files).
+
+| Issuer | Card 1 | Card 2 | Card 3 | Why these 3 |
+|---|---|---|---|---|
+| HDFC Bank | Infinia Metal | Diners Club Black Metal | Regalia Gold | The first three cards with lounge benefits on the [listing](https://www.hdfc.bank.in/credit-cards) |
+| SBI Card | ELITE | PRIME | MILES ELITE | SBI's premium and travel cards with lounge terms the bank publishes |
+| ICICI Bank | Emeralde | Sapphiro | Rubyx | Featured on the [listing](https://www.icici.bank.in/personal-banking/cards/credit-card); 1838 Reserve has no lounge access |
+| Axis Bank | Atlas | Magnus | Horizon | Axis's travel cards on the [listing](https://www.axis.bank.in/cards/credit-card) |
+| Kotak Mahindra Bank | White Reserve | Solitaire | Air+ | The premium unlimited-lounge cards, plus the featured travel card on the [listing](https://www.kotak.bank.in/en/personal-banking/cards/credit-cards.html) |
+
+### Known gaps
+
+- **Networks:** the banks don't state one for Regalia Gold, SBI's three cards, Atlas or Kotak's three cards, so these show "not stated".
+- **Undated brochures:** SBI's ELITE and PRIME counts come from undated brochures. Those rules are marked ambiguous.
+- **No lounge lists:** HDFC's (JavaScript only), ICICI's and Kotak's lists of lounges for their own programmes aren't linked to lounges yet. For those programmes, the checker finds no lounges.
+- **Atlas:** the bank says its international programme is "under maintenance".

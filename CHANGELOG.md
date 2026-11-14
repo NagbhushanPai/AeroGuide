@@ -4,6 +4,13 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (Stage 5c: launch content)
+- 15 cards, the top 3 travel cards of the 5 largest issuers: HDFC Bank (Infinia, Diners Club Black Metal, Regalia Gold), SBI Card (ELITE, PRIME, MILES ELITE), ICICI Bank (Emeralde, Sapphiro, Rubyx), Axis Bank (Atlas, Magnus, Horizon) and Kotak (White Reserve, Solitaire, Air+). Each policy cites the bank's own page or terms document. Unclear wording is marked ambiguous, so the checker answers "depends".
+- 44 lounges at DEL, BOM, BLR, HYD, MAA, COK and JAI, from airport, operator and Priority Pass pages. Bank-run domestic programmes are linked to lounges from the banks' own participating-lounge lists (Axis and SBI Card).
+
+### Changed
+- A card's network is optional (migration 0005). Several banks don't say which network a card runs on, so the site shows "not stated" instead of guessing.
+
 ### Added (Stage 5a + 5b: lounges and cards)
 - Database (migration 0004): amenities, access programmes, lounges with amenities and acceptance windows, banks, card networks, cards, and versioned lounge policies with typed rules. Policy versions and acceptance windows can't overlap.
 - Seed format for lounges (`data/lounges/{IATA}.yaml`) and cards (`data/cards/*.yaml`), validated across files. 5 issuers and 5 card networks seeded; no lounges or cards yet (they need checking against official pages).

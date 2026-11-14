@@ -108,7 +108,7 @@ A card (example values, not a real card):
 ```yaml
 slug: example-bank-voyager
 bank: example-bank                  # slug from banks.yaml
-network: visa                       # code from card_networks.yaml
+network: visa                       # code from card_networks.yaml; leave out if the bank doesn't say
 name: Voyager
 product_url: https://example.org/cards/voyager
 provenance: { status: verified, source: example-bank-voyager-page, verified_at: 2026-11-20, verified_by: your-github-handle }
