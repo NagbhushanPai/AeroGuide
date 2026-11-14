@@ -42,7 +42,14 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             else None
         )
         live = LiveService(
-            build_position_providers(settings.position_providers, http),
+            build_position_providers(
+                settings.position_providers,
+                http,
+                settings.opensky_client_id,
+                settings.opensky_client_secret.get_secret_value()
+                if settings.opensky_client_secret
+                else None,
+            ),
             build_route_lookup(settings.route_lookups_enabled, http),
             RedisKeyValue(redis),
             ttl_s=settings.snapshot_ttl_s,

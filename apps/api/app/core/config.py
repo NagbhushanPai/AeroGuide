@@ -3,7 +3,7 @@
 from functools import lru_cache
 from typing import Annotated, Literal
 
-from pydantic import Field, PostgresDsn, RedisDsn, field_validator
+from pydantic import Field, PostgresDsn, RedisDsn, SecretStr, field_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 SYNC_SCHEMES = ("postgres://", "postgresql://", "postgresql+psycopg://", "postgresql+psycopg2://")
@@ -48,6 +48,10 @@ class Settings(BaseSettings):
 
     # Live data (ADR-0004, ADR-0011, ADR-0012). Comma-separated, tried in order.
     position_providers: Annotated[list[str], NoDecode] = ["adsblol", "adsbfi", "opensky"]
+    # OpenSky API client (OAuth2 client credentials). Optional: without it OpenSky is used
+    # anonymously, with a small per-IP allowance shared with other apps on the same host.
+    opensky_client_id: str | None = None
+    opensky_client_secret: SecretStr | None = None
     route_lookups_enabled: bool = True
     # One sweep a minute fits adsb.lol's 10 requests/minute limit (see adsblol.GRID).
     snapshot_ttl_s: float = 60.0

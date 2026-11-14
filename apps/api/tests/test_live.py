@@ -370,6 +370,56 @@ async def test_opensky_429_is_a_rate_limit() -> None:
     assert info.value.retry_after_s == 900
 
 
+async def test_opensky_uses_a_cached_token_and_renews_it() -> None:
+    from app.providers.positions import opensky as os_
+
+    now = [0.0]
+    tokens: list[str] = []
+    seen_auth: list[str | None] = []
+    reject_next = [False]
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.url == os_.TOKEN_URL:
+            assert b"grant_type=client_credentials" in request.content
+            assert b"client_id=id" in request.content and b"client_secret=secret" in request.content
+            tokens.append(f"t{len(tokens) + 1}")
+            return httpx.Response(200, json={"access_token": tokens[-1], "expires_in": 1800})
+        seen_auth.append(request.headers.get("authorization"))
+        if reject_next[0]:
+            reject_next[0] = False
+            return httpx.Response(401)
+        return httpx.Response(200, json={"states": []})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        p = os_.OpenSkyProvider(client, "id", "secret", clock=lambda: now[0])
+        await p.fetch()
+        await p.fetch()
+        assert tokens == ["t1"] and seen_auth == ["Bearer t1", "Bearer t1"]  # reused
+
+        reject_next[0] = True
+        await p.fetch()  # 401: one renewal and retry
+        assert tokens == ["t1", "t2"] and seen_auth[-2:] == ["Bearer t1", "Bearer t2"]
+
+        now[0] = 1800.0  # past expiry (less the safety margin): renewed before the call
+        await p.fetch()
+        assert tokens[-1] == "t3" and seen_auth[-1] == "Bearer t3"
+
+
+async def test_opensky_without_credentials_stays_anonymous() -> None:
+    from app.providers.positions.opensky import OpenSkyProvider
+
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(200, json={"states": []})
+
+    async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+        await OpenSkyProvider(client).fetch()
+        await OpenSkyProvider(client, "id", None).fetch()  # half-configured counts as none
+    assert len(seen) == 2 and all("authorization" not in r.headers for r in seen)
+
+
 async def test_adsbfi_uses_its_own_path_and_names_itself() -> None:
     from app.providers.positions.adsblol import GRID, AdsbFiProvider
 

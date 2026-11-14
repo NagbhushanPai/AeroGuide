@@ -13,7 +13,12 @@ from app.providers.positions.opensky import OpenSkyProvider
 POSITION_PROVIDERS = ("adsblol", "adsbfi", "opensky", "demo")
 
 
-def build_position_providers(names: list[str], client: httpx.AsyncClient) -> list[PositionProvider]:
+def build_position_providers(
+    names: list[str],
+    client: httpx.AsyncClient,
+    opensky_client_id: str | None = None,
+    opensky_client_secret: str | None = None,
+) -> list[PositionProvider]:
     unknown = set(names) - set(POSITION_PROVIDERS)
     if unknown:
         raise ValueError(f"unknown position providers: {sorted(unknown)}")
@@ -25,7 +30,7 @@ def build_position_providers(names: list[str], client: httpx.AsyncClient) -> lis
     factories: dict[str, Callable[[], PositionProvider]] = {
         "adsblol": lambda: AdsbLolProvider(client),
         "adsbfi": lambda: AdsbFiProvider(client),
-        "opensky": lambda: OpenSkyProvider(client),
+        "opensky": lambda: OpenSkyProvider(client, opensky_client_id, opensky_client_secret),
         "demo": DemoProvider,
     }
     return [factories[n]() for n in names]
