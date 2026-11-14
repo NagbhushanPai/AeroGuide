@@ -4,6 +4,37 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Changed (checker answers you can trust)
+- Missing data is never "no": a card with no recorded benefit for the scope, a programme whose lounge list we don't have, and guests the terms don't mention now give "depends". A benefit that ended is still "no" ([ADR-0009](docs/decisions/0009-deterministic-eligibility-engine.md), revised).
+- Informational rule types `fee` and `add_on_cardholders` (migration 0006) never change an answer. The 15 verified cards were remodelled with them, so a ₹2 authorisation fee no longer forces "depends": 9 of the 15 can now get a plain "yes".
+- Lounges have a `direction` (departures, arrivals, transit). 5 arrivals lounges are no longer offered to departing passengers.
+- A "no" shows only its deciding checks; programmes appear by name; quoted bank wording is folded behind "Show the bank's wording".
+- Overlap constraints are deferrable, so editing a version's start date no longer breaks the seed.
+
+### Added (lounge lists)
+- 66 lounge acceptances at the 7 guide airports from HDFC's, ICICI's and Kotak's own participating-lounge lists. The Visa/Mastercard and Diners lists couldn't be read (one blocks automated access, one is app-only).
+
+### Added (finding your way)
+- Card picker with search and bank groups (chips, remembered in this browser only), airport search by city, airport/date/scope kept in the URL, results per lounge.
+- Two-way links: "Cards that may get you in" on lounge pages, "Lounges this card opens" on card pages (`GET /cards/{slug}/lounges`), lounges on the map's airport card, breadcrumbs.
+- Site search with Ctrl/Cmd-K over airports, lounges and cards (`GET /search`).
+- Filters on the lounge and card directories, kept in the URL.
+- Bottom tab bar on phones; map controls reflowed for 390 px; altitude legend; theme-aware map colours.
+
+### Added (reach)
+- Per-page titles, descriptions, canonical URLs, Open Graph image and JSON-LD; `sitemap.xml` and `robots.txt`; real 404s for unknown airports, lounges and cards; lowercase airport codes redirect.
+
+### Changed (reliability)
+- Live status says "Delayed" or "No recent data" when the feed is stale or failing, instead of "Live". Each provider gets at most 45 s, and a first request waits at most 10 s. `/health` reports each provider's last sweep.
+- One "waking the server" message, and retries that outlast a 60 s cold start.
+- Per-client rate limit on the REST API (120 a minute) keyed on the proxy-appended address, also fixing the MCP limiter; request bodies over 16 KB refused; database connect and command timeouts; Redis optional.
+- Lounges and cards are cached in memory for 5 minutes, so eligibility needs no database round trip on a warm cache.
+- "Airlines seen" measures height above the airport, so Bengaluru, Hyderabad and Leh are no longer under-counted.
+- Twice-weekly database keep-alive workflow, so the free-tier database doesn't pause.
+
+### Removed
+- "Coming soon" placeholders on the About page, 14 unused sources, and dead components.
+
 ### Added (cards imported for checking)
 - 61 more cards from 17 issuers, including 12 new ones (American Express, HSBC, AU, IndusInd, Yes Bank, RBL, Standard Chartered, BOBCARD, IDFC FIRST, Federal Bank, Niyo, Jupiter), imported from a third-party lounge tracker. Every one is marked unverified, cites the page the tracker relied on, and says it hasn't been checked by AeroGuide. Their policies carry the tracker's wording as unmodelled terms, so the checker answers "depends" for them, never "yes" (enforced by a test). They join the weekly review queue.
 
