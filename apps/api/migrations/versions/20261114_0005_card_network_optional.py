@@ -24,4 +24,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # A network can't be invented, so cards without one are removed (their policies cascade).
+    # They come back from the YAML seed after upgrading again.
+    op.execute("DELETE FROM credit_cards WHERE network_code IS NULL")
     op.alter_column("credit_cards", "network_code", existing_type=sa.Text(), nullable=False)
