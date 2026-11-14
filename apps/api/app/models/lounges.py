@@ -41,6 +41,12 @@ class LoungeScope(StrEnum):
     BOTH = "both"
 
 
+class LoungeDirection(StrEnum):
+    DEPARTURES = "departures"
+    ARRIVALS = "arrivals"  # meet-and-greet or arrivals lounges
+    TRANSIT = "transit"  # for connecting passengers only
+
+
 class LoungeSide(StrEnum):
     AIRSIDE = "airside"
     LANDSIDE = "landside"
@@ -61,6 +67,7 @@ class PolicyScope(StrEnum):
 
 lounge_scope_enum = pg_enum(LoungeScope, "lounge_scope")
 lounge_side_enum = pg_enum(LoungeSide, "lounge_side")
+lounge_direction_enum = pg_enum(LoungeDirection, "lounge_direction")
 program_kind_enum = pg_enum(ProgramKind, "program_kind")
 policy_scope_enum = pg_enum(PolicyScope, "policy_scope")
 
@@ -97,6 +104,9 @@ class Lounge(UuidPk, Timestamps, Provenance, Base):
     operator: Mapped[str | None] = mapped_column(Text)
     scope: Mapped[LoungeScope] = mapped_column(lounge_scope_enum)
     side: Mapped[LoungeSide] = mapped_column(lounge_side_enum)
+    direction: Mapped[LoungeDirection] = mapped_column(
+        lounge_direction_enum, server_default=LoungeDirection.DEPARTURES.value
+    )
     location_text: Mapped[str | None] = mapped_column(Text)
     nearest_gate: Mapped[str | None] = mapped_column(Text)
     # {"mode": "24h"} or {"mode": "weekly", "periods": [...]}; null = not verified.
@@ -133,6 +143,9 @@ class LoungeAccessMethod(UuidPk, Timestamps, Provenance, Base):
             (text("daterange(valid_from, valid_to)"), "&&"),
             name="ex_lounge_access_methods_no_overlap",
             using="gist",
+            # Deferred, so the seed can swap a version whose valid_from changed (0006).
+            deferrable=True,
+            initially="DEFERRED",
         ),
         provenance_check(),
     )
@@ -197,6 +210,9 @@ class LoungePolicy(UuidPk, Timestamps, Provenance, Base):
             (text("daterange(valid_from, valid_to)"), "&&"),
             name="ex_lounge_policies_no_overlap",
             using="gist",
+            # Deferred, so the seed can swap a version whose valid_from changed (0006).
+            deferrable=True,
+            initially="DEFERRED",
         ),
         provenance_check(),
     )

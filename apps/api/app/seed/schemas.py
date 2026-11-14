@@ -6,6 +6,7 @@ from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, StringConstraints, model_validator
 
+from app.core.india import today_ist
 from app.eligibility.rules import Rule
 from app.models.enums import AirlineOperation, SourceType, TerminalRole, VerificationStatus
 
@@ -55,7 +56,7 @@ class ProvenanceIn(Strict):
             ]
             if missing:
                 raise ValueError(f"a verified record needs {', '.join(missing)}")
-        if self.verified_at is not None and self.verified_at > date.today():
+        if self.verified_at is not None and self.verified_at > today_ist():
             raise ValueError("verified_at is in the future")
         return self
 
@@ -231,6 +232,8 @@ class LoungeIn(Strict):
     operator: Text | None = None
     scope: Literal["domestic", "international", "both"]
     side: Literal["airside", "landside"]
+    # Arrivals and transit lounges aren't offered to departing passengers by the checker.
+    direction: Literal["departures", "arrivals", "transit"] = "departures"
     location_text: Text | None = None  # quoted from the source
     nearest_gate: Text | None = None  # only when the source states it
     opening_hours: OpeningHours | None = None  # None = not verified

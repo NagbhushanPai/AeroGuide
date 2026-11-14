@@ -1,7 +1,9 @@
 """Lounge policy rule types (ADR-0009). A fixed set, each with typed fields.
 
 Anything a bank writes that doesn't fit one of these is kept as quoted text on the policy
-(`unmodelled_terms`) and makes the checker answer "depends", never a guess.
+(`unmodelled_terms`) and makes the checker answer "depends", never a guess. Wording that
+matters to the traveller but can't change the answer (a fee, add-on cardholders) has its own
+informational rule types, so it doesn't block a "yes".
 """
 
 from typing import Annotated, Literal
@@ -67,8 +69,34 @@ class EntryMethod(_Rule):
     method: Literal["card_swipe", "programme_card", "app_pass", "voucher", "other"]
 
 
+class Fee(_Rule):
+    """A charge per visit (for example a ₹2 card authorisation, or a guest fee).
+    Informational: shown with the answer, never changes it."""
+
+    type: Literal["fee"] = "fee"
+    amount: float = Field(ge=0, le=100_000)
+    currency: Literal["INR", "USD"] = "INR"
+    applies_to: Literal["cardholder", "guest"] = "cardholder"
+    refundable: bool | None = None  # None = the bank doesn't say
+
+
+class AddOnCardholders(_Rule):
+    """Whether add-on cardholders get the benefit. Informational."""
+
+    type: Literal["add_on_cardholders"] = "add_on_cardholders"
+    covered: bool
+    shares_quota: bool | None = None  # None = the bank doesn't say
+
+
 Rule = Annotated[
-    ProgramEntitlement | VisitQuota | SpendGate | GuestAllowance | AirportRestriction | EntryMethod,
+    ProgramEntitlement
+    | VisitQuota
+    | SpendGate
+    | GuestAllowance
+    | AirportRestriction
+    | EntryMethod
+    | Fee
+    | AddOnCardholders,
     Field(discriminator="type"),
 ]
 RULE_TYPES = (
@@ -78,4 +106,8 @@ RULE_TYPES = (
     "guest_allowance",
     "airport_restriction",
     "entry_method",
+    "fee",
+    "add_on_cardholders",
 )
+# Rule types that never change an answer, only add a note to it.
+INFORMATIONAL = frozenset({"entry_method", "fee", "add_on_cardholders"})

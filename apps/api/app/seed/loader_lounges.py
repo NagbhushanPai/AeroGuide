@@ -110,6 +110,7 @@ async def apply_lounges_and_cards(
                     "operator": lg.operator,
                     "scope": lg.scope,
                     "side": lg.side,
+                    "direction": lg.direction,
                     "location_text": lg.location_text,
                     "nearest_gate": lg.nearest_gate,
                     "opening_hours": lg.opening_hours.model_dump() if lg.opening_hours else None,

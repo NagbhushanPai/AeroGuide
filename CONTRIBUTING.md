@@ -93,6 +93,7 @@ lounges:
     terminal: T1                    # as the source names it
     scope: domestic                 # domestic | international | both
     side: airside                   # airside (after security) | landside
+    direction: departures           # departures (default) | arrivals | transit
     location_text: "Level 2, near gate 10"   # quoted, only if stated
     opening_hours: { mode: 24h }    # or { mode: weekly, periods: [{ days: [mon, tue], open: "05:00", close: "23:00" }] }
     amenities: [wifi, food]         # codes from amenities.yaml, only what the source states
@@ -126,7 +127,8 @@ policies:
 
 Rules:
 
-- **Rule types:** `program_entitlement`, `visit_quota`, `spend_gate`, `guest_allowance`, `airport_restriction` and `entry_method`. Each has fixed fields, and an unknown field is an error.
+- **Rule types:** `program_entitlement`, `visit_quota`, `spend_gate`, `guest_allowance`, `airport_restriction`, `entry_method`, `fee` and `add_on_cardholders`. Each has fixed fields, and an unknown field is an error.
+- **Informational rules:** `entry_method`, `fee` (`{ type: fee, amount: 2, currency: INR, applies_to: cardholder | guest, refundable: true }`) and `add_on_cardholders` (`{ type: add_on_cardholders, covered: true, shares_quota: true }`) are shown with the answer and never change it. Use them instead of `unmodelled_terms` for fees and add-on rules, so a small charge doesn't turn every answer into "depends". Leave out `refundable` or `shares_quota` when the bank doesn't say.
 - **Unclear wording:** if the bank's wording can be read two ways (for example "previous quarter" without saying calendar or billing), add `ambiguous: true` to that rule. The checker then answers "depends", never "yes".
 - **Conditions no rule type captures:** quote them in `unmodelled_terms`. Every answer for that version becomes "depends".
 - **Benefit changes:** end the old version with `valid_to` (the first day the old version no longer applies) and add a new one. Never rewrite a past version. Versions of the same card and scope can't overlap.

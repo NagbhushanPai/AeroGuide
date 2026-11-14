@@ -19,12 +19,22 @@ Card lounge benefits have quotas, spend gates over various windows, scope (domes
 
 Implemented in `apps/api/app/eligibility/` (`rules.py`, `engine.py`). Differences from the proposal above:
 
-- **Three outcomes:** `yes`, `no` and `depends`. "Unknown" and "conditional" are both `depends`, each with the check that caused it. No policy in force is a plain `no` ("no benefit recorded"). The UI labels `yes` as "Likely yes", because the bank and the lounge decide at the door.
+- **Three outcomes:** `yes`, `no` and `depends`. "Unknown" and "conditional" are both `depends`, each with the check that caused it. No policy in force was a plain `no` ("no benefit recorded"); see the revision below. The UI labels `yes` as "Likely yes", because the bank and the lounge decide at the door.
 - **No card variants:** a variant with different benefits is its own card (own slug).
 - **Versions** are linked by date (`valid_from`/`valid_to`, exclusive end), not by `superseded_by_id`. Exclusion constraints stop overlaps per (card, scope) and per (lounge, programme).
 - **Rule fields:** every rule has `ambiguous` (it can never yield a plain yes) and `note`. A policy can quote `unmodelled_terms`, which make every answer `depends`.
 - **Tests:** table-driven tests for every rule type, and Hypothesis property tests: more spend never makes the answer worse, more visits used never makes it better, a policy outside its window never applies, an ambiguous rule never gives a plain yes, and every non-yes answer names its reason.
 - **API:** `POST /api/v1/eligibility` takes card slugs, an airport, a date, the flight scope, guests and optional per-card facts. It evaluates every listed lounge at that airport. Unknown fields are rejected, the response is `no-store`, and nothing is persisted or logged.
+
+## Revision (2026-11-14): missing data is never "no"
+
+The launch data showed the engine could almost never say "yes", and sometimes said "no" when it simply lacked a record. Changes (migration 0006):
+
+- **No recorded benefit is `depends`**, with "that doesn't mean there isn't one". Only a benefit that ended (a version with `valid_to` and nothing after it) is `no`. This replaces "no policy in force is a plain `no`" above.
+- **Guests:** when the traveller brings guests and the policy has no guest rule, the answer is `depends` ("the terms don't say"). A stated guest fee answers it.
+- **Informational rule types** `fee` and `add_on_cardholders`, like `entry_method`, add notes and never change the answer. Fees and add-on rules no longer need `unmodelled_terms`. A property test checks they never change the status.
+- **Lounge direction:** lounges are `departures`, `arrivals` or `transit`. Only departure lounges are evaluated.
+- **Output:** a `no` returns only its deciding checks. Programme keys are shown by name. Quoted bank wording moves from the message to a separate `detail`, so the UI can fold it away.
 
 ## Consequences
 The engine is easy to test exhaustively (table-driven and property-based). Each new rule shape needs a model, engine support, tests and docs. Ambiguity is visible to users instead of hidden.

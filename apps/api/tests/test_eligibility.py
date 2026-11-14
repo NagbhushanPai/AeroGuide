@@ -19,8 +19,10 @@ from app.eligibility.engine import (
     evaluate,
 )
 from app.eligibility.rules import (
+    AddOnCardholders,
     AirportRestriction,
     EntryMethod,
+    Fee,
     GuestAllowance,
     ProgramEntitlement,
     Rule,
@@ -74,7 +76,7 @@ def policy(*rules: Rule, scope: str = "domestic", **kw: object) -> Policy:
             Lounge("x", "DEL", "both", LOUNGE.accepts),
             Trip(D, "international"),
             Facts(),
-            Status.NO,
+            Status.DEPENDS,  # no international benefit recorded: not the same as none
             "policy",
         ),
         (
@@ -87,7 +89,14 @@ def policy(*rules: Rule, scope: str = "domestic", **kw: object) -> Policy:
         ),
         # validity
         ([policy(valid_to=D)], LOUNGE, TRIP, Facts(), Status.NO, "policy"),  # valid_to is exclusive
-        ([policy(valid_from=D + timedelta(days=1))], LOUNGE, TRIP, Facts(), Status.NO, "policy"),
+        (
+            [policy(valid_from=D + timedelta(days=1))],
+            LOUNGE,
+            TRIP,
+            Facts(),
+            Status.DEPENDS,  # nothing recorded before the first version
+            "policy",
+        ),
         (
             [policy()],
             Lounge("x", "DEL", "domestic", (Acceptance("test-programme", date(2026, 1, 1), D),)),
@@ -253,6 +262,59 @@ def test_the_version_in_force_on_the_trip_date_is_used() -> None:
     assert later.status is Status.NO and later.policy_id == "new"
 
 
+def test_arrivals_and_transit_lounges_are_not_for_departures() -> None:
+    for direction in ("arrivals", "transit"):
+        lounge = Lounge("x", "DEL", "both", LOUNGE.accepts, direction)  # type: ignore[arg-type]
+        d = evaluate([policy()], lounge, TRIP)
+        assert d.status is Status.NO and d.checks[0].rule == "direction"
+
+
+def test_no_recorded_benefit_is_depends_but_an_ended_one_is_no() -> None:
+    assert evaluate([], LOUNGE, TRIP).status is Status.DEPENDS
+    ended = evaluate([policy(valid_to=D)], LOUNGE, TRIP)
+    assert ended.status is Status.NO and "ended" in ended.checks[0].message
+
+
+def test_guests_the_terms_dont_mention_make_it_depend() -> None:
+    d = evaluate([policy()], LOUNGE, Trip(D, "domestic", guests=1))
+    assert d.status is Status.DEPENDS and d.checks[-1].rule == "guests"
+    fee = Fee(amount=1200, applies_to="guest")
+    paid = evaluate([policy(fee)], LOUNGE, Trip(D, "domestic", guests=2))
+    assert paid.status is Status.YES and "₹1,200" in paid.checks[-1].message
+    assert evaluate([policy()], LOUNGE, TRIP).status is Status.YES  # no guests, no question
+
+
+def test_informational_rules_add_notes_and_never_change_the_answer() -> None:
+    rules = (Fee(amount=2, refundable=True), AddOnCardholders(covered=True, shares_quota=True))
+    d = evaluate([policy(*rules)], LOUNGE, TRIP)
+    assert d.status is Status.YES
+    assert d.notes == (
+        "Each visit is charged ₹2 (refunded).",
+        "Add-on cardholders are covered and share the primary card's visits.",
+    )
+
+
+def test_a_no_answer_shows_only_its_reasons() -> None:
+    p = [
+        policy(
+            SpendGate(amount=50_000, window="previous_calendar_quarter"),
+            rules=(ProgramEntitlement(program="other"),),
+            unmodelled_terms="Quoted terms",
+        )
+    ]
+    d = evaluate(p, LOUNGE, TRIP, program_names={"other": "Other Programme"})
+    assert d.status is Status.NO
+    assert [c.rule for c in d.checks] == ["program_entitlement"]
+    assert "Other Programme" in d.checks[0].message and "other)" not in d.checks[0].message
+
+
+def test_unmodelled_terms_are_quoted_in_the_detail_not_the_message() -> None:
+    d = evaluate([policy(unmodelled_terms="Primary cardholder only")], LOUNGE, TRIP)
+    terms = next(c for c in d.checks if c.rule == "terms")
+    assert terms.detail == "Primary cardholder only"
+    assert "Primary cardholder" not in terms.message
+
+
 # ------------------------------------------------------------------ property-based
 
 rules_strategy = st.lists(
@@ -272,6 +334,10 @@ rules_strategy = st.lists(
         st.builds(GuestAllowance, count=st.integers(0, 3)),
         st.builds(AirportRestriction, only=st.lists(st.sampled_from(["DEL", "BOM"]), max_size=2)),
         st.builds(EntryMethod, method=st.just("card_swipe")),
+        st.builds(
+            Fee, amount=st.integers(0, 3000), applies_to=st.sampled_from(["cardholder", "guest"])
+        ),
+        st.builds(AddOnCardholders, covered=st.booleans()),
     ),
     max_size=4,
 )
@@ -316,7 +382,7 @@ def test_policy_outside_its_window_never_applies(
     p = [policy(*rules, valid_from=start, valid_to=start + timedelta(days=length))]
     d = evaluate(p, LOUNGE, TRIP, Facts(visits_used=0, spend_inr=10**9))
     if not (start <= D < start + timedelta(days=length)):
-        assert d.status is Status.NO and d.policy_id is None
+        assert d.status is not Status.YES and d.policy_id is None
 
 
 @given(
@@ -328,7 +394,8 @@ def test_ambiguous_rules_never_give_a_plain_yes(
     rules: list[Rule], spend: int | None, used: int | None
 ) -> None:
     d = evaluate([policy(*rules)], LOUNGE, TRIP, Facts(visits_used=used, spend_inr=spend))
-    if any(r.ambiguous for r in rules if not isinstance(r, (GuestAllowance, EntryMethod))):
+    informational = (GuestAllowance, EntryMethod, Fee, AddOnCardholders)
+    if any(r.ambiguous for r in rules if not isinstance(r, informational)):
         assert d.status is not Status.YES
 
 
@@ -343,3 +410,13 @@ def test_every_non_yes_answer_names_its_reason(
     d = evaluate([policy(*rules)], LOUNGE, TRIP, Facts(visits_used=used, spend_inr=spend))
     if d.status is not Status.YES:
         assert any(c.status is d.status for c in d.checks)
+
+
+@given(rules=rules_strategy, guests=st.integers(0, 4))
+def test_informational_rules_never_change_the_status(rules: list[Rule], guests: int) -> None:
+    trip = Trip(D, "domestic", guests=guests)
+    core = [r for r in rules if not isinstance(r, (EntryMethod, AddOnCardholders, Fee))]
+    with_info = evaluate([policy(*rules)], LOUNGE, trip, Facts(visits_used=0, spend_inr=10**9))
+    without = evaluate([policy(*core)], LOUNGE, trip, Facts(visits_used=0, spend_inr=10**9))
+    if not any(isinstance(r, Fee) and r.applies_to == "guest" for r in rules) or guests == 0:
+        assert with_info.status is without.status
