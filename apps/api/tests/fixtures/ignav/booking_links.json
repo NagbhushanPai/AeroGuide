@@ -1,0 +1,13 @@
+{
+  "itinerary": {"price": {"amount": 5432, "currency": "INR", "status": "verified"}, "outbound": {"segments": []}},
+  "booking_options": [
+    {"legs": ["outbound"], "links": [
+      {"provider_name": "IndiGo", "provider_type": "airline", "fare_name": "Saver", "price": {"amount": 5432, "currency": "INR", "status": "verified"}, "url": "https://www.goindigo.in/booking?x=1"},
+      {"provider_name": "Some OTA", "provider_type": "ota", "fare_name": null, "price": {"amount": 5399, "currency": "INR", "status": "unverified"}, "url": "https://ota.example/book?id=2"},
+      {"provider_name": "Insecure", "url": "http://insecure.example/book"}
+    ]},
+    {"legs": ["outbound"], "links": [
+      {"provider_name": "IndiGo", "url": "https://www.goindigo.in/booking?x=1"}
+    ]}
+  ]
+}

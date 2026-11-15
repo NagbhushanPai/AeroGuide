@@ -72,6 +72,29 @@ class Settings(BaseSettings):
     sightings_enabled: bool = True
     sightings_flush_interval_s: float = 300.0
 
+    # Fare search (ADR-0015). Ignav is paid after a one-time free allowance of 1,000 requests,
+    # so every request is counted (Postgres) and capped. "mock" is demo data and runs alone.
+    fare_providers: Annotated[list[str], NoDecode] = ["ignav"]
+    ignav_api_key: SecretStr | None = None
+    ignav_base_url: str = "https://ignav.com/api"
+    ignav_market: str = Field(default="IN", pattern=r"^[A-Z]{2}$")
+    ignav_timeout_s: float = Field(default=20.0, gt=0)
+    ignav_max_retries: int = Field(default=2, ge=0, le=5)
+    ignav_min_interval_s: float = Field(default=0.5, ge=0)
+    ignav_max_concurrent: int = Field(default=2, ge=1, le=10)
+    # Lifetime cap: below Ignav's 1,000 free requests, leaving room for the coverage script.
+    fares_total_request_cap: int = Field(default=900, ge=0)
+    fares_monthly_request_cap: int | None = Field(default=None, ge=0)
+    fares_daily_request_cap: int | None = Field(default=100, ge=0)
+    # Share of a cap at which searches show "Heads up: N of M used".
+    fares_budget_warn_ratio: float = Field(default=0.95, gt=0, le=1)
+    fares_cache_ttl_s: int = Field(default=600, ge=60, le=3600)
+    fares_provider_timeout_s: float = Field(default=30.0, gt=0)
+    # "Best" sort weights: price, duration, stops.
+    fares_best_weights: str = "0.6,0.3,0.1"
+    # Per-client limit on /api/v1/fares (protects the request budget from scripts and bots).
+    fares_rate_limit_per_minute: int = Field(default=10, ge=1)
+
     # MCP server at /mcp (ADR-0014): read-only tools for AI assistants.
     mcp_enabled: bool = True
     # Host headers the MCP endpoint answers to (DNS-rebinding protection). Render sets
@@ -111,7 +134,25 @@ class Settings(BaseSettings):
             return normalise_database_url(value)
         return value
 
-    @field_validator("position_providers", mode="before")
+    @field_validator("fares_best_weights")
+    @classmethod
+    def valid_weights(cls, value: str) -> str:
+        from app.fares.ranking import Weights
+
+        Weights.parse(value)
+        return value
+
+    @field_validator("fares_monthly_request_cap", "fares_daily_request_cap", mode="before")
+    @classmethod
+    def blank_cap_is_none(cls, value: object) -> object:
+        return None if isinstance(value, str) and not value.strip() else value
+
+    @field_validator("ignav_api_key", mode="before")
+    @classmethod
+    def blank_key_is_none(cls, value: object) -> object:
+        return None if isinstance(value, str) and not value.strip() else value
+
+    @field_validator("position_providers", "fare_providers", mode="before")
     @classmethod
     def split_providers(cls, value: object) -> object:
         if isinstance(value, str):

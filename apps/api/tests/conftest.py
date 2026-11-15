@@ -1,4 +1,11 @@
+import os
+
 import pytest
+
+# Tests never use a real paid API: blank the Ignav key even if apps/api/.env has one
+# (environment variables override the .env file), and use demo fares by default.
+os.environ["IGNAV_API_KEY"] = ""
+os.environ["FARE_PROVIDERS"] = "mock"
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

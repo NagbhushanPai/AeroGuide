@@ -1,9 +1,14 @@
 """Build providers from settings (ADR-0004). Swapping sources is a config change."""
 
+import logging
 from collections.abc import Callable
 
 import httpx
 
+from app.fares.budget import BudgetGuard
+from app.providers.fares.base import FlightProvider
+from app.providers.fares.ignav import IgnavProvider
+from app.providers.fares.mock import MockProvider
 from app.providers.flight_info.adsbdb import AdsbdbRoutes
 from app.providers.positions.adsblol import AdsbFiProvider, AdsbLolProvider
 from app.providers.positions.base import PositionProvider
@@ -11,6 +16,9 @@ from app.providers.positions.demo import DemoProvider
 from app.providers.positions.opensky import OpenSkyProvider
 
 POSITION_PROVIDERS = ("adsblol", "adsbfi", "opensky", "demo")
+FARE_PROVIDERS = ("ignav", "mock")
+
+logger = logging.getLogger(__name__)
 
 
 def build_position_providers(
@@ -38,3 +46,49 @@ def build_position_providers(
 
 def build_route_lookup(enabled: bool, client: httpx.AsyncClient) -> AdsbdbRoutes | None:
     return AdsbdbRoutes(client) if enabled else None
+
+
+def build_fare_providers(
+    names: list[str],
+    client: httpx.AsyncClient,
+    budget: BudgetGuard,
+    *,
+    ignav_api_key: str | None,
+    ignav_base_url: str,
+    ignav_market: str,
+    ignav_timeout_s: float,
+    ignav_max_retries: int,
+    ignav_min_interval_s: float,
+    ignav_max_concurrent: int,
+) -> list[FlightProvider]:
+    """Fare providers (ADR-0015). A paid provider without a key is left out with a warning, so
+    the site runs without fare search rather than failing to start."""
+    unknown = set(names) - set(FARE_PROVIDERS)
+    if unknown:
+        raise ValueError(f"unknown fare providers: {sorted(unknown)}")
+    if "mock" in names and len(names) > 1:
+        raise ValueError(
+            "the mock fare provider must be configured on its own (FARE_PROVIDERS=mock)"
+        )
+    providers: list[FlightProvider] = []
+    for name in names:
+        if name == "mock":
+            providers.append(MockProvider())
+        elif name == "ignav":
+            if not ignav_api_key:
+                logger.warning("IGNAV_API_KEY is not set: fare search is off")
+                continue
+            providers.append(
+                IgnavProvider(
+                    client,
+                    ignav_api_key,
+                    budget,
+                    market=ignav_market,
+                    base_url=ignav_base_url,
+                    timeout_s=ignav_timeout_s,
+                    max_retries=ignav_max_retries,
+                    min_interval_s=ignav_min_interval_s,
+                    max_concurrent=ignav_max_concurrent,
+                )
+            )
+    return providers

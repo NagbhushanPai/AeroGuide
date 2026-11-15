@@ -7,6 +7,8 @@ from contextlib import AsyncExitStack, asynccontextmanager
 import httpx
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from redis.asyncio import Redis
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app import __version__
 from app.api.deps import AppResources
@@ -15,13 +17,59 @@ from app.core.config import Settings, get_settings
 from app.core.logging import configure_logging
 from app.database.redis import RedisKeyValue, create_redis
 from app.database.session import create_engine
+from app.fares.budget import BudgetGuard, BudgetPolicy, PostgresUsageLedger
+from app.fares.cache import FareCache, InMemoryFareCache, RedisFareCache
+from app.fares.ranking import Weights
 from app.ingestion.live import LiveService
 from app.ingestion.sightings import SightingRecorder
 from app.mcp_server import RateLimit, build_mcp
 from app.mcp_server.ratelimit import BodyLimit
-from app.providers.registry import build_position_providers, build_route_lookup
+from app.providers.registry import (
+    build_fare_providers,
+    build_position_providers,
+    build_route_lookup,
+)
+from app.services.fares import DatabaseAirportCodes, FareSearchService
 
 REPO_URL = "https://github.com/NagbhushanPai/AeroGuide"
+
+
+def build_fare_service(
+    settings: Settings, http: httpx.AsyncClient, engine: AsyncEngine, redis: "Redis | None"
+) -> FareSearchService:
+    """Fare search (ADR-0015): providers, the Postgres request budget and the result cache."""
+    budget = BudgetGuard(
+        PostgresUsageLedger(engine),
+        BudgetPolicy(
+            total_cap=settings.fares_total_request_cap,
+            monthly_cap=settings.fares_monthly_request_cap,
+            daily_cap=settings.fares_daily_request_cap,
+            warn_ratio=settings.fares_budget_warn_ratio,
+        ),
+    )
+    providers = build_fare_providers(
+        settings.fare_providers,
+        http,
+        budget,
+        ignav_api_key=settings.ignav_api_key.get_secret_value() if settings.ignav_api_key else None,
+        ignav_base_url=settings.ignav_base_url,
+        ignav_market=settings.ignav_market,
+        ignav_timeout_s=settings.ignav_timeout_s,
+        ignav_max_retries=settings.ignav_max_retries,
+        ignav_min_interval_s=settings.ignav_min_interval_s,
+        ignav_max_concurrent=settings.ignav_max_concurrent,
+    )
+    cache: FareCache = RedisFareCache(redis) if redis is not None else InMemoryFareCache()
+    return FareSearchService(
+        providers,
+        cache,
+        budget=budget,
+        currency_key=f"market-{settings.ignav_market}",
+        cache_ttl_s=settings.fares_cache_ttl_s,
+        provider_timeout_s=settings.fares_provider_timeout_s,
+        weights=Weights.parse(settings.fares_best_weights),
+        airports=DatabaseAirportCodes(engine),
+    )
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -64,7 +112,13 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             on_snapshot=recorder,
         )
         await live.warm_start()
-        app.state.resources = AppResources(settings=settings, engine=engine, redis=redis, live=live)
+        app.state.resources = AppResources(
+            settings=settings,
+            engine=engine,
+            redis=redis,
+            live=live,
+            fares=build_fare_service(settings, http, engine, redis),
+        )
         try:
             async with AsyncExitStack() as stack:
                 if mcp is not None:
@@ -103,6 +157,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         RateLimit,
         per_minute=settings.api_rate_limit_per_minute,
         exempt=("/api/v1/health", "/mcp"),
+    )
+    # Fare search spends a paid request budget: a tighter per-client limit on top.
+    app.add_middleware(
+        RateLimit, per_minute=settings.fares_rate_limit_per_minute, only=("/api/v1/fares/",)
     )
     app.add_middleware(BodyLimit, max_bytes=settings.max_request_bytes)
 
