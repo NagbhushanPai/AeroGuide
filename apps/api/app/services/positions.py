@@ -25,7 +25,22 @@ KT_TO_KMH = 1.852
 BBox = tuple[float, float, float, float]  # min_lon, min_lat, max_lon, max_lat
 
 
-def build_meta(snap: Snapshot | None, now: datetime) -> PositionsMeta:
+RETRYING = " AeroGuide keeps trying every minute, and the map updates on its own."
+
+
+def outage_reason(last_error: str | None) -> str:
+    """Why the latest sweeps failed, in plain words (from LiveService.last_error)."""
+    if not last_error:
+        return "The open data sources didn't respond."
+    parts = [p for p in last_error.split(";") if p.strip()]
+    if parts and all("rate-limited" in p or "resting" in p for p in parts):
+        return "The open data sources are busy right now (they're limiting requests)."
+    return "The open data sources aren't responding right now."
+
+
+def build_meta(
+    snap: Snapshot | None, now: datetime, last_error: str | None = None
+) -> PositionsMeta:
     """Mode follows docs/architecture/flight-data-flow.md. `count` is filled in by callers."""
     if snap is None:
         return PositionsMeta(
@@ -36,13 +51,18 @@ def build_meta(snap: Snapshot | None, now: datetime) -> PositionsMeta:
             fetched_at=None,
             generated_at=now,
             count=0,
-            message="Live flight data is unavailable. The open data sources didn't respond.",
+            message="Live flight data is unavailable. " + outage_reason(last_error) + RETRYING,
         )
 
     mode: LiveMode
     age = now - snap.fetched_at
     if age > DEGRADED_MAX_AGE:
-        mode, message = "unavailable", "Live data is more than 5 minutes old, so it isn't shown."
+        mode, message = (
+            "unavailable",
+            "The last live data is more than 5 minutes old, so it isn't shown. "
+            + outage_reason(last_error)
+            + RETRYING,
+        )
     elif snap.source.is_demo:
         mode, message = "demo", "Simulated aircraft for testing. These are not real flights."
     elif age > LIVE_MAX_AGE:
@@ -83,7 +103,7 @@ def _in_bbox(a: AircraftState, bbox: BBox | None) -> bool:
 async def get_positions(live: LiveService, bbox: BBox | None = None) -> PositionsResponse:
     snap = await live.snapshot()
     now = datetime.now(UTC)
-    meta = build_meta(snap, now)
+    meta = build_meta(snap, now, live.last_error)
     if snap is None or meta.mode == "unavailable":
         return PositionsResponse(features=[], meta=meta)
 
@@ -142,7 +162,7 @@ def compute_progress(state: AircraftState, route: ReportedRoute, now: datetime) 
 async def get_aircraft(live: LiveService, icao24: str) -> AircraftDetail | None:
     snap = await live.snapshot()
     now = datetime.now(UTC)
-    meta = build_meta(snap, now)
+    meta = build_meta(snap, now, live.last_error)
     if snap is None or meta.mode == "unavailable":
         return None
     state = snap.by_icao.get(icao24.lower())

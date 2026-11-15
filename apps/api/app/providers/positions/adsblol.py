@@ -1,9 +1,12 @@
-"""Community ADS-B networks that share the readsb JSON format (adsb.lol, adsb.fi).
+"""Community ADS-B networks that share the readsb JSON format (adsb.lol, adsb.fi), and a pool
+that uses them together with point-by-point failover.
 
 Each sweep queries the same 10-point India grid. adsb.lol data is ODbL 1.0; adsb.fi is for
 personal, non-commercial use with attribution. Both credits are shown in the UI."""
 
 import asyncio
+import time
+from collections.abc import Awaitable, Callable
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -136,3 +139,113 @@ class AdsbFiProvider(ReadsbGridProvider):
 
     def point_path(self, lat: float, lon: float) -> str:
         return f"/v3/lat/{lat}/lon/{lon}/dist/{RADIUS_NM}"
+
+
+class ReadsbPool:
+    """Several readsb networks (adsb.lol, adsb.fi) as one source, failing over point by point.
+
+    Each grid point is asked of the network currently preferred. A 429 rests that network for
+    its Retry-After and the remaining points go to the next one, so points already fetched are
+    kept instead of starting the whole sweep again on another network. A point that fails for
+    another reason is also tried on the next network. The pool sticks with whichever network
+    last answered, so a busy network isn't asked first every minute.
+
+    Rate limits are per network and often shared with other apps on the same host address, so
+    spreading one sweep over two networks keeps the map live when either is busy.
+    """
+
+    is_demo = False
+
+    def __init__(
+        self,
+        networks: list[ReadsbGridProvider],
+        *,
+        clock: Callable[[], float] = time.monotonic,
+        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
+    ) -> None:
+        if len(networks) < 2:
+            raise ValueError("a pool needs at least two networks")
+        self.networks = networks
+        self.name = " + ".join(n.name for n in networks)
+        self.url = networks[0].url
+        self.attribution = "; ".join(n.attribution for n in networks)
+        self._clock = clock
+        self._sleep = sleep
+        self._resting_until: dict[str, float] = {}
+        self._last_request: dict[str, float] = {}
+        self._preferred = 0
+
+    def _available(self, broken: set[str]) -> list[ReadsbGridProvider]:
+        now = self._clock()
+        n = len(self.networks)
+        order = [self.networks[(self._preferred + k) % n] for k in range(n)]
+        return [
+            net
+            for net in order
+            if net.name not in broken and self._resting_until.get(net.name, 0.0) <= now
+        ]
+
+    async def _ask(self, net: ReadsbGridProvider, lat: float, lon: float) -> list[Any] | None:
+        last = self._last_request.get(net.name)
+        if last is not None:
+            wait = net._spacing - (self._clock() - last)
+            if wait > 0:
+                await self._sleep(wait)
+        self._last_request[net.name] = self._clock()
+        return await net._point(lat, lon)
+
+    async def fetch(self) -> list[AircraftState]:
+        results: list[tuple[str, list[Any]] | None] = []
+        served: dict[str, int] = {}
+        # A network that errors (not a rate limit) is skipped for the rest of this sweep, so
+        # one that hangs can't make every remaining point wait for its timeout.
+        broken: set[str] = set()
+        for lat, lon in GRID:
+            got: tuple[str, list[Any]] | None = None
+            for net in self._available(broken):
+                try:
+                    batch = await self._ask(net, lat, lon)
+                except ProviderRateLimitedError as exc:
+                    self._resting_until[net.name] = self._clock() + exc.retry_after_s
+                    continue
+                if batch is None:
+                    broken.add(net.name)
+                    continue
+                got = (net.name, batch)
+                served[net.name] = served.get(net.name, 0) + 1
+                break
+            results.append(got)
+
+        failed = sum(r is None for r in results)
+        if failed > MAX_FAILED_POINTS:
+            resting = [
+                until - self._clock()
+                for until in self._resting_until.values()
+                if until > self._clock()
+            ]
+            if len(resting) == len(self.networks):
+                raise ProviderRateLimitedError(self.name, min(resting))
+            raise RuntimeError(f"{self.name}: {failed} of {len(GRID)} point queries failed")
+
+        if served:  # stick with the network that answered most
+            best = max(served, key=lambda name: served[name])
+            self._preferred = next(i for i, n in enumerate(self.networks) if n.name == best)
+
+        now = datetime.now(UTC)
+        by_hex: dict[str, AircraftState] = {}
+        for item in results:
+            if item is None:
+                continue
+            network, batch = item
+            for raw in batch:
+                state = normalise(raw, now, network)  # each aircraft credits its own network
+                if state is not None:
+                    by_hex[state.icao24] = state
+        return list(by_hex.values())
+
+    def status(self) -> dict[str, float]:
+        """Seconds each resting network has left, for /health."""
+        now = self._clock()
+        return {
+            name: round(until - now) for name, until in self._resting_until.items() if until > now
+        }

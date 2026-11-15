@@ -1,5 +1,7 @@
 import asyncio
+from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import httpx
 import pytest
@@ -482,3 +484,112 @@ async def test_first_request_waits_only_briefly_when_every_provider_hangs() -> N
     assert await live.snapshot() is None
     assert asyncio.get_running_loop().time() - started < 1
     await live.aclose()
+
+
+# ---- readsb pool: point-by-point failover ---------------------------------------------------
+
+
+def _pool_client(
+    behaviour: dict[str, Callable[[int], httpx.Response]],
+) -> tuple[httpx.AsyncClient, dict[str, int]]:
+    calls: dict[str, int] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        host = request.url.host
+        calls[host] = calls.get(host, 0) + 1
+        return behaviour[host](calls[host])
+
+    return httpx.AsyncClient(transport=httpx.MockTransport(handler)), calls
+
+
+def _ac(hex_: str) -> httpx.Response:
+    return httpx.Response(
+        200, json={"ac": [{"hex": hex_, "lat": 23.0, "lon": 77.0, "alt_baro": 30000}]}
+    )
+
+
+def _pool(client: httpx.AsyncClient, clock: Clock) -> Any:
+    from app.providers.positions.adsblol import AdsbFiProvider, AdsbLolProvider, ReadsbPool
+
+    async def no_sleep(_: float) -> None:
+        return None
+
+    return ReadsbPool(
+        [AdsbLolProvider(client, spacing_s=0), AdsbFiProvider(client, spacing_s=0)],
+        clock=clock,
+        sleep=no_sleep,
+    )
+
+
+async def test_pool_keeps_fetched_points_and_finishes_on_the_other_network() -> None:
+    client, calls = _pool_client(
+        {
+            # adsb.lol answers 6 points, then rate-limits.
+            "api.adsb.lol": lambda n: (
+                _ac(f"a{n:05d}") if n <= 6 else httpx.Response(429, headers={"Retry-After": "90"})
+            ),
+            "opendata.adsb.fi": lambda n: _ac(f"f{n:05d}"),
+        }
+    )
+    clock = Clock()
+    pool = _pool(client, clock)
+    aircraft = await pool.fetch()
+    assert calls == {"api.adsb.lol": 7, "opendata.adsb.fi": 4}  # no point asked twice needlessly
+    assert len(aircraft) == 10
+    assert {a.source for a in aircraft} == {"adsb.lol", "adsb.fi"}  # each credits its network
+    assert pool.status() == {"adsb.lol": 90}
+    # Sticky: adsb.lol is resting, so the next sweep goes to adsb.fi only.
+    clock.t += 30
+    await pool.fetch()
+    assert calls["api.adsb.lol"] == 7 and calls["opendata.adsb.fi"] == 14
+
+
+async def test_pool_skips_a_failing_network_for_the_rest_of_the_sweep() -> None:
+    client, calls = _pool_client(
+        {
+            "api.adsb.lol": lambda n: httpx.Response(502),
+            "opendata.adsb.fi": lambda n: _ac(f"f{n:05d}"),
+        }
+    )
+    aircraft = await _pool(client, Clock()).fetch()
+    assert len(aircraft) == 10 and calls["api.adsb.lol"] == 1  # tried once, then skipped
+
+
+async def test_pool_reports_a_rate_limit_when_every_network_is_resting() -> None:
+    from app.providers.positions.base import ProviderRateLimitedError
+
+    client, _ = _pool_client(
+        {
+            "api.adsb.lol": lambda n: httpx.Response(429, headers={"Retry-After": "120"}),
+            "opendata.adsb.fi": lambda n: httpx.Response(429, headers={"Retry-After": "45"}),
+        }
+    )
+    with pytest.raises(ProviderRateLimitedError) as exc:
+        await _pool(client, Clock()).fetch()
+    assert exc.value.retry_after_s == 45  # the live service rests the pool until one is back
+
+
+def test_registry_pools_adsblol_and_adsbfi() -> None:
+    client = httpx.AsyncClient()
+    names = [p.name for p in build_position_providers(["adsblol", "adsbfi", "opensky"], client)]
+    assert names == ["adsb.lol + adsb.fi", "OpenSky Network"]
+    assert [p.name for p in build_position_providers(["opensky", "adsbfi", "adsblol"], client)] == [
+        "OpenSky Network",
+        "adsb.fi + adsb.lol",
+    ]
+
+
+def test_outage_message_says_why_and_that_it_retries() -> None:
+    from app.services.positions import outage_reason
+
+    busy = build_meta(
+        None, NOW, "adsb.lol + adsb.fi: rate-limited; OpenSky Network: resting after rate limit"
+    )
+    assert (
+        busy.message is not None and "busy" in busy.message and "updates on its own" in busy.message
+    )
+    down = build_meta(
+        None, NOW, "adsb.lol + adsb.fi: rate-limited; OpenSky Network: ConnectTimeout"
+    )
+    assert down.message is not None and "aren't responding" in down.message
+    assert outage_reason(None) == "The open data sources didn't respond."

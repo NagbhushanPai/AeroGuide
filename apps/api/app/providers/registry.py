@@ -10,12 +10,18 @@ from app.providers.fares.base import FlightProvider
 from app.providers.fares.ignav import IgnavProvider
 from app.providers.fares.mock import MockProvider
 from app.providers.flight_info.adsbdb import AdsbdbRoutes
-from app.providers.positions.adsblol import AdsbFiProvider, AdsbLolProvider
+from app.providers.positions.adsblol import (
+    AdsbFiProvider,
+    AdsbLolProvider,
+    ReadsbGridProvider,
+    ReadsbPool,
+)
 from app.providers.positions.base import PositionProvider
 from app.providers.positions.demo import DemoProvider
 from app.providers.positions.opensky import OpenSkyProvider
 
 POSITION_PROVIDERS = ("adsblol", "adsbfi", "opensky", "demo")
+READSB = ("adsblol", "adsbfi")  # same JSON format: pooled when both are configured
 FARE_PROVIDERS = ("ignav", "mock")
 
 logger = logging.getLogger(__name__)
@@ -35,13 +41,38 @@ def build_position_providers(
         raise ValueError(
             "the demo provider must be configured on its own (POSITION_PROVIDERS=demo)"
         )
+    # adsb.lol and adsb.fi share one format: when both are listed they work as one pool with
+    # point-by-point failover, placed where the first of them is listed.
+    readsb_names = [n for n in names if n in READSB]
+    if len(readsb_names) > 1:
+        networks: list[ReadsbGridProvider] = [
+            AdsbLolProvider(client) if n == "adsblol" else AdsbFiProvider(client)
+            for n in readsb_names
+        ]
+        pool = ReadsbPool(networks)
+        providers: list[PositionProvider] = []
+        for n in names:
+            if n == readsb_names[0]:
+                providers.append(pool)
+            elif n not in READSB:
+                providers.append(_one(n, client, opensky_client_id, opensky_client_secret))
+        return providers
+    return [_one(n, client, opensky_client_id, opensky_client_secret) for n in names]
+
+
+def _one(
+    name: str,
+    client: httpx.AsyncClient,
+    opensky_client_id: str | None,
+    opensky_client_secret: str | None,
+) -> PositionProvider:
     factories: dict[str, Callable[[], PositionProvider]] = {
         "adsblol": lambda: AdsbLolProvider(client),
         "adsbfi": lambda: AdsbFiProvider(client),
         "opensky": lambda: OpenSkyProvider(client, opensky_client_id, opensky_client_secret),
         "demo": DemoProvider,
     }
-    return [factories[n]() for n in names]
+    return factories[name]()
 
 
 def build_route_lookup(enabled: bool, client: httpx.AsyncClient) -> AdsbdbRoutes | None:
