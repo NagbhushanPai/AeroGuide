@@ -73,6 +73,17 @@ AI assistants can also use these services through the read-only MCP server at `/
 
 Lounges, cards, policies and acceptances are held in memory for 5 minutes (they change only when the seed runs), so eligibility, search and the two-way lists need no database round trip on a warm cache.
 
+### Fares
+Fare search for Indian domestic routes from Ignav, within a request budget ([ADR-0015](../decisions/0015-paid-fare-search-with-a-request-budget.md)). Every endpoint is `Cache-Control: no-store` and limited to 10 requests a minute per client.
+
+| | |
+|---|---|
+| `POST /fares/search` | **Implemented.** `{ origin, destination, departure_date, return_date?, passengers { adults, children, infants_in_seat, infants_on_lap }, cabin, nearby_airports, max_stops?, airlines?, depart_after_hour?, depart_before_hour?, max_price?, sort }`, where `sort` is best, cheapest or fastest. Returns normalised `offers` (price is the total for all passengers; legs with local times and time zones; `booking { provider, reference }`), `total_offers`, `excluded_abroad`, `airlines`, `providers` (outcome per source), `budget`, `is_demo` and `notice`. Filters and sort apply to cached results (10 minutes). Errors: `422` (validation, or an airport outside India), `429` (budget reached), `502`, `503` (not set up, or the budget can't be checked), `504` |
+| `POST /fares/booking-links` | **Implemented.** `{ provider, reference }` from an offer, returning sellers with links, cheapest first. One upstream request the first time per offer, then cached. `404` when the fare expired |
+| `GET /fares/budget` | **Implemented.** `{ provider, used, cap, today, daily_cap, near_limit, message }`, or `null` without a paid source |
+
+Airport autocomplete is `GET /airports?q=` (AeroGuide's own data, no upstream cost).
+
 ### Eligibility
 `POST /eligibility` (**implemented**, [ADR-0009](../decisions/0009-deterministic-eligibility-engine.md)). Unknown fields are rejected, so a card number can't be sent by mistake. The response is `Cache-Control: no-store`, and nothing is stored or logged.
 

@@ -4,6 +4,14 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (fare search)
+- Fare search and comparison for Indian domestic routes, one-way or round trip, from the Ignav API ([ADR-0015](docs/decisions/0015-paid-fare-search-with-a-request-budget.md)): `POST /api/v1/fares/search`, `POST /api/v1/fares/booking-links`, `GET /api/v1/fares/budget`, and the `/fares` page.
+- Provider-agnostic design: providers implement one `FlightProvider` interface and map to a normalised offer. They're asked concurrently with per-provider timeouts, and one failing never fails the search. A demo provider (`FARE_PROVIDERS=mock`) gives labelled demo fares for tests and offline work.
+- A hard request budget: every Ignav request, retries included, is counted in Postgres (migration 0007) under a lock and capped at 900 requests by default (below the 1,000 free ones) and 100 a day. Searches show a gentle reminder at 95%, and stop at the cap.
+- Requests are spent carefully: a 10-minute result cache (filters and sorting reuse it), booking links fetched only on Book, airport autocomplete from AeroGuide's own data, non-Indian airports refused before any request, and a per-client limit on `/fares`.
+- Itineraries connecting outside India (for example via Colombo) are left out of domestic results.
+- `apps/api/scripts/check_ignav_coverage.py`: a 3-request airline coverage check, dry run by default.
+
 ### Changed (checker answers you can trust)
 - Missing data is never "no": a card with no recorded benefit for the scope, a programme whose lounge list we don't have, and guests the terms don't mention now give "depends". A benefit that ended is still "no" ([ADR-0009](docs/decisions/0009-deterministic-eligibility-engine.md), revised).
 - Informational rule types `fee` and `add_on_cardholders` (migration 0006) never change an answer. The 15 verified cards were remodelled with them, so a ₹2 authorisation fee no longer forces "depends": 9 of the 15 can now get a plain "yes".

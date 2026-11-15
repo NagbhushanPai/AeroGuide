@@ -18,5 +18,6 @@ Format: [ADR-0001](./0001-record-architecture-decisions.md). Statuses: Proposed 
 | [0012](./0012-zero-budget-hosting.md) | Zero-budget hosting and on-demand ingestion | Proposed |
 | [0013](./0013-weekly-data-check.md) | Weekly data check job | Proposed |
 | [0014](./0014-mcp-server-for-ai-assistants.md) | An MCP server for AI assistants | Proposed |
+| [0015](./0015-paid-fare-search-with-a-request-budget.md) | Fare search from a paid API, within a hard request budget | Accepted |
 
 "Proposed" ADRs become "Accepted" once the owner approves Stage 0.

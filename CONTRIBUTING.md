@@ -5,7 +5,7 @@
 1. **Never invent data.** Live positions, schedules, terminal assignments, lounge hours, facilities and card benefits must come from a cited source, or be marked `unverified` or `unavailable`.
 2. **Never commit secrets.** Use `.env` files (git-ignored) and the platform secret stores.
 3. **Keep the app runnable** after every change.
-4. **Open data and free tiers only.** AeroGuide is non-commercial with a zero budget. Don't add paid services or proprietary data sources.
+4. **Open data and free tiers only.** AeroGuide is non-commercial with a zero budget. Don't add paid services or proprietary data sources. The one exception is fare search from Ignav, within a hard request budget ([ADR-0015](docs/decisions/0015-paid-fare-search-with-a-request-budget.md)). Tests must never call it.
 
 By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE).
 
