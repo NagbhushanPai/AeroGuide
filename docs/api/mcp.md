@@ -34,8 +34,17 @@ All tools are read-only. Results carry each record's source and verification sta
 | `check_lounge_access` | Which of your cards get you into each lounge: yes, no or depends, with the reasons |
 | `flights_near_airport` | Aircraft near an airport right now, nearest first |
 | `get_flight` | One aircraft's live position, reported route and progress |
+| `search_flights` | Fares on Indian domestic flights, one way or round trip: the top 10 by best, cheapest or fastest, with filters, and a link to AeroGuide's fares page to compare all and book |
 
 `check_lounge_access` runs the same deterministic engine as the website. You can add the visits you've used and your spend, keyed by card. Without them, a benefit with a spend condition answers "depends". Never share card numbers; the tool identifies card products only, and refuses fields it doesn't know.
+
+`search_flights` uses a paid source within a request budget ([ADR-0015](../decisions/0015-paid-fare-search-with-a-request-budget.md)):
+
+- **Daily cap for assistants:** live searches from all AI assistants together are capped at `FARES_MCP_DAILY_REQUEST_CAP` (20) a day. They also count against the site's own caps. When the cap is reached, the tool says so and points to the website.
+- **Free repeats:** a search repeated within 10 minutes, or one that changes only the sort or filters, reuses the earlier result at no cost. Searches on the website and through MCP share that cache.
+- **No booking-link tool:** each result includes `search_url`, the website's fares page with the same search filled in, where the traveller presses Book.
+- **One airport pair per search:** the tool never searches a city's other airports (DXN, NMI, GOX), because each extra pair costs another request. That option is on the website only.
+- **Guidance for assistants:** the tool tells them to search only once they know the route and date, and not to scan dates or routes.
 
 ## Things to ask
 
@@ -43,6 +52,7 @@ All tools are read-only. Results carry each record's source and verification sta
 - "Which lounges at Bengaluru accept Priority Pass, and are they before or after security?"
 - "What changed in the HDFC Regalia Gold lounge benefit this year, and where does it say so?"
 - "What's landing at Mumbai in the next few minutes, and where is it coming from?"
+- "What are the cheapest non-stop flights from Delhi to Bengaluru on 20 December?"
 
 ## Rules the assistant is given
 
@@ -68,4 +78,6 @@ The endpoint is part of the API, so `make dev-api` serves it at `http://localhos
 |---|---|---|
 | `MCP_ENABLED` | `true` | Turn the endpoint off |
 | `MCP_RATE_LIMIT_PER_MINUTE` | `60` | Requests per client address per minute |
+| `FARES_MCP_DAILY_REQUEST_CAP` | `20` | Live fare searches all assistants may make per IST day (0 turns live searches off) |
+| `SITE_URL` | `https://aeroguide-theta.vercel.app` | The website, for the fares-page links in results |
 | `MCP_ALLOWED_HOSTS` | `localhost:*,127.0.0.1:*,[::1]:*,test` | Accepted Host headers. On Render, `RENDER_EXTERNAL_HOSTNAME` is added automatically |

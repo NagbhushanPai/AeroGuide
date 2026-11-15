@@ -38,6 +38,16 @@ Coverage check on 2026-11-15 (one request per route, 6 Dec 2026):
 6. **Domestic only.** Itineraries that touch an airport outside India, such as a connection via Colombo, are left out, and the response says how many.
 7. **Honesty.** Results say prices can change and that the seller confirms them, and unverified prices are labelled. The demo provider (`FARE_PROVIDERS=mock`) is for tests and offline demos only, runs on its own, and every offer and page is labelled demo ([ADR-0011](./0011-demo-mode-is-explicit.md)).
 
+## Addendum (2026-11-15): fare search for AI assistants
+
+The MCP server has a `search_flights` tool ([ADR-0014](./0014-mcp-server-for-ai-assistants.md), owner decisions 2026-11-15):
+
+- **Own daily cap:** assistants' live searches are marked with a budget channel and capped at `FARES_MCP_DAILY_REQUEST_CAP` (20) a day, counted as `ignav:mcp`. They also count against the site's caps.
+- **Shared cache:** the tool uses the same service and cache as the website.
+- **Spending stays on the website:** there's no booking-link tool (results link to the fares page instead), and no multi-airport searches.
+- **Output:** the top 10 fares and summary counts.
+- **Usage guidance:** the tool description and the server instructions tell assistants to search only for a known route and date, and to refine with filters, which cost nothing.
+
 ## Consequences
 - Fare search costs nothing until 900 requests are used, then pauses until the owner raises the cap and adds billing at Ignav.
 - On a busy day the daily cap may pause searches until midnight IST, which is preferable to an unexpected bill.

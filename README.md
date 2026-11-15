@@ -111,6 +111,7 @@ Compares fares on Indian domestic routes, one-way or round trip, from the [Ignav
 | `FARES_CACHE_TTL_S` | `600` | Result cache, 60 to 3,600 s |
 | `FARES_BEST_WEIGHTS` | `0.6,0.3,0.1` | Price, duration, stops |
 | `FARES_RATE_LIMIT_PER_MINUTE` | `10` | Per client, on `/api/v1/fares/*` |
+| `FARES_MCP_DAILY_REQUEST_CAP` | `20` | Live searches by AI assistants through the MCP tool `search_flights`, per IST day, inside the caps above |
 
 **Running it.** Run `pnpm migrate` (creates `provider_usage`), then the API and web as above, then open http://localhost:3000/fares. For demo fares that cost nothing, set `FARE_PROVIDERS=mock`. The tests never call Ignav: they use fixtures and a mock transport, and blank the key.
 
