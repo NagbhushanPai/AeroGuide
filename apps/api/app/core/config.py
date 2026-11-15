@@ -94,6 +94,11 @@ class Settings(BaseSettings):
     fares_best_weights: str = "0.6,0.3,0.1"
     # Per-client limit on /api/v1/fares (protects the request budget from scripts and bots).
     fares_rate_limit_per_minute: int = Field(default=10, ge=1)
+    # Upstream requests AI assistants may spend per IST day through the MCP fare tool. They also
+    # count against the caps above. 0 turns the tool's live searches off.
+    fares_mcp_daily_request_cap: int = Field(default=20, ge=0)
+    # The website, for links in tool results (the /fares page with a search filled in).
+    site_url: str = "https://aeroguide-theta.vercel.app"
 
     # MCP server at /mcp (ADR-0014): read-only tools for AI assistants.
     mcp_enabled: bool = True

@@ -46,6 +46,12 @@ def build_fare_service(
             daily_cap=settings.fares_daily_request_cap,
             warn_ratio=settings.fares_budget_warn_ratio,
         ),
+        channel_daily_caps={"mcp": settings.fares_mcp_daily_request_cap},
+        channel_refusal=lambda _channel, cap: (
+            f"AI assistants have used today's {cap:,} live fare searches on AeroGuide. Searches "
+            f"made in the last 10 minutes still work, or search at {settings.site_url}/fares. "
+            "The allowance resets at midnight IST."
+        ),
     )
     providers = build_fare_providers(
         settings.fare_providers,

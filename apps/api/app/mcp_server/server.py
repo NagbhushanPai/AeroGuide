@@ -23,6 +23,7 @@ from app.api.deps import AppResources
 from app.core.config import Settings
 from app.core.geo import haversine_km
 from app.core.india import Region, today_ist
+from app.mcp_server.fares import register_fare_tools
 from app.schemas.airports import AirlinesSeen, AirportDetail, AirportList
 from app.schemas.lounges import (
     CardDetail,
@@ -46,7 +47,7 @@ UNAVAILABLE = "AeroGuide's database is unavailable right now (it may be starting
 
 INSTRUCTIONS = """\
 AeroGuide has open, source-cited data on Indian airports, airport lounges, credit-card lounge
-benefits and live flights.
+benefits and live flights, and fare search for Indian domestic flights.
 
 Rules for using these tools:
 - Answer only from tool results. If the tools don't have it, say so. Never fill gaps from memory.
@@ -57,6 +58,10 @@ Rules for using these tools:
 - Terminals change. Tell travellers to confirm their terminal with the airline or airport.
 - Dates are in India time (IST).
 - Never ask for or send card numbers. Card products are identified by slugs from list_cards.
+- Fares: call search_flights only when the traveller wants prices, after you know the route
+  and date. Each new search uses a small shared daily allowance; changing sort or filters, or
+  repeating a search within 10 minutes, is free. Don't scan dates or routes. Give the
+  search_url so the traveller can see every fare and book, and say prices can change.
 """
 
 READ_ONLY = ToolAnnotations(
@@ -294,4 +299,5 @@ def build_mcp(get_resources: Callable[[], AppResources], settings: Settings) -> 
         detail = await position_svc.get_aircraft(get_resources().live, icao24)
         return found(detail, "That aircraft isn't being tracked right now.")
 
+    register_fare_tools(mcp, get_resources, settings)
     return mcp

@@ -8,11 +8,16 @@ concurrent requests. If the counter can't be reached, no request is sent (fail c
 Caps: a lifetime total (the free allowance is one-time), an optional calendar-month cap for
 when billing is on, and an optional daily cap that stops one busy day draining the rest.
 Days and months are IST.
+
+Channels: a caller can mark its requests with `budget_channel` (for example "mcp" for AI
+assistants). A channel with a daily cap is counted separately as well ("ignav:mcp"), so
+assistants can't use up the website's day. Its requests still count against the site's caps.
 """
 
 import asyncio
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
+from contextvars import ContextVar
 from dataclasses import dataclass
 from datetime import date
 from typing import Protocol
@@ -26,6 +31,9 @@ from app.providers.fares.base import BudgetExceededError, BudgetUnavailableError
 from app.schemas.fares import BudgetStatus
 
 logger = logging.getLogger(__name__)
+
+# Who is spending: None for the website, "mcp" for AI assistants. Copied into tasks.
+budget_channel: ContextVar[str | None] = ContextVar("fare_budget_channel", default=None)
 
 
 @dataclass(frozen=True, slots=True)
@@ -101,14 +109,35 @@ class BudgetGuard:
         ledger: UsageLedger,
         policy: BudgetPolicy,
         today: Callable[[], date] = today_ist,
+        channel_daily_caps: Mapping[str, int] | None = None,
+        channel_refusal: Callable[[str, int], str] | None = None,
     ) -> None:
         self._ledger = ledger
         self.policy = policy
         self._today = today
         self._warned = False
+        self._channel_caps = dict(channel_daily_caps or {})
+        self._channel_refusal = channel_refusal or (
+            lambda channel, cap: (
+                f"Today's {cap:,} fare searches for {channel} are used up. "
+                "They reset at midnight IST."
+            )
+        )
 
     async def reserve(self, provider: str) -> BudgetStatus:
-        """Reserve one upstream request, or raise. Call before every request (retries too)."""
+        """Reserve one upstream request, or raise. Call before every request (retries too).
+
+        A capped channel is reserved first. If the site's caps then refuse, that channel has
+        counted one request that wasn't sent: it errs on the side of spending less."""
+        channel = budget_channel.get()
+        if channel is not None and channel in self._channel_caps:
+            cap = self._channel_caps[channel]
+            message = self._channel_refusal(channel, cap)
+            await self._ledger.reserve(
+                f"{provider}:{channel}",
+                self._today(),
+                lambda u: message if u.today >= cap else None,
+            )
         usage = await self._ledger.reserve(provider, self._today(), self.policy.refusal)
         status = self.policy.status(provider, usage)
         if status.near_limit and not self._warned:
