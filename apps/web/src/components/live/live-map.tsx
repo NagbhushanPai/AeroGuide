@@ -19,6 +19,7 @@ import type { AircraftFeature, ReportedRoute } from "@/lib/api/client";
 
 import { AIRCRAFT_ICON_ID, createAircraftIcon } from "./aircraft-icon";
 import { ALTITUDE_STOPS, GROUND_COLOR } from "./altitude";
+import { moveAircraft } from "./motion";
 
 export type LayerVisibility = { traffic: boolean; weather: boolean; airports: boolean };
 export type FlyTarget = { lon: number; lat: number; key: number };
@@ -111,6 +112,9 @@ function prefersReducedMotion(): boolean {
     typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
+
+/** How often moving aircraft are redrawn (twice a second is smooth at country zoom). */
+const MOTION_TICK_MS = 500;
 
 function toCollection(features: AircraftFeature[]): FeatureCollection {
   return { type: "FeatureCollection", features: features as unknown as Feature[] };
@@ -340,6 +344,7 @@ export function LiveMap({
     weatherTilesUrl,
     dimmed,
     theme,
+    animate: false,
   });
   useLayoutEffect(() => {
     latest.current = {
@@ -352,6 +357,7 @@ export function LiveMap({
       weatherTilesUrl,
       dimmed,
       theme,
+      animate: !dimmed && !prefersReducedMotion(),
     };
   });
   const prevSelected = useRef<string | null>(null);
@@ -379,7 +385,9 @@ export function LiveMap({
       addOverlays(map, l.theme);
       applyTheme(map, l.theme);
       applyDimmed(map, l.dimmed);
-      (map.getSource("aircraft") as GeoJSONSource | undefined)?.setData(toCollection(l.features));
+      (map.getSource("aircraft") as GeoJSONSource | undefined)?.setData(
+        toCollection(l.animate ? moveAircraft(l.features, Date.now()) : l.features),
+      );
       const sel = l.features.find((f) => f.id === l.selected);
       (map.getSource("route") as GeoJSONSource | undefined)?.setData(routeCollection(l.route, sel));
       applyVisibility(map, l.layers);
@@ -438,11 +446,26 @@ export function LiveMap({
     if (map?.isStyleLoaded()) applyDimmed(map, dimmed);
   }, [dimmed]);
 
-  // Aircraft data.
+  // Aircraft data. Airborne aircraft glide along their reported heading and speed between
+  // updates (estimates, see motion.ts), unless the data is too old or motion is reduced.
+  const animate = !dimmed && !prefersReducedMotion();
   useEffect(() => {
-    const src = mapRef.current?.getSource("aircraft") as GeoJSONSource | undefined;
-    src?.setData(toCollection(features));
-  }, [features]);
+    const draw = () => {
+      const map = mapRef.current;
+      const src = map?.getSource("aircraft") as GeoJSONSource | undefined;
+      if (!map || !src) return;
+      src.setData(toCollection(animate ? moveAircraft(features, Date.now()) : features));
+      // Keep the selected aircraft highlighted across redraws.
+      const sel = latest.current.selected;
+      if (sel) map.setFeatureState({ source: "aircraft", id: sel }, { selected: true });
+    };
+    draw();
+    if (!animate) return;
+    const timer = window.setInterval(() => {
+      if (document.visibilityState === "visible") draw();
+    }, MOTION_TICK_MS);
+    return () => window.clearInterval(timer);
+  }, [features, animate]);
 
   // Selection highlight.
   useEffect(() => {

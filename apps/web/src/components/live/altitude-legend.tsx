@@ -59,6 +59,10 @@ export function AltitudeLegend({ className }: { className?: string }) {
           />
           On the ground · altitudes in feet
         </p>
+        <p className="text-muted-foreground">
+          Between updates, airborne aircraft move along their reported heading and speed: those
+          positions are estimates, corrected at each update.
+        </p>
       </div>
     </div>
   );
