@@ -171,9 +171,17 @@ test.describe("desktop", () => {
     await search.fill("B738");
     await expect(sidebar.getByText(/^1 shown/)).toBeVisible();
     await search.fill("");
-    await sidebar.getByRole("combobox", { name: "From airport" }).selectOption("DEL");
+    // The From filter is searchable: type a code (or city) and pick from the list.
+    const from = sidebar.getByRole("combobox", { name: "From airport" });
+    await from.fill("del");
+    const option = sidebar.getByRole("option", { name: /DEL/ });
+    await expect(option).toContainText("1 flight");
+    await option.click();
+    await expect(from).toHaveValue(/^From: DEL/);
     await expect(sidebar.getByText(/^1 shown/)).toBeVisible();
     await expect(sidebar.getByRole("list", { name: "Aircraft" }).getByText("TS101")).toBeVisible();
+    await sidebar.getByRole("button", { name: "Clear from filter" }).click();
+    await expect(from).toHaveValue("");
   });
 
   test("watching a flight is remembered across reloads", async ({ page }) => {
@@ -195,6 +203,14 @@ test("explains when live data is unavailable instead of showing an empty map", a
       .filter({ visible: true })
       .first(),
   ).toBeVisible();
+  // It keeps checking by itself, and the traveller can check now.
+  await expect(page.getByText(/Checking again automatically/).first()).toBeVisible();
+  let polls = 0;
+  page.on("request", (r) => {
+    if (new URL(r.url()).pathname === "/api/v1/positions") polls++;
+  });
+  await page.getByRole("button", { name: "Check now" }).click();
+  await expect.poll(() => polls).toBeGreaterThan(0);
 });
 
 test("mobile shows the flight list in a sheet", async ({ page }, testInfo) => {

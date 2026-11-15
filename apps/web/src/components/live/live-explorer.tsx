@@ -1,6 +1,6 @@
 "use client";
 
-import { List, Plane, RadioTower } from "lucide-react";
+import { List, Plane, RadioTower, RefreshCw } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
@@ -17,6 +17,7 @@ import {
 import { useNow } from "@/hooks/use-now";
 import type { MapAirport } from "@/lib/airports";
 import type { AircraftFeature } from "@/lib/api/client";
+import { cn } from "@/lib/utils";
 
 import { AirportCard } from "./airport-card";
 import { AirportSearch, useMapAirports } from "./airport-search";
@@ -268,6 +269,35 @@ export function LiveExplorer() {
             <div className="pointer-events-auto max-w-sm rounded-xl border bg-background/95 p-5 text-center shadow-lg">
               <Plane aria-hidden="true" className="mx-auto mb-2 size-6 text-primary" />
               <LiveStatus meta={meta} state={status} />
+              {status.kind === "unavailable" ||
+              status.kind === "unreachable" ||
+              status.kind === "expired" ? (
+                <div className="mt-3 flex flex-col items-center gap-2">
+                  <p className="text-xs text-muted-foreground" aria-live="polite">
+                    {positions.isFetching
+                      ? "Checking now…"
+                      : positions.dataUpdatedAt
+                        ? `Checked at ${new Date(positions.dataUpdatedAt).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false })} IST. Checking again automatically.`
+                        : "Checking again automatically."}
+                  </p>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    disabled={positions.isFetching}
+                    onClick={() => void positions.refetch()}
+                  >
+                    <RefreshCw
+                      aria-hidden="true"
+                      className={cn(
+                        "size-3.5",
+                        positions.isFetching && "animate-spin motion-reduce:animate-none",
+                      )}
+                    />
+                    Check now
+                  </Button>
+                </div>
+              ) : null}
             </div>
           </div>
         ) : null}

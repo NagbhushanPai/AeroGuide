@@ -8,7 +8,9 @@ import { cn } from "@/lib/utils";
 
 import { MISSING } from "@/lib/copy";
 
+import { useMapAirports } from "./airport-search";
 import { displayName, formatAltitude, hasCallsign, typeName } from "./format";
+import { RouteAirportFilter, type RouteAirport } from "./route-airport-filter";
 
 const PAGE = 100;
 
@@ -47,17 +49,22 @@ export function FlightList({ features, selected, onSelect, isWatched, onToggleWa
   const [to, setTo] = useState("");
   const [limit, setLimit] = useState(PAGE);
 
-  // Airports that appear in known routes, for the From/To filters.
+  const mapAirports = useMapAirports();
+
+  // Airports that appear in known routes, with how many flights use each, for From/To.
   const { origins, destinations, withRoute } = useMemo(() => {
-    const o = new Set<string>();
-    const d = new Set<string>();
+    const o = new Map<string, number>();
+    const d = new Map<string, number>();
     let n = 0;
     for (const f of features) {
-      if (f.properties.origin_iata) o.add(f.properties.origin_iata);
-      if (f.properties.destination_iata) d.add(f.properties.destination_iata);
-      if (f.properties.origin_iata && f.properties.destination_iata) n++;
+      const { origin_iata: from, destination_iata: to } = f.properties;
+      if (from) o.set(from, (o.get(from) ?? 0) + 1);
+      if (to) d.set(to, (d.get(to) ?? 0) + 1);
+      if (from && to) n++;
     }
-    return { origins: [...o].sort(), destinations: [...d].sort(), withRoute: n };
+    const list = (m: Map<string, number>): RouteAirport[] =>
+      [...m].map(([code, flights]) => ({ code, flights }));
+    return { origins: list(o), destinations: list(d), withRoute: n };
   }, [features]);
 
   const filtered = useMemo(() => {
@@ -80,8 +87,26 @@ export function FlightList({ features, selected, onSelect, isWatched, onToggleWa
     <div className="flex h-full min-h-0 flex-col">
       <div className="space-y-2 border-b p-3">
         <div className="grid grid-cols-2 gap-2">
-          <AirportSelect label="From" value={from} options={origins} onChange={setFrom} />
-          <AirportSelect label="To" value={to} options={destinations} onChange={setTo} />
+          <RouteAirportFilter
+            label="From"
+            value={from}
+            options={origins}
+            airports={mapAirports.data}
+            onChange={(code) => {
+              setFrom(code);
+              setLimit(PAGE);
+            }}
+          />
+          <RouteAirportFilter
+            label="To"
+            value={to}
+            options={destinations}
+            airports={mapAirports.data}
+            onChange={(code) => {
+              setTo(code);
+              setLimit(PAGE);
+            }}
+          />
         </div>
         <label className="relative block">
           <span className="sr-only">Search flights</span>
@@ -137,36 +162,6 @@ export function FlightList({ features, selected, onSelect, isWatched, onToggleWa
         </ul>
       )}
     </div>
-  );
-}
-
-function AirportSelect({
-  label,
-  value,
-  options,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  options: string[];
-  onChange: (v: string) => void;
-}) {
-  return (
-    <label className="block">
-      <span className="sr-only">{label} airport</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 w-full rounded-md border bg-background px-2 text-sm outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-      >
-        <option value="">{label}: any</option>
-        {options.map((code) => (
-          <option key={code} value={code}>
-            {label}: {code}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }
 
