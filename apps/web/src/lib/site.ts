@@ -26,6 +26,7 @@ export type NavItem = {
 export const mainNav: readonly NavItem[] = [
   { href: "/", label: "Live Map", shortLabel: "Map" },
   { href: "/airports", label: "Airports", shortLabel: "Airports" },
+  { href: "/fares", label: "Fares", shortLabel: "Fares" },
   { href: "/lounges", label: "Lounges", shortLabel: "Lounges" },
   { href: "/cards", label: "Cards", shortLabel: "Cards" },
   { href: "/about", label: "About", shortLabel: "About" },

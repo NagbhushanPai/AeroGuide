@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.core.config import Settings
 from app.ingestion.live import LiveService
+from app.services.fares import FareSearchService
 
 
 @dataclass(frozen=True, slots=True)
@@ -16,6 +17,7 @@ class AppResources:
     engine: AsyncEngine
     redis: "Redis | None"  # None when REDIS_URL isn't set
     live: LiveService
+    fares: "FareSearchService | None" = None
 
 
 def get_resources(request: Request) -> AppResources:

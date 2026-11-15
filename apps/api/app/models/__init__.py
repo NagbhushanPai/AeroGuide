@@ -16,6 +16,7 @@ from app.models.lounges import (
 )
 from app.models.observations import AirportSighting, OsmTerminal
 from app.models.sources import RecordSource, Source, SourceCheck
+from app.models.usage import ProviderUsage
 
 __all__ = [
     "AccessProgram",
@@ -33,6 +34,7 @@ __all__ = [
     "LoungePolicy",
     "OsmTerminal",
     "PolicyRule",
+    "ProviderUsage",
     "RecordSource",
     "Source",
     "SourceCheck",

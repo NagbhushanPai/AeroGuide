@@ -6,7 +6,14 @@ import { cn } from "@/lib/utils";
  * Shown whenever simulated data is on screen (ADR-0011). Deliberately loud and always labelled
  * in text, so demo data can't be mistaken for live data.
  */
-export function DemoBadge({ className }: { className?: string }) {
+export function DemoBadge({
+  className,
+  note,
+}: {
+  className?: string;
+  /** Shown after "Demo data" in the badge itself, e.g. "not real fares". */
+  note?: string;
+}) {
   return (
     <span
       role="status"
@@ -18,8 +25,9 @@ export function DemoBadge({ className }: { className?: string }) {
       )}
     >
       <FlaskConical aria-hidden="true" className="size-3.5" />
-      Demo data
-      <span className="sr-only">: simulated aircraft, not real flights</span>
+      {/* One text node, so the flex gap doesn't split "Demo data: …". */}
+      <span>{note ? `Demo data: ${note}` : "Demo data"}</span>
+      {note ? null : <span className="sr-only">: simulated aircraft, not real flights</span>}
     </span>
   );
 }

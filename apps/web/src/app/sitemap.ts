@@ -6,6 +6,7 @@ import { absoluteUrl } from "@/lib/site";
 const STATIC_PAGES: MetadataRoute.Sitemap = [
   { url: absoluteUrl("/"), changeFrequency: "always", priority: 1 },
   { url: absoluteUrl("/airports"), changeFrequency: "weekly", priority: 0.8 },
+  { url: absoluteUrl("/fares"), changeFrequency: "monthly", priority: 0.7 },
   { url: absoluteUrl("/lounges"), changeFrequency: "weekly", priority: 0.8 },
   { url: absoluteUrl("/cards"), changeFrequency: "weekly", priority: 0.8 },
   { url: absoluteUrl("/about"), changeFrequency: "monthly", priority: 0.5 },

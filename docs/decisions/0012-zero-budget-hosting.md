@@ -31,6 +31,9 @@ The owner has decided AeroGuide is **non-commercial with a zero budget**. The ma
 5. **The live page handles cold starts.** It shows "Waking up the live data service…" while the API spins up, instead of an error.
 6. **Scheduled jobs run on GitHub Actions** ([ADR-0013](./0013-weekly-data-check.md)), not on a paid worker.
 
+## Exception
+Fare search uses Ignav, a paid API, within a hard request budget that stays below its free allowance by default ([ADR-0015](./0015-paid-fare-search-with-a-request-budget.md)).
+
 ## Consequences
 - AeroGuide runs at $0. The first live-map visitor after a quiet period waits about 1 minute.
 - One API instance means in-memory state is consistent. Scaling out later would move the snapshot and rate limits to Redis, which is a config change in the repository layer.

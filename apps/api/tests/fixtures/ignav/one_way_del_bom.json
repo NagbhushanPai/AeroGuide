@@ -1,0 +1,60 @@
+{
+  "origin": "DEL",
+  "destination": "BOM",
+  "departure_date": "2026-12-10",
+  "observed_at": "2026-11-15T06:30:00Z",
+  "itineraries": [
+    {
+      "price": {"amount": 5432, "currency": "INR", "status": "verified"},
+      "outbound": {
+        "carrier": "IndiGo",
+        "duration_minutes": 135,
+        "segments": [
+          {
+            "marketing_carrier_code": "6E", "flight_number": "2134", "operating_carrier_name": "IndiGo",
+            "departure_airport": "DEL", "departure_time_local": "2026-12-10T06:15:00", "departure_timezone": "Asia/Kolkata", "departure_time_utc": "2026-12-10T00:45:00Z",
+            "arrival_airport": "BOM", "arrival_time_local": "2026-12-10T08:30:00", "arrival_timezone": "Asia/Kolkata", "arrival_time_utc": "2026-12-10T03:00:00Z",
+            "duration_minutes": 135, "aircraft": "Airbus A321neo"
+          }
+        ]
+      },
+      "cabin_class": "economy",
+      "has_mixed_carriers": false,
+      "ignav_id": "ig_one"
+    },
+    {
+      "price": {"amount": 6120, "currency": "INR", "status": "unverified"},
+      "outbound": {
+        "carrier": "Air India",
+        "duration_minutes": null,
+        "segments": [
+          {
+            "marketing_carrier_code": "AI", "flight_number": "AI 805", "operating_carrier_name": "Air India",
+            "departure_airport": "DEL", "departure_time_local": "2026-12-10T09:00:00", "departure_timezone": "Asia/Kolkata", "departure_time_utc": "2026-12-10T03:30:00Z",
+            "arrival_airport": "HYD", "arrival_time_local": "2026-12-10T11:10:00", "arrival_timezone": "Asia/Kolkata", "arrival_time_utc": "2026-12-10T05:40:00Z",
+            "duration_minutes": 130, "aircraft": null
+          },
+          {
+            "marketing_carrier_code": "AI", "flight_number": "2952", "operating_carrier_name": "Air India",
+            "departure_airport": "HYD", "departure_time_local": "2026-12-10T12:40:00", "departure_timezone": "Asia/Kolkata", "departure_time_utc": "2026-12-10T07:10:00Z",
+            "arrival_airport": "BOM", "arrival_time_local": "2026-12-10T14:05:00", "arrival_timezone": "Asia/Kolkata", "arrival_time_utc": "2026-12-10T08:35:00Z",
+            "duration_minutes": 85, "aircraft": "Airbus A320"
+          }
+        ]
+      },
+      "cabin_class": "economy",
+      "has_mixed_carriers": false,
+      "ignav_id": "ig_two"
+    },
+    {
+      "price": {"amount": 4999, "currency": "INR", "status": "verified"},
+      "outbound": {"carrier": "Broken", "segments": []},
+      "ignav_id": "ig_broken"
+    },
+    {
+      "price": {"amount": "not a number", "currency": "INR", "status": "verified"},
+      "outbound": {"segments": []},
+      "ignav_id": "ig_bad_price"
+    }
+  ]
+}

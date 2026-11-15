@@ -5,6 +5,7 @@ const routes = [
   { path: "/", heading: "Live flight map of India" },
   { path: "/about", heading: /flights, airports and lounges/i },
   { path: "/airports", heading: "Airports" },
+  { path: "/fares", heading: "Flight fares" },
   { path: "/lounges", heading: "Lounges" },
   { path: "/cards", heading: "Cards" },
   { path: "/design-system", heading: "Design system" },
@@ -50,7 +51,7 @@ test("every main nav link leads to a working page", async ({ page }, testInfo) =
   await page.goto("/");
   const links = page.getByRole("navigation", { name: "Main" }).getByRole("link");
   const hrefs = await links.evaluateAll((els) => els.map((el) => el.getAttribute("href")));
-  expect(hrefs).toHaveLength(5);
+  expect(hrefs).toHaveLength(6);
   for (const href of hrefs) {
     const response = await page.goto(href!);
     expect(response?.status(), href!).toBe(200);
@@ -95,7 +96,7 @@ test("mobile tab bar marks the current section and navigates", async ({ page }, 
 
 test("content pages don't scroll sideways on a phone", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  for (const path of ["/about", "/airports"]) {
+  for (const path of ["/about", "/airports", "/fares"]) {
     await page.goto(path);
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - window.innerWidth,
@@ -119,7 +120,7 @@ test("sitemap lists the main sections even without the API", async ({ request })
   const res = await request.get("/sitemap.xml");
   expect(res.status()).toBe(200);
   const body = await res.text();
-  for (const path of ["/airports", "/lounges", "/cards", "/about"]) {
+  for (const path of ["/airports", "/fares", "/lounges", "/cards", "/about"]) {
     expect(body).toContain(`${path}</loc>`);
   }
 });

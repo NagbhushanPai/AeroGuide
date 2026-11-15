@@ -1,0 +1,37 @@
+{
+  "origin": "BLR",
+  "destination": "HYD",
+  "departure_date": "2026-12-10",
+  "return_date": "2026-12-14",
+  "observed_at": "2026-11-15T06:31:00Z",
+  "itineraries": [
+    {
+      "price": {"amount": 9100, "currency": "INR", "status": "verified"},
+      "outbound": {
+        "carrier": "Akasa Air", "duration_minutes": 75,
+        "segments": [
+          {
+            "marketing_carrier_code": "QP", "flight_number": "1385", "operating_carrier_name": "Akasa Air",
+            "departure_airport": "BLR", "departure_time_local": "2026-12-10T19:20:00", "departure_timezone": "Asia/Kolkata", "departure_time_utc": "2026-12-10T13:50:00Z",
+            "arrival_airport": "HYD", "arrival_time_local": "2026-12-10T20:35:00", "arrival_timezone": "Asia/Kolkata", "arrival_time_utc": "2026-12-10T15:05:00Z",
+            "duration_minutes": 75, "aircraft": "Boeing 737 MAX 8"
+          }
+        ]
+      },
+      "inbound": {
+        "carrier": "SpiceJet", "duration_minutes": 80,
+        "segments": [
+          {
+            "marketing_carrier_code": "SG", "flight_number": "SG 3015", "operating_carrier_name": "SpiceJet",
+            "departure_airport": "HYD", "departure_time_local": "2026-12-14T07:00:00", "departure_timezone": "Asia/Kolkata", "departure_time_utc": "2026-12-14T01:30:00Z",
+            "arrival_airport": "BLR", "arrival_time_local": "2026-12-14T08:20:00", "arrival_timezone": "Asia/Kolkata", "arrival_time_utc": "2026-12-14T02:50:00Z",
+            "duration_minutes": 80, "aircraft": "Boeing 737-800"
+          }
+        ]
+      },
+      "cabin_class": "economy",
+      "has_mixed_carriers": true,
+      "ignav_id": "ig_rt"
+    }
+  ]
+}

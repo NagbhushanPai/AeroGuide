@@ -37,11 +37,13 @@ class RateLimit:
         per_minute: int,
         clock: Callable[[], float] = time.monotonic,
         exempt: tuple[str, ...] = (),
+        only: tuple[str, ...] = (),
     ) -> None:
         self.app = app
         self.per_minute = per_minute
         self.clock = clock
         self.exempt = exempt  # path prefixes that aren't counted (for example health checks)
+        self.only = only  # if set, only these path prefixes are counted
         self.hits: dict[str, deque[float]] = {}
 
     def _allow(self, key: str) -> float | None:
@@ -69,7 +71,11 @@ class RateLimit:
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         path = str(scope.get("path", ""))
-        if scope["type"] != "http" or (self.exempt and path.startswith(self.exempt)):
+        if (
+            scope["type"] != "http"
+            or (self.exempt and path.startswith(self.exempt))
+            or (self.only and not path.startswith(self.only))
+        ):
             await self.app(scope, receive, send)
             return
         wait = self._allow(client_key(scope))
