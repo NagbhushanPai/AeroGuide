@@ -36,6 +36,19 @@ export type BankRef = components["schemas"]["BankRef"];
 export type SearchHit = components["schemas"]["SearchHit"];
 export type SearchResults = components["schemas"]["SearchResults"];
 export type Region = AirportSummary["region"];
+export type FareSearchRequest = components["schemas"]["FareSearchRequest"];
+export type FareSearchResponse = components["schemas"]["FareSearchResponse"];
+export type Offer = components["schemas"]["Offer"];
+export type Leg = components["schemas"]["Leg"];
+export type Passengers = components["schemas"]["Passengers"];
+export type Cabin = FareSearchRequest["cabin"];
+export type FareSort = FareSearchRequest["sort"];
+export type AirlineOption = components["schemas"]["AirlineOption"];
+export type ProviderOutcome = components["schemas"]["ProviderOutcome"];
+export type BudgetStatus = components["schemas"]["BudgetStatus"];
+export type BookingRef = components["schemas"]["BookingRef"];
+export type BookingLink = components["schemas"]["BookingLink"];
+export type BookingLinksResponse = components["schemas"]["BookingLinksResponse"];
 
 export const REGIONS: readonly Region[] = [
   "North",
@@ -55,6 +68,8 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     message: string,
+    /** The API's explanation, written for people, when the response carried one. */
+    readonly detail: string | null = null,
   ) {
     super(message);
   }
@@ -174,6 +189,64 @@ export async function checkEligibility(
   if (res.status === 404) return null;
   if (!res.ok) throw new ApiError(res.status, `${res.status} ${res.statusText}`);
   return (await res.json()) as EligibilityResponse;
+}
+
+/**
+ * The API's own explanation from an error response: FastAPI's `detail` as a string, or the
+ * messages of a validation error list. Null when the body has neither.
+ */
+export function errorDetail(body: unknown): string | null {
+  if (!body || typeof body !== "object" || !("detail" in body)) return null;
+  const detail = (body as { detail: unknown }).detail;
+  if (typeof detail === "string") return detail.trim() || null;
+  if (Array.isArray(detail)) {
+    const messages = detail
+      .map((d) =>
+        d && typeof d === "object" && "msg" in d ? String((d as { msg: unknown }).msg) : "",
+      )
+      .map((m) => m.replace(/^Value error, /, "").trim())
+      .filter(Boolean);
+    return messages.length ? messages.join(" ") : null;
+  }
+  return null;
+}
+
+/** POST without retries; failures throw ApiError with the API's own wording when it gave one. */
+async function postJson<T>(path: string, body: unknown, signal?: AbortSignal): Promise<T> {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    method: "POST",
+    signal,
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) {
+    const detail = errorDetail(await res.json().catch(() => null));
+    throw new ApiError(res.status, detail ?? `${res.status} ${res.statusText}`, detail);
+  }
+  return (await res.json()) as T;
+}
+
+/**
+ * Fares for a route. The first search for a route and date costs an upstream request; filters
+ * and sort are applied to the cached results, so re-posting with new filters is free.
+ */
+export function searchFares(
+  body: FareSearchRequest,
+  signal?: AbortSignal,
+): Promise<FareSearchResponse> {
+  return postJson<FareSearchResponse>("/api/v1/fares/search", body, signal);
+}
+
+/** Sellers for one offer. Each first call for an offer costs an upstream request. */
+export function fetchBookingLinks(
+  ref: BookingRef,
+  signal?: AbortSignal,
+): Promise<BookingLinksResponse> {
+  return postJson<BookingLinksResponse>(
+    "/api/v1/fares/booking-links",
+    { provider: ref.provider, reference: ref.reference },
+    signal,
+  );
 }
 
 /** Resolves to null when the aircraft is no longer tracked (404). */

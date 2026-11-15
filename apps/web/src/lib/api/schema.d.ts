@@ -13,7 +13,7 @@ export interface paths {
     };
     /**
      * Service health
-     * @description Liveness plus dependency status. Always returns 200 while the process is up; `status` is `degraded` when the database, PostGIS or Redis is unavailable.
+     * @description Liveness plus dependency status. Always returns 200 while the process is up; `status` is `degraded` when the database, PostGIS or Redis is unavailable. `live` reports the last live-position sweep per provider (this process only).
      */
     get: operations["health_api_v1_health_get"];
     put?: never;
@@ -263,6 +263,66 @@ export interface paths {
     patch?: never;
     trace?: never;
   };
+  "/api/v1/fares/search": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Search and compare fares
+     * @description One-way, or round trip with return_date. Results are cached for a few minutes per route, dates, passengers and cabin; filters and sort apply to the cached results, so changing them doesn't cost an upstream request. Prices are totals for all passengers.
+     */
+    post: operations["search_api_v1_fares_search_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/fares/booking-links": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    get?: never;
+    put?: never;
+    /**
+     * Where to book an offer
+     * @description Pass an offer's booking.provider and booking.reference. Costs one upstream request the first time per offer (then cached).
+     */
+    post: operations["booking_links_api_v1_fares_booking_links_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/v1/fares/budget": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Fare search allowance
+     * @description How many upstream requests are used of the cap; null without a paid source.
+     */
+    get: operations["budget_api_v1_fares_budget_get"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -403,6 +463,15 @@ export interface components {
      * @enum {string}
      */
     AirlineOperation: "domestic" | "international" | "both";
+    /** AirlineOption */
+    AirlineOption: {
+      /** Code */
+      code: string;
+      /** Name */
+      name: string;
+      /** Offers */
+      offers: number;
+    };
     /** AirlineRef */
     AirlineRef: {
       /** Icao */
@@ -577,6 +646,68 @@ export interface components {
       /** Url */
       url: string;
     };
+    /** BookingLink */
+    BookingLink: {
+      /** Seller */
+      seller: string;
+      /** Seller Type */
+      seller_type: string | null;
+      /** Fare Name */
+      fare_name: string | null;
+      /** Price */
+      price: number | null;
+      /** Currency */
+      currency: string | null;
+      /** Url */
+      url: string;
+    };
+    /** BookingLinksRequest */
+    BookingLinksRequest: {
+      /** Provider */
+      provider: string;
+      /** Reference */
+      reference: string;
+    };
+    /** BookingLinksResponse */
+    BookingLinksResponse: {
+      /** Provider */
+      provider: string;
+      /** Reference */
+      reference: string;
+      /** Links */
+      links: components["schemas"]["BookingLink"][];
+      budget: components["schemas"]["BudgetStatus"] | null;
+    };
+    /** BookingRef */
+    BookingRef: {
+      /** Provider */
+      provider: string;
+      /**
+       * Reference
+       * @description Pass to /fares/booking-links to get booking links
+       */
+      reference: string;
+    };
+    /**
+     * BudgetStatus
+     * @description Upstream request allowance (ADR-0015).
+     */
+    BudgetStatus: {
+      /** Provider */
+      provider: string;
+      /** Used */
+      used: number;
+      /** Cap */
+      cap: number;
+      /** Today */
+      today: number;
+      /** Daily Cap */
+      daily_cap: number | null;
+      /** Near Limit */
+      near_limit: boolean;
+      /** Message */
+      message: string | null;
+    };
     /**
      * CardAccess
      * @description A card that may get into a lounge (through the programme named).
@@ -718,7 +849,7 @@ export interface components {
        * Status
        * @enum {string}
        */
-      status: "ok" | "error";
+      status: "ok" | "error" | "disabled";
       /**
        * Version
        * @description Server version, when known.
@@ -788,6 +919,128 @@ export interface components {
       /** Disclaimer */
       disclaimer: string;
     };
+    /**
+     * FareSearchRequest
+     * @description What the website (or any client) asks for. Filters and sorting apply after the search,
+     *     so changing them never costs another upstream request.
+     */
+    FareSearchRequest: {
+      /** Origin */
+      origin: string;
+      /** Destination */
+      destination: string;
+      /**
+       * Departure Date
+       * Format: date
+       */
+      departure_date: string;
+      /**
+       * Return Date
+       * @description Set for a round trip
+       */
+      return_date?: string | null;
+      /**
+       * @default {
+       *       "adults": 1,
+       *       "children": 0,
+       *       "infants_in_seat": 0,
+       *       "infants_on_lap": 0
+       *     }
+       */
+      passengers: components["schemas"]["Passengers"];
+      /**
+       * Cabin
+       * @default economy
+       * @enum {string}
+       */
+      cabin: "economy" | "premium_economy" | "business" | "first";
+      /**
+       * Nearby Airports
+       * @description Also search the city's other airports (for example GOX with GOI). Each extra airport pair is one more upstream request.
+       * @default false
+       */
+      nearby_airports: boolean;
+      /** Max Stops */
+      max_stops?: number | null;
+      /** Airlines */
+      airlines?: string[];
+      /** Depart After Hour */
+      depart_after_hour?: number | null;
+      /** Depart Before Hour */
+      depart_before_hour?: number | null;
+      /** Max Price */
+      max_price?: number | null;
+      /**
+       * Sort
+       * @default best
+       * @enum {string}
+       */
+      sort: "best" | "cheapest" | "fastest";
+    };
+    /** FareSearchResponse */
+    FareSearchResponse: {
+      /** Origin */
+      origin: string;
+      /** Destination */
+      destination: string;
+      /**
+       * Departure Date
+       * Format: date
+       */
+      departure_date: string;
+      /** Return Date */
+      return_date: string | null;
+      passengers: components["schemas"]["Passengers"];
+      /**
+       * Cabin
+       * @enum {string}
+       */
+      cabin: "economy" | "premium_economy" | "business" | "first";
+      /**
+       * Routes
+       * @description Airport pairs searched, for example DEL-GOI
+       */
+      routes: string[];
+      /**
+       * Sort
+       * @enum {string}
+       */
+      sort: "best" | "cheapest" | "fastest";
+      /** Offers */
+      offers: components["schemas"]["Offer"][];
+      /**
+       * Total Offers
+       * @description Before filters
+       */
+      total_offers: number;
+      /**
+       * Excluded Abroad
+       * @description Itineraries left out because they connect outside India
+       */
+      excluded_abroad: number;
+      /**
+       * Airlines
+       * @description Airlines in the results, for filters
+       */
+      airlines: components["schemas"]["AirlineOption"][];
+      /**
+       * Fetched At
+       * @description When the results were fetched upstream
+       */
+      fetched_at: string | null;
+      /** Cached */
+      cached: boolean;
+      /** Is Demo */
+      is_demo: boolean;
+      /** Providers */
+      providers: components["schemas"]["ProviderOutcome"][];
+      budget: components["schemas"]["BudgetStatus"] | null;
+      /**
+       * Notice
+       * @description Shown with the results
+       */
+      notice: string;
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -811,6 +1064,63 @@ export interface components {
       /** Version */
       version: string;
       checks: components["schemas"]["HealthChecks"];
+      live?: components["schemas"]["LiveHealth"] | null;
+    };
+    /** Leg */
+    Leg: {
+      /** Origin */
+      origin: string;
+      /** Destination */
+      destination: string;
+      /** Departure Local */
+      departure_local: string;
+      /** Departure Timezone */
+      departure_timezone: string | null;
+      /** Arrival Local */
+      arrival_local: string;
+      /** Arrival Timezone */
+      arrival_timezone: string | null;
+      /** Duration Minutes */
+      duration_minutes: number;
+      /** Stops */
+      stops: number;
+      /**
+       * Carriers
+       * @description Marketing carrier codes, in flight order
+       */
+      carriers: string[];
+      /** Carrier Names */
+      carrier_names: string[];
+      /** Flight Numbers */
+      flight_numbers: string[];
+      /** Segments */
+      segments: components["schemas"]["Segment"][];
+    };
+    /**
+     * LiveHealth
+     * @description The live position pipeline in this process.
+     */
+    LiveHealth: {
+      /**
+       * Source
+       * @description Provider behind the current snapshot
+       */
+      source: string | null;
+      /** Fetched At */
+      fetched_at: string | null;
+      /**
+       * Age S
+       * @description Seconds since the snapshot was fetched
+       */
+      age_s: number | null;
+      /** Aircraft */
+      aircraft: number | null;
+      /** Last Error */
+      last_error: string | null;
+      /** Providers */
+      providers: {
+        [key: string]: components["schemas"]["ProviderHealth"];
+      };
     };
     /** LoungeDetail */
     LoungeDetail: {
@@ -973,6 +1283,72 @@ export interface components {
       /** Attribution */
       attribution: string;
     };
+    /** Offer */
+    Offer: {
+      /**
+       * Id
+       * @description Stable for the same flights from the same provider
+       */
+      id: string;
+      /** Provider */
+      provider: string;
+      /**
+       * Is Demo
+       * @description Generated by the demo provider: not a real fare
+       */
+      is_demo: boolean;
+      /**
+       * Price
+       * @description Total for all passengers
+       */
+      price: number;
+      /** Currency */
+      currency: string;
+      /** Price Verified */
+      price_verified: boolean;
+      /** Cabin */
+      cabin: string | null;
+      outbound: components["schemas"]["Leg"];
+      inbound: components["schemas"]["Leg"] | null;
+      /** Total Duration Minutes */
+      total_duration_minutes: number;
+      /**
+       * Stops
+       * @description Most stops in either direction
+       */
+      stops: number;
+      /** Mixed Carriers */
+      mixed_carriers: boolean;
+      /**
+       * Fetched At
+       * Format: date-time
+       */
+      fetched_at: string;
+      booking: components["schemas"]["BookingRef"];
+    };
+    /** Passengers */
+    Passengers: {
+      /**
+       * Adults
+       * @default 1
+       */
+      adults: number;
+      /**
+       * Children
+       * @default 0
+       */
+      children: number;
+      /**
+       * Infants In Seat
+       * @default 0
+       */
+      infants_in_seat: number;
+      /**
+       * Infants On Lap
+       * @default 0
+       */
+      infants_on_lap: number;
+    };
     /** PointGeometry */
     PointGeometry: {
       /**
@@ -1092,6 +1468,39 @@ export interface components {
       /** Notes */
       notes: string | null;
     };
+    /** ProviderHealth */
+    ProviderHealth: {
+      /**
+       * Ok
+       * @description Result of its last sweep; null if not tried yet
+       */
+      ok: boolean | null;
+      /** Checked At */
+      checked_at: string | null;
+      /** Error */
+      error: string | null;
+      /** Aircraft */
+      aircraft: number | null;
+      /**
+       * Resting S
+       * @description Seconds left resting after a rate limit
+       */
+      resting_s: number;
+    };
+    /** ProviderOutcome */
+    ProviderOutcome: {
+      /** Provider */
+      provider: string;
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: "ok" | "error" | "timeout" | "budget" | "unavailable";
+      /** Offers */
+      offers: number;
+      /** Message */
+      message?: string | null;
+    };
     /**
      * Region
      * @enum {string}
@@ -1196,6 +1605,41 @@ export interface components {
       q: string;
       /** Items */
       items: components["schemas"]["SearchHit"][];
+    };
+    /** Segment */
+    Segment: {
+      /** Carrier Code */
+      carrier_code: string | null;
+      /** Carrier Name */
+      carrier_name: string | null;
+      /**
+       * Flight Number
+       * @description Carrier code and number, for example 6E2345
+       */
+      flight_number: string | null;
+      /** Origin */
+      origin: string;
+      /** Destination */
+      destination: string;
+      /**
+       * Departure Local
+       * @description Local wall-clock time, ISO 8601 without offset
+       */
+      departure_local: string;
+      /** Departure Timezone */
+      departure_timezone: string | null;
+      /** Departure Utc */
+      departure_utc: string | null;
+      /** Arrival Local */
+      arrival_local: string;
+      /** Arrival Timezone */
+      arrival_timezone: string | null;
+      /** Arrival Utc */
+      arrival_utc: string | null;
+      /** Duration Minutes */
+      duration_minutes: number;
+      /** Aircraft */
+      aircraft: string | null;
     };
     /** SourceRef */
     SourceRef: {
@@ -1819,6 +2263,169 @@ export interface operations {
         };
       };
       /** @description Database unavailable */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  search_api_v1_fares_search_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["FareSearchRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["FareSearchResponse"];
+        };
+      };
+      /** @description Unknown fare source or expired fare (booking links) */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Request budget reached, or too many requests from this client */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The fare source refused or failed the search */
+      502: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Fare search isn't set up, or the budget can't be checked */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The fare source took too long */
+      504: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  booking_links_api_v1_fares_booking_links_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["BookingLinksRequest"];
+      };
+    };
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BookingLinksResponse"];
+        };
+      };
+      /** @description Unknown fare source or expired fare (booking links) */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+      /** @description Request budget reached, or too many requests from this client */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The fare source refused or failed the search */
+      502: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Fare search isn't set up, or the budget can't be checked */
+      503: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description The fare source took too long */
+      504: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  budget_api_v1_fares_budget_get: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["BudgetStatus"] | null;
+        };
+      };
+      /** @description Fare search isn't set up */
       503: {
         headers: {
           [name: string]: unknown;

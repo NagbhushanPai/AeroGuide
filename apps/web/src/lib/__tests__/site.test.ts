@@ -5,10 +5,11 @@ import { absoluteUrl, isActive, mainNav, SITE_URL } from "@/lib/site";
 const byHref = (href: string) => mainNav.find((item) => item.href === href)!;
 
 describe("mainNav", () => {
-  it("has the five primary sections in order", () => {
+  it("has the six primary sections in order", () => {
     expect(mainNav.map((item) => item.label)).toEqual([
       "Live Map",
       "Airports",
+      "Fares",
       "Lounges",
       "Cards",
       "About",
@@ -19,6 +20,7 @@ describe("mainNav", () => {
     expect(mainNav.map((item) => item.shortLabel)).toEqual([
       "Map",
       "Airports",
+      "Fares",
       "Lounges",
       "Cards",
       "About",
