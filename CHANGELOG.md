@@ -4,6 +4,10 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Added (fare search for AI assistants)
+- MCP tool `search_flights`: Indian domestic fares, one way or round trip, with filters and sort. It returns the top 10 and a link to the website's fares page, where the traveller compares everything and books.
+- Assistants' live searches have their own daily cap (`FARES_MCP_DAILY_REQUEST_CAP`, 20) inside the site's request budget. They share the website's 10-minute cache, and filter changes are free. There is no booking-link tool and no multi-airport search, so spending stays on the website.
+
 ### Added (fare search)
 - Fare search and comparison for Indian domestic routes, one-way or round trip, from the Ignav API ([ADR-0015](docs/decisions/0015-paid-fare-search-with-a-request-budget.md)): `POST /api/v1/fares/search`, `POST /api/v1/fares/booking-links`, `GET /api/v1/fares/budget`, and the `/fares` page.
 - Provider-agnostic design: providers implement one `FlightProvider` interface and map to a normalised offer. They're asked concurrently with per-provider timeouts, and one failing never fails the search. A demo provider (`FARE_PROVIDERS=mock`) gives labelled demo fares for tests and offline work.

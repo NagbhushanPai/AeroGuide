@@ -34,6 +34,7 @@ TOOLS = {
     "check_lounge_access",
     "flights_near_airport",
     "get_flight",
+    "search_flights",
 }
 MCP_HEADERS = {"accept": "application/json, text/event-stream", "content-type": "application/json"}
 
@@ -241,3 +242,125 @@ async def test_tools_return_the_same_answers_as_the_api(seeded_mcp: tuple[Any, F
     assert isinstance(near, dict) and near["airport"] == "DEL"
     distances = [f["distance_km"] for f in near["flights"]]
     assert distances == sorted(distances) and all(d <= 150 for d in distances)
+
+
+# ---- fare search tool (ADR-0015) -------------------------------------------------------------
+
+
+def fares_app(service: Any, **settings: Any) -> FastMCP:
+    s = Settings(environment="test", database_url=UNREACHABLE_DB, **settings)
+    app = create_app(s)
+    app.state.resources = AppResources(
+        settings=s,
+        engine=create_engine(UNREACHABLE_DB),
+        redis=None,
+        live=LiveService([DemoProvider()], None, None),
+        fares=service,
+    )
+    mcp: FastMCP = app.state.mcp
+    return mcp
+
+
+def soon(days: int = 20) -> str:
+    from datetime import timedelta
+
+    from app.core.india import today_ist
+
+    return (today_ist() + timedelta(days=days)).isoformat()
+
+
+async def test_search_flights_tool_schema_keeps_costly_options_out() -> None:
+    mcp = fares_app(None)
+    tool = next(t for t in await mcp.list_tools() if t.name == "search_flights")
+    schema = tool.inputSchema
+    assert set(schema["required"]) == {"origin", "destination", "departure_date"}
+    assert "nearby_airports" not in schema["properties"]  # extra airports cost extra requests
+    assert tool.annotations is not None and tool.annotations.openWorldHint is True
+    assert "judiciously" in (tool.description or "")
+
+
+async def test_search_flights_returns_top_10_and_a_link_to_the_fares_page() -> None:
+    from app.fares.cache import InMemoryFareCache
+    from app.providers.fares.mock import MockProvider
+    from app.services.fares import FareSearchService
+
+    service = FareSearchService(
+        [MockProvider()], InMemoryFareCache(), budget=None, currency_key="IN"
+    )
+    mcp = fares_app(service, site_url="https://site.example")
+    args = {
+        "origin": "del",
+        "destination": "BOM",
+        "departure_date": soon(),
+        "return_date": soon(24),
+        "adults": 2,
+        "sort": "cheapest",
+    }
+    _, out = await mcp.call_tool("search_flights", args)  # type: ignore[misc]
+    assert isinstance(out, dict)
+    assert out["route"] == "DEL-BOM" and out["is_demo"] is True
+    assert len(out["fares"]) == 10 and out["matching"] == out["total"] == 15
+    prices = [f["price"] for f in out["fares"]]
+    assert prices == sorted(prices) and out["cheapest_price"] == prices[0]
+    assert all(f["inbound"] is not None for f in out["fares"])
+    assert out["search_url"] == (
+        f"https://site.example/fares?from=DEL&to=BOM&depart={args['departure_date']}"
+        f"&trip=round&return={args['return_date']}&adults=2&sort=cheapest"
+    )
+    # Changing only filters reuses the cached search.
+    _, nonstop = await mcp.call_tool(  # type: ignore[misc]
+        "search_flights", {**args, "max_stops": 0, "airlines": ["6E"]}
+    )
+    assert isinstance(nonstop, dict) and nonstop["from_cache"] is True
+    assert all(f["outbound"]["stops"] == 0 for f in nonstop["fares"])
+
+
+async def test_search_flights_errors_are_clear() -> None:
+    with pytest.raises(ToolError, match="isn't set up"):
+        await fares_app(None).call_tool(
+            "search_flights", {"origin": "DEL", "destination": "BOM", "departure_date": soon()}
+        )
+    from app.fares.cache import InMemoryFareCache
+    from app.providers.fares.mock import MockProvider
+    from app.services.fares import FareSearchService
+
+    mcp = fares_app(
+        FareSearchService([MockProvider()], InMemoryFareCache(), budget=None, currency_key="IN")
+    )
+    with pytest.raises(ToolError, match="Invalid search: origin and destination must differ"):
+        await mcp.call_tool(
+            "search_flights", {"origin": "DEL", "destination": "DEL", "departure_date": soon()}
+        )
+    with pytest.raises(ToolError):
+        await mcp.call_tool(
+            "search_flights",
+            {"origin": "DEL", "destination": "BOM", "departure_date": "2020-01-01"},
+        )
+
+
+async def test_assistant_searches_have_their_own_daily_cap_inside_the_site_caps() -> None:
+    from datetime import date
+
+    from app.fares.budget import BudgetGuard, BudgetPolicy, InMemoryUsageLedger, budget_channel
+    from app.providers.fares.base import BudgetExceededError
+
+    ledger = InMemoryUsageLedger()
+    g = BudgetGuard(
+        ledger,
+        BudgetPolicy(total_cap=10),
+        today=lambda: date(2026, 11, 15),
+        channel_daily_caps={"mcp": 2},
+    )
+    token = budget_channel.set("mcp")
+    try:
+        await g.reserve("ignav")
+        await g.reserve("ignav")
+        with pytest.raises(BudgetExceededError) as exc:
+            await g.reserve("ignav")
+        assert exc.value.message.startswith("Today's 2 fare searches for mcp")
+    finally:
+        budget_channel.reset(token)
+    await g.reserve("ignav")  # the website still has its allowance
+    status = await g.status("ignav")
+    assert status is not None and status.used == 3  # assistants' searches count site-wide too
+    assert ledger.counts[("ignav:mcp", date(2026, 11, 15))] == 2
