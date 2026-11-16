@@ -1,6 +1,6 @@
 # ADR-0014: An MCP server for AI assistants
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-14
 - Supersedes: [ADR-0008](./0008-defer-ai-integration.md)
 
@@ -22,6 +22,8 @@ ADR-0008 kept the services tool-ready for this. Three ways to run the agent were
 - **Privacy holds.** Tool arguments are never stored or logged. The access check refuses unknown fields, as the REST endpoint does, so a card number can't be sent.
 - **Abuse limits.** A per-client rate limit (`MCP_RATE_LIMIT_PER_MINUTE`, default 60) and DNS-rebinding protection with a Host allow-list (`MCP_ALLOWED_HOSTS`; Render's `RENDER_EXTERNAL_HOSTNAME` is added automatically). `MCP_ENABLED=false` turns the endpoint off.
 - **No authentication for now.** Every tool reads public data. If a write tool or private data is ever added, it needs OAuth first.
+
+Note (2026-11-16): built as decided (`app/mcp_server/`): 12 tools, all annotated read-only and non-destructive. Live-data tools are marked open-world and non-idempotent. The twelfth, `search_flights`, spends paid fare requests under its own daily cap ([ADR-0015](./0015-paid-fare-search-with-a-request-budget.md), addendum); it is still read-only.
 
 ## Consequences
 - Users get an agent at no cost to the project, using whatever MCP client they already have.

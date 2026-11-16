@@ -1,6 +1,6 @@
 # ADR-0003: Technology stack and tooling
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-13
 
 ## Context
@@ -24,3 +24,5 @@ The project brief mandates the core stack. Tooling choices within it are still o
 
 ## Consequences
 Contributors need Node 22+, pnpm, Python 3.12, uv and Docker. Exact versions are pinned in Stage 1 lockfiles.
+
+Note (2026-11-16): two table rows differ from what was built. API tests mock HTTP with `httpx.MockTransport` rather than respx, and the web app calls the API through a small hand-written client over the generated types (`apps/web/src/lib/api/client.ts`) rather than openapi-fetch. Everything else in the table is in use (`apps/api/pyproject.toml`, `apps/web/package.json`).

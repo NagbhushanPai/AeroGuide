@@ -1,6 +1,6 @@
 # ADR-0006: Content provenance and verification
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-13
 
 ## Context
@@ -18,3 +18,5 @@ Terminal assignments, lounge hours, lounge acceptance and card benefits change o
 
 ## Consequences
 Data entry is slower and costs more, and that's intended. Every claim can be audited. A staleness report (CLI and CI warning) shows what needs re-checking.
+
+Note (2026-11-16): built as decided (`app/models/mixins.py`, `app/models/sources.py`), with two small differences. `sources` has a stable `key` used by the seed files and no `content_hash`; link-check hashes belong to `source_checks` instead. The database constraint `verified_has_evidence` requires `verified_at`, `verified_by` and `primary_source_id`; the "official or licensed type" part of rule 3 is enforced by the seed validator (`app/seed/bundle.py`), not the database. `outdated` is computed in `services/airports.display_status` and again in the web app (`lib/freshness.ts`). The staleness report is the weekly data check ([ADR-0013](./0013-weekly-data-check.md)).

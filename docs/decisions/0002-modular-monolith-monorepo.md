@@ -1,6 +1,6 @@
 # ADR-0002: Modular monolith in a monorepo
 
-- Status: Proposed
+- Status: Accepted
 - Date: 2026-11-13
 
 ## Context
@@ -16,3 +16,5 @@ There are five feature areas (flights, airports, lounges, cards, eligibility), a
 - Ingestion and jobs share the domain code, so moving them into a separate process later needs no new codebase.
 - Module boundaries must be enforced by tooling (`import-linter`), or the monolith will erode.
 - A domain can be split out later if load requires it. The service layer is the seam.
+
+Note (2026-11-16): the layout is as decided (`apps/web`, `apps/api`, `docs/`, `scripts/`; one API process on Render; jobs in `app/jobs/` run from GitHub Actions; types generated with `pnpm gen:api` into `apps/web/src/lib/api/schema.d.ts`). `import-linter` is not configured: CI enforces only `ruff` and `mypy`, so the layer rules are convention for now.

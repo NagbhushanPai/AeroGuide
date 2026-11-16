@@ -1,6 +1,6 @@
 # ADR-0009: Deterministic, versioned eligibility engine
 
-- Status: Proposed
+- Status: Accepted (as implemented and revised below)
 - Date: 2026-11-13
 
 ## Context

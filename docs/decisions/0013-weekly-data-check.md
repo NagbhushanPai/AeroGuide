@@ -1,6 +1,6 @@
 # ADR-0013: Weekly data check job
 
-- Status: Proposed
+- Status: Accepted (as implemented below)
 - Date: 2026-11-13
 
 ## Context
@@ -39,7 +39,13 @@ The first version reads the **YAML seed files** (the reviewed source of truth, [
 
 The database keep-alive concern is unchanged. The `deploy-data.yml` runs and normal API traffic count as activity.
 
+## Update (2026-11-16)
+
+- The keep-alive question is settled: `.github/workflows/keep-alive.yml` runs `python -m app.jobs.ping_db` (one read-only query) on Mondays and Thursdays at 04:17 UTC, so the database never goes a week without activity.
+- The provider check also covers adsb.fi, now part of the position pool ([ADR-0004](./0004-flight-provider-abstraction.md)).
+- Still YAML-based: no `DATABASE_URL_READONLY` role and no writes to `source_checks`.
+
 ## Consequences
 - $0 cost. Staleness is visible every week without a person having to remember to check.
 - Source pages that change cosmetically will cause false positives. The hash is computed over extracted main text, not raw HTML, to reduce noise.
-- **Risk:** Supabase pauses after 1 week without database activity. A weekly job alone sits right at that limit. Normal site traffic usually covers it. If not, add a twice-weekly keep-alive step (open question for the owner).
+- **Risk:** Supabase pauses after 1 week without database activity. A weekly job alone sits right at that limit. Normal site traffic usually covers it. If not, add a twice-weekly keep-alive step (open question for the owner). Resolved 2026-11-16: see the update above.
