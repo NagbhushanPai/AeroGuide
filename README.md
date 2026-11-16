@@ -6,7 +6,7 @@ AeroGuide is a free, non-commercial aviation and airport intelligence website fo
 
 ## Features
 
-- **Live flight map.** Full-screen MapLibre map of aircraft over India from open ADS-B networks (adsb.lol, adsb.fi, OpenSky). Select a plane for its reported route, altitude, speed, heading and estimated arrival. Shows the data source, how fresh it is and an explicit **DEMO DATA** mode.
+- **Live flight map.** Full-screen MapLibre map of aircraft over India from open ADS-B networks (adsb.lol and adsb.fi as one failover pool, OpenSky as backup). Planes move between updates by dead reckoning, labelled as estimates. Select a plane for its reported route, altitude, speed, heading and estimated arrival; filter the list by origin or destination. Shows the data source, how fresh it is, why the feed is down when it is, and an explicit **DEMO DATA** mode.
 - **Airport guides.** 116 Indian airports, with guides for DEL, BOM, BLR, HYD, MAA, COK and JAI.
 - **Lounges and card lounge access.** Lounges at the 7 guide airports, 76 cards with versioned lounge policies, and a deterministic eligibility checker.
 - **Fare search.** Compare one-way and round-trip fares on Indian domestic routes (`/fares`), sorted by best, cheapest or fastest, with filters and links to book.
@@ -14,7 +14,7 @@ AeroGuide is a free, non-commercial aviation and airport intelligence website fo
 
 ## Screenshots
 
-None yet. They will be added from Stage 2 onward.
+None yet.
 
 ## Technology stack
 
@@ -22,7 +22,7 @@ None yet. They will be added from Stage 2 onward.
 |---|---|
 | Web | Next.js (App Router), TypeScript, Tailwind CSS, shadcn/ui, Lucide, MapLibre GL JS, TanStack Query |
 | API | Python 3.12, FastAPI, Pydantic, SQLAlchemy, Alembic |
-| Data | PostgreSQL + PostGIS, Redis |
+| Data | PostgreSQL + PostGIS, Redis (optional: in-memory caches without it) |
 | Deploy ($0) | Vercel Hobby (web), Render free (API), Supabase free (Postgres), Upstash free (Redis), GitHub Actions (CI + weekly data check) |
 
 ## Architecture
@@ -47,16 +47,18 @@ Details: [system architecture](docs/architecture/system-architecture.md) · [ADR
 .
 ├── apps/
 │   ├── web/          # Next.js 16 app (App Router, Tailwind v4, shadcn/ui)
-│   └── api/          # FastAPI app, Alembic migrations, scheduled jobs
+│   └── api/          # FastAPI app, MCP server, Alembic migrations, seed data (data/), jobs
 ├── docs/
-│   ├── api/          # API contract
+│   ├── api/          # API contract, MCP guide
 │   ├── architecture/ # system, frontend, backend, database, data flow, deployment
 │   ├── database/     # ERD, schema, data dictionary
 │   ├── decisions/    # ADRs
+│   ├── deployment/   # local development guide
 │   ├── planning/     # PRD, MVP scope, roadmap, backlog, implementation plan
 │   ├── research/     # provider and data-source research
 │   └── testing/      # testing strategy
-├── .github/workflows # CI
+├── scripts/          # builds the airport seed and OpenStreetMap terminals from open data
+├── .github/workflows # CI, deploy data, weekly data check, database keep-alive
 ├── docker-compose.yml # local Postgres+PostGIS and Redis
 └── Makefile          # dev commands (mirrored as root pnpm scripts)
 ```
@@ -129,7 +131,7 @@ It prints the airlines returned per route and whether IndiGo, Air India Express,
 
 On free tiers: Vercel (web), Render (API), Supabase (Postgres). See the [deployment architecture](docs/architecture/deployment-architecture.md) and [ADR-0012](docs/decisions/0012-zero-budget-hosting.md).
 
-A weekly GitHub Actions job checks content staleness, source links and the open data APIs, and opens a `data-check` issue ([ADR-0013](docs/decisions/0013-weekly-data-check.md)).
+A weekly GitHub Actions job checks content staleness, source links and the open data APIs, and opens a `data-check` issue ([ADR-0013](docs/decisions/0013-weekly-data-check.md)). Two more workflows run migrations and the seed when `main` changes (`deploy-data`) and ping the database twice a week so the free tier doesn't pause (`keep-alive`).
 
 ## Implementation status
 
@@ -142,7 +144,7 @@ A weekly GitHub Actions job checks content staleness, source links and the open 
 | 4 Flight tracking | Shipped: live map homepage, positions API with adsb.lol, adsb.fi and OpenSky, routes, weather, watch alerts. Flight detail page still to do |
 | 5 Lounges and cards | Shipped: 44 lounges, 76 cards (15 verified), eligibility checker |
 | Fare search | Shipped: Ignav fare search for Indian domestic routes with a request budget ([ADR-0015](docs/decisions/0015-paid-fare-search-with-a-request-budget.md)) |
-| 6 Testing and deployment | In progress: deployed at $0; monitoring still to do |
+| 6 Testing and deployment | In progress: deployed at $0 (Vercel, Render, Supabase); Upstash Redis not yet connected; monitoring still to do |
 
 ## Roadmap
 

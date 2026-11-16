@@ -43,7 +43,7 @@ So FlightAware AeroAPI, Flightradar24, AeroDataBox, aviationstack and Cirium/OAG
 | Live positions | **adsb.lol** (primary), **adsb.fi** (second), **OpenSky Network** (third) | Fetched on demand by the API while people are viewing the map, refreshed at most once a minute ([ADR-0012](../decisions/0012-zero-budget-hosting.md)) |
 | Aircraft type and registration | adsb.lol fields (`t`, `r`) | Shown as broadcast or derived by the network |
 | Callsign → route | adsbdb.com (community) | Shown only as a **"reported route"**, with its source. Hidden when the aircraft's track contradicts it |
-| Observed departures and arrivals per airport | **OpenSky `/flights/departure` and `/flights/arrival`** (batch, previous-day data, interval ≤ 7 days, needs a free account and OAuth2 client credentials) | Airport pages: "flights observed yesterday". Flight pages: observed first-seen and last-seen times for recent days |
+| Observed departures and arrivals per airport | **OpenSky `/flights/departure` and `/flights/arrival`** (batch, previous-day data, interval ≤ 7 days, needs a free account and OAuth2 client credentials) | **Not built yet.** Intended for airport pages ("flights observed yesterday") and flight pages (observed first-seen and last-seen times). The OAuth2 client is already used for positions |
 | Demo | `DemoProvider` | Development and tests only, always labelled DEMO ([ADR-0011](../decisions/0011-demo-mode-is-explicit.md)) |
 
 ### What open data cannot provide
@@ -60,8 +60,9 @@ These fields show **"Not available from open data sources"**. The only status sh
 
 | Source | Limit | Our use |
 |---|---|---|
-| adsb.lol | **Observed 2026-11-13: 10 requests per rolling minute** (the 11th gets `429` with `Retry-After`) | One India sweep of exactly 10 point queries, 1 s apart, at most once a minute, only while someone is viewing. `429` is honoured |
-| OpenSky (registered free account) | Daily credit allowance. An India bbox costs 4 credits | Fallback only. Airport departure and arrival batch calls run once a day |
+| adsb.lol | **Observed 2026-11-13: 10 requests per rolling minute** (the 11th gets `429` with `Retry-After`) | Pooled with adsb.fi: one India sweep of 10 point queries, 1 s apart per network, at most once a minute, only while someone is viewing. A `429` rests the network and the remaining points go to adsb.fi |
+| adsb.fi | 1 request per second; errors count toward a temporary block | Pooled with adsb.lol, same sweep. Never asked faster than 1 s apart |
+| OpenSky (registered free account) | Daily credit allowance (4,000 with an API client). An India bbox costs 4 credits | Fallback only, when both readsb networks are resting. Airport departure and arrival batch calls (once a day) are planned, not built |
 | adsbdb | Not published | Cached 6 h per callsign. Called only when a user selects a flight |
 
 ### Other open data used
@@ -76,6 +77,8 @@ These fields show **"Not available from open data sources"**. The only status sh
 
 On Render's free tier, outgoing requests share IP addresses with other apps. adsb.lol answered `429` on the **second** request of a sweep, and OpenSky requests failed. A single community source isn't enough from shared hosting, which is why adsb.fi was added as a second source with the same data format.
 
+**Follow-up (2026-11-16).** Even with two sources, all three failed at the same time: adsb.lol and adsb.fi each returned `429` early in a sweep (their per-address limits used up by other apps on the host), and OpenSky timed out. Each source was tried whole-sweep-then-next, so one `429` wasted the points already fetched. The two readsb networks are now one pool that fails over **point by point** ([flight data flow](../architecture/flight-data-flow.md#source-failover)). After deploying, the map served 260 aircraft from "adsb.lol + adsb.fi" with no provider errors.
+
 ### Terminals and airlines (2026-11-14)
 
 No open dataset says which airline uses which terminal. AeroGuide uses two open substitutes, each labelled for what it is:
@@ -89,7 +92,7 @@ Verified terminal assignments still need a person reading the airport's or airli
 
 1. Does adsb.lol's ODbL licence and its terms fit our use (display plus short-lived caching, no redistribution of a database)? Ask the project.
 2. ~~Check adsb.fi's open data terms.~~ Done: personal, non-commercial, attribution with a link (the UI links the active source).
-3. Register an OpenSky account and confirm the current daily credit allowance.
+3. ~~Register an OpenSky account and confirm the current daily credit allowance.~~ Done: the API uses OAuth2 client credentials when `OPENSKY_CLIENT_ID` and `OPENSKY_CLIENT_SECRET` are set (4,000 credits a day for a registered account).
 
 ## Sources
 

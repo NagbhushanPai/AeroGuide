@@ -25,6 +25,6 @@ Common operators and programmes in India to research (confirm current relationsh
 
 ## Limitations
 
-- Programme acceptance changes.It is an example of why `valid_from` and `valid_to` are needed on acceptance records.
-- There is no open API for lounge data. Curation is manual.
+- Programme acceptance changes. It is an example of why `valid_from` and `valid_to` are needed on acceptance records.
+- There is no open API for lounge data. Curation is manual. As of 2026-11-14: 44 lounges at the 7 guide airports (`apps/api/data/lounges/{IATA}.yaml`), with Priority Pass and the HDFC, ICICI, Kotak, Axis and SBI Card lists linked; the Visa/Mastercard list refuses automated access and the Diners list is app-only, so those acceptances are not recorded.
 - Hours and prices must show their verification date in the UI, with a "may have changed" notice after the re-verify interval (60 days by default).

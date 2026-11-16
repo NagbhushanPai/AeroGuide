@@ -69,11 +69,11 @@ Navigation is minimal: three text links (live map, airport guides, lounge access
 
 | Gap in the reference | AeroGuide approach |
 |---|---|
-| No search or filters on card tables | Searchable, filterable card directory with comparison |
+| No search or filters on card tables | Searchable, filterable card directory (comparison still to do) |
 | No eligibility checker | Deterministic backend rules engine with versioned policies |
-| Lounges only appear on airport pages | A dedicated `/lounges` directory and `/lounge/[slug]` pages with amenity filters |
+| Lounges only appear on airport pages | A dedicated `/lounges` directory and `/lounges/[slug]` pages with airport, terminal, side, scope and programme filters |
 | Lounge *acceptance* and card *entitlement* sit in one table | Modelled separately: a lounge accepts programme X, and a card entitles you to programme X under conditions |
-| Minimal navigation | Five-section navigation, homepage with flight search |
+| Minimal navigation | Six-section navigation (Live Map, Airports, Fares, Lounges, Cards, About); the homepage is the live map with a flight search, plus site search |
 | Flat content pages | Structured directory and dashboard layouts |
 
 ## Things we must not do

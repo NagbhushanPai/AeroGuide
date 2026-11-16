@@ -1,8 +1,10 @@
 # Implementation plan
 
-Last updated: 2026-11-13. This is the detailed plan for the **next** stage. Later stages are summarised in the [roadmap](./roadmap.md) and get their own detailed plan when they start.
+Last updated: 2026-11-16. This was the detailed plan for Stage 1, kept as a record. Stages 2 to 6 were tracked in the [roadmap](./roadmap.md) and the [changelog](../../CHANGELOG.md) rather than in separate plans.
 
-## Stage 1: Foundation (pending approval)
+## Stage 1: Foundation (done)
+
+Built as planned, with these differences: Docker Compose uses `postgis/postgis:17-3.7` and `redis:7.4-alpine`; the root `package.json` mirrors every Makefile target as a `pnpm` script for Windows shells; the first migration also enables `pg_trgm` and `btree_gist`; CI has a third job (secret scan) and `.env.example` files live per app, not at the root.
 
 ### Steps
 1. **Repository tooling**

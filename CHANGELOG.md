@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format: [Keep a Changel
 
 ## [Unreleased]
 
+### Changed (live map that stays live)
+- adsb.lol and adsb.fi now work as one pooled source that fails over **point by point**: when one network rate-limits a sweep, the remaining grid points go to the other and the points already fetched are kept, instead of restarting the sweep elsewhere. The pool sticks with whichever network answered last, and the map reports "adsb.lol + adsb.fi" as the source. Only when every network is resting does the sweep fall through to OpenSky.
+- When the feed is down, the map says why ("the open data sources are busy" or "aren't responding"), shows when it last checked, and offers a **Check now** button. It still polls every 15 seconds, so no page reload is needed.
+- Airborne aircraft move between updates: the map draws each plane where its reported speed and track would have taken it since its last position (dead reckoning, at most 75 s past the report, redrawn twice a second). The legend says these in-between positions are estimates. Off when `prefers-reduced-motion` is set or the data has expired (no update for 5 minutes).
+- The flight list's From and To filters are searchable: type a code or a city and pick with the keyboard or a tap. Only airports in the current reported routes are listed, busiest first, with their flight counts.
+
 ### Added (fare search for AI assistants)
 - MCP tool `search_flights`: Indian domestic fares, one way or round trip, with filters and sort. It returns the top 10 and a link to the website's fares page, where the traveller compares everything and books.
 - Assistants' live searches have their own daily cap (`FARES_MCP_DAILY_REQUEST_CAP`, 20) inside the site's request budget. They share the website's 10-minute cache, and filter changes are free. There is no booking-link tool and no multi-airport search, so spending stays on the website.
