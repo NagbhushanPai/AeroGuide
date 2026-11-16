@@ -62,6 +62,9 @@ The server tells connected assistants to:
 - cite the source of each fact and say when a record is unverified or outdated
 - use `check_lounge_access` for lounge questions instead of working out eligibility, and to pass on "depends" with its reasons
 - remind travellers to confirm terminals with the airline or airport
+- treat dates as India time (IST)
+- never ask for or send card numbers: cards are identified by slugs from `list_cards`
+- call `search_flights` only once the traveller wants prices and the route and date are known, never to scan dates or routes, and to pass on `search_url` and say prices can change
 
 How an assistant phrases its answer is up to that assistant. Treat answers as guidance and check with the bank or lounge before you travel.
 

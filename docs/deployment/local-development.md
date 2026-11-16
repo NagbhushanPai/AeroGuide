@@ -1,6 +1,6 @@
 # Local development guide
 
-Last updated: 2026-11-13 (Stage 1).
+Last updated: 2026-11-16.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env.local
 pnpm up                            # Postgres+PostGIS and Redis (docker compose)
 pnpm migrate                       # alembic upgrade head
-pnpm seed                          # load apps/api/data (airports, sources) into Postgres
+pnpm seed                          # load apps/api/data (airports, guides, lounges, cards) into Postgres
 ```
 
 Then, in two terminals:
@@ -36,6 +36,7 @@ pnpm dev:web    # http://localhost:3000
 
 | Make | pnpm (works everywhere) | What it does |
 |---|---|---|
+| `make install` | `pnpm install && pnpm install:api` | Web and API dependencies |
 | `make up` / `make down` | `pnpm up` / `pnpm down` | Start or stop local services |
 | `make migrate` | `pnpm migrate` | Apply migrations |
 | `make seed` | `pnpm seed` | Load the reviewed YAML content into Postgres (idempotent) |
@@ -45,8 +46,8 @@ pnpm dev:web    # http://localhost:3000
 | `make lint` | `pnpm lint` | ESLint + Ruff |
 | `make fmt` | `pnpm fmt` | Prettier + Ruff format |
 | `make typecheck` | `pnpm typecheck` | `tsc` + mypy |
-| `make test` | `pnpm test` | Unit tests (Vitest + pytest) |
-| `make test-integration` | `pnpm up && pnpm migrate && pnpm seed && pnpm test:api:integration` | API tests against real Postgres+PostGIS and Redis |
+| `make test` | `pnpm test` | Unit tests (Vitest + pytest; tests marked `integration` are skipped) |
+| `make test-integration` | `pnpm up && pnpm migrate && pnpm seed && pnpm test:api:integration` | All API tests (`pytest --integration`) against real Postgres+PostGIS and Redis |
 | `make build` | `pnpm build:web` | Production build of the web app |
 | — | `pnpm --filter web test:e2e` | Playwright smoke tests (run `pnpm build:web` first; needs `pnpm --filter web exec playwright install chromium` once) |
 
@@ -59,10 +60,15 @@ pnpm dev:web    # http://localhost:3000
 | API | `DATABASE_URL` | `postgresql+asyncpg://…`. Local default matches `docker-compose.yml` |
 | API | `REDIS_URL` | `redis://…` locally, `rediss://…` for Upstash |
 | API | `CORS_ORIGINS` | Comma-separated browser origins |
+| API | `POSITION_PROVIDERS` | Comma-separated, tried in order. Default `adsblol,adsbfi,opensky`; `demo` runs alone |
+| API | `OPENSKY_CLIENT_ID`, `OPENSKY_CLIENT_SECRET` | Optional OpenSky API client; anonymous without them |
+| API | `IGNAV_API_KEY`, `FARE_PROVIDERS` | Fare search ([ADR-0015](../decisions/0015-paid-fare-search-with-a-request-budget.md)). Empty key = fare search off; `FARE_PROVIDERS=mock` = demo fares. Caps: `FARES_*` in `.env.example` |
+| API | `MCP_*`, `SITE_URL` | MCP server settings, see the [MCP guide](../api/mcp.md) |
 | Web | `API_BASE_URL` | API URL for server-side fetches |
 | Web | `NEXT_PUBLIC_API_BASE_URL` | API URL for browser polling (not secret) |
+| Web | `NEXT_PUBLIC_SITE_URL` | Public site URL for canonical links, the sitemap and Open Graph images |
 
-Never commit `.env` files. Only `.env.example` files are tracked.
+`apps/api/app/core/config.py` lists every API setting with its default. Never commit `.env` files. Only `.env.example` files are tracked.
 
 ## Live map notes
 
@@ -76,6 +82,7 @@ Never commit `.env` files. Only `.env.example` files are tracked.
 
 - `apps/api/data/airports.yaml` and `apps/web/public/data/airports-in.geojson` are both generated from OurAirports by `python scripts/build_airport_data.py airports.csv` (see the script's docstring for the download URL). Regenerate them together.
 - `python scripts/build_osm_terminals.py` refreshes `apps/api/data/osm_terminals.yaml` from OpenStreetMap (one Overpass API request). Fix wrong terminals in OpenStreetMap itself, not in the file.
+- The MCP endpoint is served by the same dev server at `http://localhost:8000/mcp` ([MCP guide](../api/mcp.md)).
 - With the live map open, the API records airline sightings near airports every sweep and writes them every 5 minutes (`SIGHTINGS_ENABLED`, `SIGHTINGS_FLUSH_INTERVAL_S`).
 - The integration tests' migration test downgrades to an empty database. Run `pnpm seed` again afterwards if you want data in your local database.
 - The live map's airport search reads the static GeoJSON, so it works without the API. The `/airports` pages need the API and a seeded database.
