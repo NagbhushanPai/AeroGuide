@@ -1,34 +1,40 @@
 # Backend architecture
 
-Last updated: 2026-11-13. Status: proposed.
+Last updated: 2026-11-16. Status: implemented.
 
 ## Stack
 
-Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x (async, asyncpg), GeoAlchemy2, Alembic, redis-py (asyncio), httpx. Tooling: uv, ruff, mypy, pytest (+ pytest-asyncio, Hypothesis, respx).
+Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x (async, asyncpg), GeoAlchemy2, Alembic, redis-py (asyncio), httpx, the `mcp` SDK. Tooling: uv, ruff, mypy (strict), pytest (+ pytest-asyncio, Hypothesis).
 
 ## Layout (`apps/api`)
 
 ```text
 app/
-├── main.py                 # app factory: routers, middleware, lifespan (db/redis pools)
-├── api/v1/                 # thin routers: parse → call service → map to response schema
-│   ├── health.py  airports.py  lounges.py  cards.py  eligibility.py  flights.py  positions.py
-├── core/                   # settings, logging, errors, rate limiting, time utils
-├── database/               # engine, session dependency, base model, mixins (Provenance, Timestamps)
-├── models/                 # SQLAlchemy ORM models per domain
+├── main.py                 # app factory: routers, CORS, body and rate limits, lifespan (engine, Redis, live service, fare service), /mcp mount
+├── api/
+│   ├── deps.py             # AppResources (settings, engine, redis, live, fares) created once in the lifespan
+│   └── v1/                 # thin routers: parse → call service → map to response schema
+│       ├── health.py  positions.py  airports.py  fares.py
+│       └── lounges.py      # lounges, cards, access programmes, site search, eligibility
+├── core/                   # config.py (settings), logging.py (JSON logs), geo.py (great circle), india.py (regions, IST)
+├── database/               # engine/session, base model, Redis client
+├── models/                 # SQLAlchemy ORM models: sources, airports, observations, lounges (incl. cards), usage; mixins.py (Provenance, Timestamps, UuidPk)
 ├── schemas/                # Pydantic request/response models per domain (API contract)
-├── repositories/           # DB and Redis access only; no business rules
 ├── services/               # business logic; the "tool-ready" surface (ADR-0008)
-│   ├── airports.py  lounges.py  cards.py  flights.py  positions.py
-│   └── eligibility/        # engine.py (pure), rules.py (typed rule models), explain.py
+│   └── airports.py  lounges.py  positions.py  fares.py  health.py
+├── eligibility/            # engine.py (pure, deterministic) and rules.py (typed rule models), ADR-0009
+├── fares/                  # budget.py (Postgres request ledger + caps), cache.py, ranking.py, cities.py (ADR-0015)
+├── mcp_server/             # server.py (12 read-only tools), fares.py (search_flights), ratelimit.py (per-client limit, body limit), ADR-0014
 ├── providers/
-│   ├── positions/          # base.py (Protocol), demo.py, adsblol.py, opensky.py
-│   ├── flight_info/        # base.py (Protocol), adsbdb.py (routes), opensky.py (airport movements)
-│   └── registry.py         # builds providers from settings
-├── ingestion/              # on-demand snapshot refresh, single-flight lock, trail ring buffer (ADR-0012)
-├── jobs/                   # data_check.py: weekly job run by GitHub Actions (ADR-0013)
-└── seed/                   # loader + validation (content lives in /data, see ADR-0007)
-migrations/                 # Alembic
+│   ├── positions/          # base.py (Protocol), demo.py, adsblol.py (adsb.lol, adsb.fi and the ReadsbPool), opensky.py
+│   ├── flight_info/        # adsbdb.py (reported routes)
+│   ├── fares/              # base.py (Protocol), ignav.py, mock.py
+│   └── registry.py         # builds providers from settings; pools adsb.lol + adsb.fi when both are configured
+├── ingestion/              # live.py: on-demand snapshot refresh with a single-flight lock (ADR-0012); sightings.py: airline sightings per airport
+├── jobs/                   # data_check.py: weekly job (ADR-0013); ping_db.py: database keep-alive
+└── seed/                   # loader + validation (content lives in /data, see ADR-0007); `python -m app.seed [--check]`
+migrations/                 # Alembic (0001-0007)
+scripts/                    # check_ignav_coverage.py
 tests/
 ```
 
@@ -36,55 +42,67 @@ tests/
 
 | Layer | May import | May not |
 |---|---|---|
-| `api` | `services`, `schemas`, `core` | `models`, `repositories`, `providers` directly |
-| `services` | `repositories`, `providers`, `schemas`, `core` | FastAPI (`Request` etc.). Services are framework-agnostic |
-| `repositories` | `models`, `database` | `services` |
+| `api` | `services`, `schemas`, `core` | `models`, `providers` directly |
+| `services` | `models`, `database`, `providers`, `schemas`, `core` | FastAPI (`Request` etc.). Services are framework-agnostic |
 | `providers` | `schemas` (normalised DTOs), `core` | DB |
 
-These rules are enforced with `import-linter` in CI.
+There is no separate repository layer: services query the database directly. The rules are a convention, reviewed in PRs; they are not enforced by a tool.
 
-Because services are framework-agnostic, take typed Pydantic inputs and return typed Pydantic outputs, they can later be wrapped as AI tools or MCP endpoints without changes.
+Because services are framework-agnostic, take typed Pydantic inputs and return typed Pydantic outputs, the MCP server (`mcp_server/`) wraps them as tools without changes.
 
-## Provider interfaces (sketch)
+## Provider interfaces
 
 ```python
-class PositionProvider(Protocol):
-    name: str                      # "adsb.lol", "opensky", "demo"
+class PositionProvider(Protocol):                 # providers/positions/base.py
+    name: str                                     # "adsb.lol", "adsb.fi", "adsb.lol + adsb.fi", "opensky", "demo"
+    url: str
+    attribution: str
     is_demo: bool
-    async def fetch(self, area: BBox) -> PositionBatch: ...   # normalised AircraftState list + fetched_at
+    async def fetch(self) -> list[AircraftState]: ...   # India coverage area; raises on failure, never an empty list
 
-class FlightInfoProvider(Protocol):
+class RouteLookup(Protocol):                      # ingestion/live.py; implemented by providers/flight_info/adsbdb.py
+    async def route_for_callsign(self, callsign: str) -> ReportedRoute | None: ...
+
+class FlightProvider(Protocol):                   # providers/fares/base.py (ADR-0015)
     name: str
-    async def route_for_callsign(self, callsign: str) -> RouteRecord | None: ...
-    async def airport_movements(self, icao: str, day: date) -> list[ObservedMovement]: ...
-    async def schedule(self, flight_number: str, day: date) -> FlightRecord | None: ...  # None for all open sources
+    is_demo: bool
+    async def search(self, query: FareQuery) -> list[Offer]: ...
+    async def booking_links(self, reference: str) -> list[BookingLink]: ...
 ```
 
-Only open, free sources are used ([ADR-0004](../decisions/0004-flight-provider-abstraction.md)). `schedule()` is kept in the interface so a schedule source could be added later without changing services.
+Live positions and routes come only from open, free sources ([ADR-0004](../decisions/0004-flight-provider-abstraction.md)). Fare search is the one paid source, Ignav, kept inside a hard request budget ([ADR-0015](../decisions/0015-paid-fare-search-with-a-request-budget.md)). There is no schedule source: open data has none, and the API doesn't pretend otherwise.
 
-`AircraftState` fields: `icao24`, `callsign`, `registration`, `type_code`, `lat`, `lon`, `alt_baro_ft`, `on_ground`, `gs_kt`, `track_deg`, `vrate_fpm`, `squawk`, `position_time`, `source`. **Every field is nullable except `icao24`, `lat`, `lon` and `position_time`.** Nothing is filled in with a guessed default.
+`AircraftState` fields: `icao24`, `lat`, `lon`, `position_time`, `callsign`, `registration`, `type_code`, `alt_baro_ft`, `on_ground`, `gs_kt`, `track_deg`, `vrate_fpm`, `squawk`, `source`, `is_demo`. **Every optional field is `None` when the source didn't report it**; only `icao24`, `lat`, `lon`, `position_time` and `source` are required (`on_ground` and `is_demo` default to `false`). Nothing is filled in with a guessed default.
 
-## API surface (v1, draft)
+## API surface (v1)
 
 | Method | Path | Purpose |
 |---|---|---|
-| GET | `/api/v1/health`, `/api/v1/health/data` | Liveness and data freshness |
+| GET | `/api/v1/health` | Liveness, database/PostGIS/Redis checks and the live pipeline's state (snapshot age, source, last error, per-provider rest) |
 | GET | `/api/v1/positions?bbox=` | Latest positions as GeoJSON + `meta` |
-| GET | `/api/v1/positions/{icao24}` | Single aircraft latest state + reported route (+ 15-min trail, P1) |
-| GET | `/api/v1/flights/search?q=` | Search by flight number, callsign or registration |
-| GET | `/api/v1/flights/{flight_number}` | Flight page data: live state, reported route, recent observed flights |
-| GET | `/api/v1/airports/{iata}/movements` | Flights observed at the airport yesterday (OpenSky) |
-| GET | `/api/v1/airports?q=&region=&city=` | Airport search |
-| GET | `/api/v1/airports/{iata}` | Airport detail (terminals, airlines, facilities, transport, sources) |
-| GET | `/api/v1/airports/{iata}/terminals` | Terminal information |
-| GET | `/api/v1/lounges?airport=&terminal=&scope=&amenity=` | Lounge search |
+| GET | `/api/v1/positions/{icao24}` | Single aircraft latest state + reported route + progress |
+| GET | `/api/v1/airports?q=&region=&guides_only=` | Airport search |
+| GET | `/api/v1/airports/{code}` | Airport detail (terminals, airline assignments, mapped terminals, sources) |
+| GET | `/api/v1/airports/{code}/airlines-seen` | Airlines seen at the airport in the live snapshot (ADS-B sightings) |
+| GET | `/api/v1/lounges?airport=&program=` | Lounge list |
 | GET | `/api/v1/lounges/{slug}` | Lounge detail |
-| GET | `/api/v1/cards?q=&bank=&network=&benefit=` | Card search |
-| GET | `/api/v1/cards/{slug}` | Card detail + current policy + history |
+| GET | `/api/v1/access-programs` | Lounge programmes |
+| GET | `/api/v1/cards?bank=` | Card list |
+| GET | `/api/v1/cards/{slug}` | Card detail + every policy version |
+| GET | `/api/v1/cards/{slug}/lounges` | Lounges accepting a programme the card names |
+| GET | `/api/v1/search?q=` | Site search across airports, lounges and cards |
 | POST | `/api/v1/eligibility` | Evaluate lounge eligibility (deterministic) |
+| POST | `/api/v1/fares/search` | Fare search (Ignav, budgeted) |
+| POST | `/api/v1/fares/booking-links` | Sellers for one offer |
+| GET | `/api/v1/fares/budget` | Request budget used so far |
+| — | `/mcp` | MCP server for AI assistants (Streamable HTTP), 12 read-only tools |
 
-Full details are in [docs/api/api-overview.md](../api/api-overview.md).
+OpenAPI is served at `/api/v1/openapi.json` (Swagger UI at `/api/v1/docs`). Full details are in [docs/api/api-overview.md](../api/api-overview.md) and [docs/api/mcp.md](../api/mcp.md).
+
+## Limits
+
+All in process memory, per client address (the last `X-Forwarded-For` entry behind Render's proxy): 120 requests a minute on the REST API, 10 a minute on `/api/v1/fares/*`, 60 a minute on `/mcp`; health checks aren't counted. Request bodies over 16 KB are refused (`413`).
 
 ## Errors
 
-Errors use RFC 9457 problem-details JSON (`type`, `title`, `status`, `detail`, `instance`). Upstream source failures map to `503` with `retry_after`. They are never turned into empty "success" responses that look like "no flights".
+Errors are FastAPI's JSON `{ "detail": ... }` with the right status: `404` when a record or aircraft isn't known, `422` for bad input, `503` when the database or a fare source is unavailable. The rate-limit middleware answers before FastAPI, so a `429` is `{ "error": "…" }` with `Retry-After`. Upstream source failures are never turned into empty "success" responses that look like "no flights": the positions response says `unavailable` and why in `meta`.

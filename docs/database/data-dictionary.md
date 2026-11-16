@@ -1,6 +1,6 @@
 # Data dictionary
 
-Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious field, plus the rules that keep it honest. Columns with obvious meanings (`name`, `created_at`) are left out.
+Last updated: 2026-11-16. Status: implemented. The meaning of each non-obvious field, plus the rules that keep it honest. Columns with obvious meanings (`name`, `created_at`) are left out.
 
 ## Shared
 
@@ -9,7 +9,8 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 | `verification_status` | `verified`: checked against a primary source on `verified_at`. `unverified`: entered from a secondary lead or not yet checked. `unavailable`: we looked and no reliable source exists. The API adds a computed `outdated` when the re-verify window has passed |
 | `reverify_after_days` | How long a verification is trusted before the record shows as outdated |
 | `valid_from` / `valid_to` | Period during which a versioned fact is in force (inclusive start, exclusive end). `valid_to = null` means current |
-| `source` (on flight rows) | Name of the provider adapter that produced the row, for example `adsb.lol` or `demo` |
+| `source` (on `airport_sightings` and live position rows) | Name of the provider adapter that produced the row, for example `adsb.lol`, `adsb.fi`, `opensky` or `demo` |
+| `sources.source_type` | `official_airport`, `aai`, `airline`, `bank`, `lounge_operator`, `network_program`, `licensed_provider` (primary sources) or `secondary`. A `verified` record needs a primary source |
 
 ## Airports
 
@@ -26,8 +27,6 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 | `terminals.role` | Main use of the terminal *as published by the operator* |
 | `terminal_airlines.operation` | Whether the airline uses this terminal for domestic flights, international flights or both |
 | `terminal_airlines.scope_note` | Free text for partial assignments, for example "flights 6E 2000–2999 only". **Copied from the source wording, not inferred** |
-| `airport_outlets.zone` | `airside` (after security), `landside` (before security), `arrivals` |
-| `airport_facilities.category` | For example `wifi`, `medical`, `prayer_room`, `accessibility`, `baggage_wrap`, `forex`, `pharmacy` |
 
 ## Open data about airports
 
@@ -35,24 +34,26 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 |---|---|
 | `osm_terminals` | A terminal building mapped in OpenStreetMap (`aeroway=terminal` inside the aerodrome). Named passenger terminals only; cargo, freight, general-aviation and VIP buildings are left out by name. Always `unverified` |
 | `osm_terminals.osm_ref` | The OSM element, for example `way/51419058`, linked as `https://www.openstreetmap.org/way/51419058` |
-| `airport_sightings` | One aircraft of one airline seen at one airport on one IST day: on the ground, or below 3,000 ft within 6 km of the reference point, in the live ADS-B snapshot. An observation while the live service ran; never a schedule or terminal claim |
+| `airport_sightings` | One aircraft of one airline seen at one airport on one IST day: on the ground, or within 3,000 ft of the airport's elevation and 6 km of the reference point, in the live ADS-B snapshot. An observation while the live service ran; never a schedule or terminal claim. Rows older than 45 days are deleted |
 | `airport_sightings.airline_icao` | The callsign's three-letter prefix when it's followed by a digit (`IGO6123` → `IGO`). Registrations and other callsigns are ignored |
 | `airport_sightings.airline_name` | From the community route lookup when one was made for that callsign. Often `null` |
 
-## Flights
+## Live positions (API memory, not a table)
 
-| Table.field | Meaning |
+`AircraftState` in `app/schemas/positions.py`, served by `GET /api/v1/positions`. There is no position table ([ADR-0012](../decisions/0012-zero-budget-hosting.md)).
+
+| Field | Meaning |
 |---|---|
-| `flights.flight_number` | Marketed IATA designator, for example `AI101` |
-| `flights.callsign` | ATC callsign as broadcast, for example `AIC101`. Can differ from the flight number |
-| `flights.service_date` | Scheduled local departure date |
-| `flights.status` | Observed state only: `airborne`, `on_ground`, `not_tracked`, `unknown`. Airline statuses (delayed, cancelled, diverted) are **not available** from open sources and are never inferred |
-| `flights.first_seen` / `last_seen` | First and last ADS-B observation for the movement (OpenSky). **Not** scheduled or actual block times |
-| `flights.sched_*`, `est_*` | Always `null` while only open sources are used |
-| `flight_positions.alt_baro_ft` | Barometric altitude, in feet. `null` if not reported. `on_ground = true` overrides it |
-| `flight_positions.gs_kt` | Ground speed, in knots |
-| `flight_positions.track_deg` | Track over ground, in degrees true |
-| `flight_positions.vrate_fpm` | Vertical rate, in feet per minute |
+| `icao24` | ICAO 24-bit address, lowercase hex. The aircraft's identity across sweeps |
+| `callsign` | ATC callsign as broadcast, for example `AIC101`. Can differ from the marketed flight number, which comes only from the community route lookup |
+| `alt_baro_ft` | Barometric altitude, in feet. `null` if not reported. `on_ground = true` overrides it |
+| `gs_kt` | Ground speed, in knots |
+| `track_deg` | Track over ground, in degrees true |
+| `vrate_fpm` | Vertical rate, in feet per minute |
+| `position_time` | When the source last heard the position. Age drives "Live", "Delayed" and removal |
+| `is_demo` | From the demo provider, never a real aircraft |
+
+Airline statuses (delayed, cancelled, diverted) and schedules are **not available** from open sources and are never inferred.
 
 ## Lounges
 
@@ -60,6 +61,7 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 |---|---|
 | `lounges.scope` | Which passengers can use the lounge (domestic departures, international departures or both) |
 | `lounges.side` | `airside` or `landside` |
+| `lounges.direction` | `departures` (default), `arrivals` (meet-and-greet or arrivals lounges) or `transit` (connecting passengers only). The checker offers only departures lounges to a departing passenger |
 | `lounges.location_text` | Location wording quoted from the source |
 | `lounges.nearest_gate` | Only filled when the source states it |
 | `lounges.opening_hours` | JSON `{ "mode": "24h" }` or `{ "mode": "weekly", "periods": [{ "days": [...], "open": "HH:MM", "close": "HH:MM" }] }`, or `null` = not verified |
@@ -72,10 +74,10 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 | Table.field | Meaning |
 |---|---|
 | `credit_cards.product_url` | Issuer's official product page |
-| `card_variants.name` | A sub-product with different benefits, for example a metal edition or a network variant |
+| `credit_cards.network_code` | `visa`, `mastercard`, `rupay`, `amex` or `diners`; `null` when the bank's own pages don't state it. Never guessed |
 | `lounge_policies.scope` | Domestic or international benefit (separate versions) |
 | `lounge_policies.summary` | Short human summary, written from the source and shown in the UI |
-| `policy_rules.rule_type` | `visit_quota`, `spend_gate`, `guest_allowance`, `program_entitlement`, `airport_restriction`, `entry_method` |
+| `policy_rules.rule_type` | `visit_quota`, `spend_gate`, `guest_allowance`, `program_entitlement`, `airport_restriction`, `entry_method`, plus the informational `fee` and `add_on_cardholders` (since migration 0006), which are shown as notes and never change the answer |
 | `policy_rules.rule` | Typed JSON for the rule. Example `visit_quota`: `{ "count": 2, "period": "quarter" }`. Example `spend_gate`: `{ "amount": 50000, "currency": "INR", "window": "previous_calendar_quarter", "ambiguous": false }`. The amounts here are illustrative only, not real card data |
 | `policy_rules.access_program_id` | For `program_entitlement`: which programme the card unlocks |
 | `policy_rules.rule.ambiguous` | The bank's wording can be read more than one way. The rule can never produce a plain "yes" |
@@ -83,3 +85,11 @@ Last updated: 2026-11-13. Status: proposed. The meaning of each non-obvious fiel
 | `lounge_policies.unmodelled_terms` | Bank wording no rule type captures, quoted. Makes every answer for that version "depends" |
 | `lounges.terminal` | Terminal as the source names it (free text; curated terminals may not exist yet) |
 | `credit_cards` (variants) | A variant with different benefits (for example a metal edition) is its own card |
+
+## Usage
+
+| Table.field | Meaning |
+|---|---|
+| `provider_usage.provider` | The paid provider's name, for example `ignav` |
+| `provider_usage.day` | IST day. The daily and MCP caps reset at midnight IST; the lifetime cap sums every row |
+| `provider_usage.requests` | Upstream requests sent that day. Incremented before each request in one locked transaction, so the cap holds across restarts |
